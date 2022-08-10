@@ -39,7 +39,7 @@ function SpecifyPronoteCredentials ({ state }: SpecifyPronoteCredentialsProps) {
     const initialButtonText = buttonCurrentText;
 
     // Remove trailling slash and append account path.
-    const pronoteUrl = state.pronoteUrl.replace(/\/$/, "") + "/" + selectedAccountType.path;
+    const pronoteUrl = state.schoolInformations.pronoteUrl.replace(/\/$/, "") + "/" + selectedAccountType.path;
     console.log("Pronote URL:", pronoteUrl);
 
     setButtonCurrentText("Connexion à Pronote...");

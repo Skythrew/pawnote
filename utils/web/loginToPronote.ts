@@ -198,6 +198,8 @@ export default async function loginToPronote ({
       key: challengeAesKeyBuffer
     });
 
+    console.log(decryptedBytes, challengeData.challenge);
+
     const decrypted = forge.util.decodeUtf8(decryptedBytes);
     const unscrambled = new Array(decrypted.length);
     for (let i = 0; i < decrypted.length; i += 1) {

@@ -63,6 +63,7 @@ export async function getCommonInformationsFrom (
       data: {
         name: fixSchoolName(schoolName),
         availableAccountTypes: types,
+        pronoteUrl: data.pronoteUrl,
         entUrl: data.pronoteEntUrl
       }
     };

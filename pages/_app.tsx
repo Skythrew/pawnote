@@ -72,7 +72,7 @@ export default function PronoteApp({
           <Component {...pageProps} />
         ) : (
           <div className="h-screen w-screen bg-brand-primary dark:bg-brand-dark text-brand-white">
-            <h2>Chargement.. </h2>
+            <h2>Chargement...</h2>
           </div>
         )}
       </ThemeProvider>

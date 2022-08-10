@@ -91,6 +91,8 @@ Every responses are typed in [`./types/ApiData.ts`](./types/ApiData.ts), and Pro
 Route that sends a call to `FonctionParametres` without any data, with common account (`0`).
 It is used to get informations about a school and its different account types available.
 
+When the request is successful, it will give us the base URL of the Pronote instance and also check if it has ENT authentication setup. If so, it gives us the URL of the ENT authentication.
+
 #### Request Body
 
 ```typescript

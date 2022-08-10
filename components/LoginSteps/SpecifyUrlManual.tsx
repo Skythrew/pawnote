@@ -26,24 +26,26 @@ type SpecifyUrlManualProps = {
 
 function SpecifyUrlManual ({ state, setState }: SpecifyUrlManualProps) {
   const [pronoteUrl, setPronoteUrl] = useState("");
+  const defaultButtonMessage = "Utiliser ce serveur";
+  const [buttonMessage, setButtonMessage] = useState(defaultButtonMessage);
 
   /**
    * Parse the informations from the selected school.
    * Move to next step if the informations are valid.
    */
   const handlePronoteConnect = async (e: FormEvent<HTMLFormElement>) => {
-    // Prevent a submit refresh.
     e.preventDefault();
 
     if (pronoteUrl) {
+      setButtonMessage("Récupération des informations...");
       const informationsData = await getCommonInformationsFrom(pronoteUrl);
 
+      setButtonMessage(defaultButtonMessage);
       if (informationsData.success) {
         const schoolInformations = informationsData.data;
 
         setState({
           ...state,
-          pronoteUrl,
           schoolInformations
         });
       }
@@ -67,31 +69,37 @@ function SpecifyUrlManual ({ state, setState }: SpecifyUrlManualProps) {
   return (
     <div className="
       flex flex-col justify-center items-center
-      min-w-lg rounded-md p-8 gap-4
-      bg-green-200 bg-opacity-60
+      min-w-lg rounded-xl p-8 gap-4
+      bg-brand-primary
+      dark:bg-brand-primary dark:bg-opacity-20
+      dark:border-2 dark:border-brand-primary
     ">
-      <div className="flex flex-col text-center">
-        <h2 className="text-lg font-medium">Manuel</h2>
-        <p>Saisissez l&apos;URL Pronote de votre établissement.</p>
-
-        <form onSubmit={handlePronoteConnect}>
-          <InputText
-            id="manualPronoteUrl"
-            label="URL Pronote"
-            placeholder="https://xxxxxx.index-education.net/pronote/"
-            value={pronoteUrl}
-            onChange={e => setPronoteUrl(e.target.value)}
-          />
-
-          <Button
-            isButton={true}
-            buttonType="submit"
-          >
-            Connexion au serveur
-          </Button>
-        </form>
+      <div className="flex flex-col text-center text-brand-light">
+        <h2 className="text-xl font-medium">Manuel</h2>
+        <p className="opacity-80 dark:opacity-60">Saisissez l&apos;URL Pronote de votre établissement</p>
       </div>
 
+      <form
+        className="flex flex-col justify-center items-center gap-4"
+        onSubmit={handlePronoteConnect}
+      >
+        <InputText
+          labelColor="text-brand-light"
+          inputClass="text-brand-light placeholder:text-opacity-20 placeholder:text-brand-light"
+          id="manualPronoteUrl"
+          label="URL Pronote"
+          placeholder="https://.../pronote/"
+          value={pronoteUrl}
+          onChange={e => setPronoteUrl(e.target.value)}
+        />
+
+        <Button
+          isButton={true}
+          buttonType="submit"
+        >
+          {buttonMessage}
+        </Button>
+      </form>
     </div>
   );
 }

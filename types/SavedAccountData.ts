@@ -17,6 +17,7 @@ export type EntData = {
 export type SchoolInformations = {
   name: string;
   entUrl?: string;
+  pronoteUrl: string;
   availableAccountTypes: AccountType[];
 }
 

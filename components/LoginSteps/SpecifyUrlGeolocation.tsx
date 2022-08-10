@@ -40,6 +40,9 @@ function SpecifyUrlGeolocation ({ state, setState }: SpecifyUrlGeolocationProps)
   const [geolocationResults, setGeolocationResults] = useState<PronoteApiGeolocationParsedItem[]>([]);
   const [selectedSchool, setSelectedSchool] = useState<PronoteApiGeolocationParsedItem | null>(null);
 
+  const defaultButtonMessage = "Choisir cette établissement";
+  const [buttonMessage, setButtonMessage] = useState(defaultButtonMessage);
+
   /**
    * Returns the school distance in kilometers
    * with the school's latitude and longitude.
@@ -120,14 +123,15 @@ function SpecifyUrlGeolocation ({ state, setState }: SpecifyUrlGeolocationProps)
    */
   const handlePronoteConnect = async () => {
     if (selectedSchool) {
+      setButtonMessage("Récupération des informations...");
       const informationsData = await getCommonInformationsFrom(selectedSchool.url);
 
+      setButtonMessage(defaultButtonMessage);
       if (informationsData.success) {
         const schoolInformations = informationsData.data;
 
         setState({
           ...state,
-          pronoteUrl: selectedSchool.url,
           schoolInformations
         });
       }
@@ -176,7 +180,7 @@ function SpecifyUrlGeolocation ({ state, setState }: SpecifyUrlGeolocationProps)
         </SelectInput>
       ): (
         <Fragment>
-          <p className="font-medium">Chargement...</p>
+          <p className="font-medium">Récupération des établissements...</p>
           <span>N&apos;oubliez pas d&apos;accepter la géolocalisation de votre appareil.</span>
         </Fragment>
       )}
@@ -184,7 +188,7 @@ function SpecifyUrlGeolocation ({ state, setState }: SpecifyUrlGeolocationProps)
       <Button
         onClick={handlePronoteConnect}
       >
-        Valider votre choix d&apos;établissement
+        {buttonMessage}
       </Button>
     </div>
   );

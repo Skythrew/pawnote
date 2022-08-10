@@ -15,9 +15,6 @@ export type StateTypes = {
   | "selectLoginSelection" // Step 3 - Login to Pronote with credentials or ENT.
   | "specifyPronoteCredentials" | "specifyEntCredentials"; // Step 4 - Pronote or ENT credentials.
 
-  // Get from step 1.
-  pronoteUrl: string;
-
   // On submit from step 1.
   schoolInformations: SchoolInformations;
 }
@@ -39,10 +36,10 @@ import SpecifyPronoteCredentials from "components/LoginSteps/SpecifyPronoteCrede
 export default function Home () {
   const [state, setState] = useState<StateTypes>({
     step: "selectSchoolSelection",
-    pronoteUrl: "",
 
     schoolInformations: {
       name: "",
+      pronoteUrl: "",
       entUrl: undefined,
       availableAccountTypes: []
     }

@@ -21,6 +21,7 @@ export interface ApiCommonInformationsResponse {
   success: true;
 
   request: RequestSuccess<PronoteApiFonctionParametresCommon>;
+  pronoteUrl: string;
   pronoteEntUrl?: string;
 }
 
