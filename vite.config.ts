@@ -70,7 +70,7 @@ export default defineConfig ({
             purpose: "maskable"
           }
         ],
-        
+
         start_url: "/",
         theme_color: "#17AA67",
         background_color: "#17AA67",
@@ -83,9 +83,10 @@ export default defineConfig ({
   ],
 
   define: {
+    APP_URL: JSON.stringify(pkg.homepage),
     APP_NAME: JSON.stringify("Pornote"),
     APP_VERSION: JSON.stringify(pkg.version),
-    APP_DESCRIPTION: JSON.stringify(pkg.description)
+    APP_DESCRIPTION: JSON.stringify(pkg.description),
   },
 
   resolve: {
