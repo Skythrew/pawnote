@@ -1,4 +1,4 @@
-# [Pornote (formerly `pronote-evolution`)](https://pornote.vexcited.ml)
+# [Pornote (formerly `pronote-evolution`)](https://pornote.vercel.app)
 
 > Project still in development.
 
@@ -10,7 +10,7 @@ local saves to access even offline - *this works* - and notifications - *current
 
 - [x] Multi-accounts (using **slugs**)
 - [x] Local save of informations fetched (with **localForage**)
-- [ ] Updating informations after timeout using [`swr`](https://github.com/Vercel/swr)
+- [ ] Updating informations after timeout.
 
 ## ENT Available
 
