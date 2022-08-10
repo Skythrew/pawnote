@@ -1,20 +1,20 @@
 # Dependencies
-/node_modules
-/.pnp
+node_modules
 .pnp.js
-
-# Next.js
-/.next/
-/out/
+.pnp
 
 # Production
-/build
+.solid
+build
+dist
 
-# Build PWA
+# PWA
 /public/service-worker.js
 /public/workbox-*.js
 
-# Miscs
+# Miscallaneous
+.eslintrc-auto-import.json
+auto-imports.d.ts
 .DS_Store
 *.pem
 
