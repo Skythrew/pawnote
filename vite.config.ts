@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import pkg from "./package.json";
 import path from "path";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import vercel from "solid-start-vercel";
 import solid from "solid-start/vite";
@@ -12,7 +13,7 @@ import auto from "unplugin-auto-import/vite";
 export default defineConfig ({
   plugins: [
     solid ({
-      ssr: false,
+      ssr: true, // `false` when SPA mode for Vercel will be supported.
       adapter: vercel()
     }),
 
@@ -41,7 +42,7 @@ export default defineConfig ({
         name: "Pornote",
         short_name: "Pornote",
         description: pkg.description,
-        
+
         categories: [
           "productivity"
         ],
@@ -86,7 +87,11 @@ export default defineConfig ({
     APP_URL: JSON.stringify(pkg.homepage),
     APP_NAME: JSON.stringify("Pornote"),
     APP_VERSION: JSON.stringify(pkg.version),
-    APP_DESCRIPTION: JSON.stringify(pkg.description),
+    APP_DESCRIPTION: JSON.stringify(pkg.description)
+  },
+
+  build: {
+    target: "esnext"
   },
 
   resolve: {
