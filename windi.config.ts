@@ -15,9 +15,9 @@ export default defineConfig ({
         }
       }
     },
-    
+
     fontFamily: {
       sans: ["Poppins", "sans-serif"]
     }
-  },
+  }
 });

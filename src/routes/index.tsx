@@ -25,7 +25,7 @@ export default () => {
               fallback={
                 <div class="
                   flex flex-col justify-center items-center gap-4 max-w-md p-6 rounded-lg
-  
+
                   dark:bg-brand-primary dark:bg-opacity-20 dark:border-2 dark:border-brand-primary
                   bg-brand-dark bg-opacity-20 border-2 border-brand-dark
                 ">
@@ -35,27 +35,27 @@ export default () => {
                   <Link href="/login">
                     Ajouter un compte Pronote
                   </Link>
-                  </div>
+                </div>
               }
             >
               <For each={accounts}>
                 {account => (
                   <Link href={`/app/${account.slug}/dashboard`}>
-                  <div
-                    class="
+                    <div
+                      class="
                       bg-brand-white rounded-xl text-brand-primary
                       p-4 cursor-pointer hover:bg-opacity-80 transition-colors
                       hover:shadow-sm
                     "
-                  >
-                    <h2 class="font-semibold">
-                      {account.data.userInformations.ressource.L} ({account.data.userInformations.ressource.classeDEleve.L})
-                    </h2>
-                    <p class="text-opacity-60">
-                      {account.data.schoolInformations.General.NomEtablissement}
-                    </p>
-                  </div>
-                </Link>
+                    >
+                      <h2 class="font-semibold">
+                        {account.data.userInformations.ressource.L} ({account.data.userInformations.ressource.classeDEleve.L})
+                      </h2>
+                      <p class="text-opacity-60">
+                        {account.data.schoolInformations.General.NomEtablissement}
+                      </p>
+                    </div>
+                  </Link>
                 )}
               </For>
             </Show>
@@ -74,5 +74,5 @@ export default () => {
         </a>
       </footer>
     </div>
-  )
-}
+  );
+};
