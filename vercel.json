@@ -3,7 +3,7 @@
   "public": false,
 
   "github": {
-    "enabled": false,
+    "enabled": true,
     "silent": true
   },
 
