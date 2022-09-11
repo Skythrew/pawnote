@@ -1,4 +1,6 @@
-export default () => {
+import type { Component } from "solid-js";
+
+const RootHomePage: Component = () => {
   const accounts = [] as any[] | null; // TODO
 
   return (
@@ -13,7 +15,7 @@ export default () => {
       </header>
 
       <section class="h-full w-full flex items-center justify-center py-32 px-4">
-        <Show
+        <Show keyed
           when={accounts !== null && accounts}
           fallback={
             <p>Chargement des comptes...</p>
@@ -76,3 +78,6 @@ export default () => {
     </div>
   );
 };
+
+export default RootHomePage;
+
