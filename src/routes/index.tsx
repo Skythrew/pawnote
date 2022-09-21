@@ -1,4 +1,6 @@
-export default () => {
+import type { Component } from "solid-js";
+
+const RootHomePage: Component = () => {
   const accounts = [] as any[] | null; // TODO
 
   return (
@@ -76,3 +78,6 @@ export default () => {
     </div>
   );
 };
+
+export default RootHomePage;
+
