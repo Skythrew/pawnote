@@ -13,7 +13,7 @@ export default () => {
       </header>
 
       <section class="h-full w-full flex items-center justify-center py-32 px-4">
-        <Show
+        <Show keyed
           when={accounts !== null && accounts}
           fallback={
             <p>Chargement des comptes...</p>
@@ -32,7 +32,7 @@ export default () => {
                   <p class="text-sm sm:text-base opacity-100 text-center">
                     Aucun compte sauvegardé localement !
                   </p>
-                  <Link href="/login">
+                  <Link href="/link">
                     Ajouter un compte Pronote
                   </Link>
                 </div>
