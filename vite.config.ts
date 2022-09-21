@@ -13,7 +13,7 @@ import auto from "unplugin-auto-import/vite";
 export default defineConfig ({
   plugins: [
     solid ({
-      ssr: true, // `false` when SPA mode for Vercel will be supported.
+      ssr: false,
       adapter: vercel()
     }),
 
