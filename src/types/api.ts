@@ -1,4 +1,4 @@
-/** Helper typing for error responsessl. */
+/** Helper typing for error responses. */
 export interface ResponseError {
   success: false;
   message: string;
@@ -14,8 +14,17 @@ export interface ResponseSuccess<T> {
 /** Helper type. */
 export type Response<T> = ResponseSuccess<T> | ResponseError;
 
-export type ResponseDataGeolocation = {
-  name: string;
-  latitude: number;
-  longitude: number;
+export interface ApiGeolocation {
+  request: {
+    latitude: number;
+    longitude: number;
+  }
+
+  response: {
+    url: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+    postal_code: number;
+  }[]
 }

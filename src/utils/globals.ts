@@ -1,11 +1,16 @@
 /**
- * Uses the Geolocation API to get user's location
- * with longitude and latitude.
+ * Helper function to get user's position
+ * using Geolocation API in a Promise.
  *
- * Used with the `/api/geolocation` endpoint.
+ * @example
+ * // Assuming the browser supports Geolocation API.
+ * const { coords } = await getGeolocationPosition();
+ * console.log(coords.latitude, coords.longitude);
  */
-export const getCurrentPosition = async (options?: PositionOptions): Promise<GeolocationPosition> => {
+export const getGeolocationPosition = (options?: PositionOptions): Promise<GeolocationPosition> => {
   return new Promise((resolve, reject) =>
     navigator.geolocation.getCurrentPosition(resolve, reject, options)
   );
 };
+
+export const objectHasProperty = <T extends Record<string, unknown>>(obj: T, prop: keyof T) => prop in obj;
