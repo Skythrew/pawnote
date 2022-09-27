@@ -22,7 +22,8 @@
 
     "types": [
       "vite/client",
-      "vite-plugin-pwa/client"
+      "vite-plugin-pwa/client",
+      "unplugin-icons/types/solid"
     ]
   },
   "include": ["src"]

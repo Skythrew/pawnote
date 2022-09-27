@@ -9,6 +9,7 @@ import solid from "solid-start/vite";
 import windi from "vite-plugin-windicss";
 import { VitePWA as pwa } from "vite-plugin-pwa";
 import auto from "unplugin-auto-import/vite";
+import icons from "unplugin-icons/vite";
 
 export default defineConfig ({
   plugins: [
@@ -80,7 +81,8 @@ export default defineConfig ({
       }
     }),
 
-    windi()
+    windi(),
+    icons({ compiler: "solid" })
   ],
 
   define: {
