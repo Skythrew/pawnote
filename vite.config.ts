@@ -4,12 +4,15 @@ import path from "path";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import vercel from "solid-start-vercel";
 import solid from "solid-start/vite";
+import vercel from "solid-start-vercel";
+
 import windi from "vite-plugin-windicss";
 import { VitePWA as pwa } from "vite-plugin-pwa";
-import auto from "unplugin-auto-import/vite";
 import icons from "unplugin-icons/vite";
+
+import auto from "unplugin-auto-import/vite";
+import icons_resolver from "unplugin-icons/resolver";
 
 export default defineConfig ({
   plugins: [
@@ -20,6 +23,13 @@ export default defineConfig ({
 
     auto ({
       dts: "./src/auto-imports.d.ts",
+
+      resolvers: [
+        icons_resolver({
+          prefix: "Icon",
+          extension: "jsx"
+        })
+      ],
 
       imports: [
         "solid-js",
