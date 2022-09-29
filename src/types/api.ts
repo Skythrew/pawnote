@@ -28,3 +28,13 @@ export interface ApiGeolocation {
     postal_code: number;
   }[]
 }
+
+export interface ApiInstance {
+  request: {
+    pronote_url: string;
+  }
+
+  response: {
+    TODO: string;
+  }
+}
