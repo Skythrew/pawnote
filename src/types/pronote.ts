@@ -10,6 +10,30 @@ export enum PronoteApiAccountId {
   Academie = 5
 }
 
+export interface PronoteApiSession {
+  /** Session ID as a **string**. */
+  h: string;
+  /** Account Type ID. */
+  a: PronoteApiAccountId;
+  d: boolean;
+
+  /** ENT Username. */
+  e?: string;
+  /** ENT Password. */
+  f?: string;
+  g?: number;
+
+  /** Modulus for RSA encryption. */
+  MR: string;
+  /** Exponent for RSA encryption. */
+  ER: string;
+
+  /** Skip request encryption. */
+  sCrA: boolean;
+  /** Skip request compression. */
+  sCoA: boolean;
+}
+
 export interface PronoteApiGeolocation {
   request: {
     nomFonction: "geoLoc";
@@ -18,11 +42,11 @@ export interface PronoteApiGeolocation {
   }
 
   response: {
-    url: string; // "https://0190027B.index-education.net/pronote",
-    nomEtab: string; // "LYCEE PROF. MARCEL BARBANCEYS",
-    lat: string; //"45.380878662",
-    long: string; // "2.274143683",
-    cp: string; //"19160"
+    url: string;
+    nomEtab: string;
+    lat: string;
+    long: string;
+    cp: string;
   }[] | Record<string, unknown> // `{}` when no results.
 }
 
