@@ -28,7 +28,7 @@ export const handleServerRequest = <T>(callback: (
       }, options),
       success: (
         data,
-        options
+        options = { status: 500 }
       ) => json({ success: true, data }, options)
     })
   );
