@@ -1,6 +1,7 @@
 import type { PronoteApiGeolocation } from "@/types/pronote";
 import type { ApiGeolocation } from "@/types/api";
 
+import { GEOLOCATION_API_URL, HEADERS_PRONOTE } from "@/utils/constants";
 import { handleServerRequest } from "@/utils/server";
 import { objectHasProperty } from "@/utils/globals";
 import { decode } from "html-entities";
@@ -22,10 +23,10 @@ export const post = handleServerRequest<ApiGeolocation["response"]>(async (req, 
       long: body.longitude.toString()
     };
 
-    // Fetch URL extracted from the Pronote APK.
-    const response = await fetch("https://www.index-education.com/swie/geoloc.php", {
+    const response = await fetch(GEOLOCATION_API_URL, {
       method: "POST",
       headers: {
+        ...HEADERS_PRONOTE,
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       },
       body: `data=${JSON.stringify(request_body)}`
