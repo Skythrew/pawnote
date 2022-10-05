@@ -1,15 +1,14 @@
-/**
- * This is where the typing of EVERY Pronote
- * functions are located.
- *
- * Whatever API call you can do to Pronote will
- * be typed here. Of course, these typings are
- * based on the data I actually got from these
- * endpoints and requests saw in the DevTools.
- *
- * Feel free to contribute on this to add new
- * specific typings for some endpoints.
- */
+export enum PronoteApiAccountId {
+  Commun = 0,
+  Eleve = 3,
+  Parent = 2,
+  Professeur = 1,
+  Accompagnant = 25,
+  Entreprise = 4,
+  VieScolaire = 13,
+  Direction = 16,
+  Academie = 5
+}
 
 export interface PronoteApiGeolocation {
   request: {
@@ -25,4 +24,27 @@ export interface PronoteApiGeolocation {
     long: string; // "2.274143683",
     cp: string; //"19160"
   }[] | Record<string, unknown> // `{}` when no results.
+}
+
+/**
+ * Helper type to build body requests types
+ * more easily and quickly.
+ * `Name` is the `nom` property and `Data` is
+ * the typings of what we send to the server.
+ */
+interface PronoteApiRequestBase<Name extends string, Data> {
+  session: number;
+  numeroOrdre: string;
+  nom: Name;
+  /** Data can be a string when encrypted/compresssed. */
+  donneesSec: Data | string;
+}
+
+export interface PronoteApiInstance {
+  request: PronoteApiRequestBase<
+    "FonctionParametres",
+    {
+      TODO: true
+    }
+  >
 }
