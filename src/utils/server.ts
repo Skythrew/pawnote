@@ -76,7 +76,7 @@ export const createPronoteApiCall = async (options: {
  * - When a login cookie is provided, the request will provide another
  * cookie that will be used on next login.
  */
-export const downloadPronotePage = async (url: string, cookie: string): Promise<{
+export const downloadPronotePage = async (url: string, cookie?: string): Promise<{
   /** Data **as text** from the given URL. */
   body: string;
 
@@ -93,7 +93,7 @@ export const downloadPronotePage = async (url: string, cookie: string): Promise<
         ...HEADERS_PRONOTE,
 
         // Append cookies to the request.
-        "Cookie": cookie
+        "Cookie": cookie ?? ""
       }
     });
 
