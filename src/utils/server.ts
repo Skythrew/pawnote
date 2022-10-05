@@ -111,9 +111,7 @@ export const downloadPronotePage = async (url: string, cookie: string): Promise<
 };
 
 /**
- * Used in /api/informations.ts to check if an ENT is available.
- * If an ENT is available, it returns the ENT URL.
- *
+ * Check if an ENT is available on a given Pronote URL.
  * @param url - Pronote URL to check.
  */
 export const checkAvailableENT = async (url: string): Promise<(
