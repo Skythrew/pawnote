@@ -72,7 +72,7 @@ class Session {
     return { aes_iv, aes_key };
   }
 
-  buildPronoteFunctionPayload <Req>(data: Req) {
+  writePronoteFunctionPayload <Req>(data: Req) {
     this.instance.order++;
 
     let final_data: Req | string = data;
@@ -123,7 +123,7 @@ class Session {
    * Returns an object when the request was successful
    * and `string` if an error has been found.
    */
-  decodePronoteFunctionResponse <Res>(response_body: string): Res | string {
+  readPronoteFunctionPayload <Res>(response_body: string): Res | string {
     if (response_body.includes("Impossible d'afficher la page")) {
       this.instance.order--; // Prevent broken response to take the order.
       return "Request is not successful. Please try again later.";
