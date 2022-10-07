@@ -10,6 +10,10 @@ export enum PronoteApiAccountId {
   Academie = 5
 }
 
+export type PronoteApiFunctions =
+  | "FonctionParametres"
+  | "Identification"
+
 export interface PronoteApiSession {
   /** Session ID as a **string**. */
   h: string;
@@ -34,6 +38,23 @@ export interface PronoteApiSession {
   sCoA: boolean;
 }
 
+export interface PronoteApiFunctionPayload<T> {
+  nom: string;
+  session: number;
+  numeroOrdre: string;
+
+  /** `string` only when compressed and/or encrypted. */
+  donneesSec: T | string;
+}
+
+export interface PronoteApiFunctionError {
+  Erreur: {
+    G: number;
+    Message: string;
+    Titre: string;
+  }
+}
+
 export interface PronoteApiGeolocation {
   request: {
     nomFonction: "geoLoc";
@@ -50,25 +71,6 @@ export interface PronoteApiGeolocation {
   }[] | Record<string, unknown> // `{}` when no results.
 }
 
-/**
- * Helper type to build body requests types
- * more easily and quickly.
- * `Name` is the `nom` property and `Data` is
- * the typings of what we send to the server.
- */
-interface PronoteApiRequestBase<Name extends string, Data> {
-  session: number;
-  numeroOrdre: string;
-  nom: Name;
-  /** Data can be a string when encrypted/compresssed. */
-  donneesSec: Data | string;
-}
-
 export interface PronoteApiInstance {
-  request: PronoteApiRequestBase<
-    "FonctionParametres",
-    {
-      TODO: true
-    }
-  >
+  request: Record<string, never>; // Always empty object.
 }
