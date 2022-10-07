@@ -26,23 +26,15 @@ ENT files and configurations are [here](./utils/api/cas).
 
 ## TO-DO
 
-- [x] Finish login.tsx.
-  - [x] Add multiple steps (select school, then account type, then ask for username/password).
-  - [x] Check if ENT is available.
-  - [x] Pass `Identification` step.
-  - [x] Solve challenge to achieve an auth request.
-  - [x] Do username/password challenge on **client-side only** (for security purposes).
-  - [x] On successful login, store it in localForage(pornote)->accounts->(slug is key).
-  - [x] ENT login support.
-- [ ] Saved account data
-  - [ ] Add `entCookies` with `loginCookie` (for ENT auto-reconnection).
-  - [ ] Add `PageAccueil` to data.
-  - [ ] Write optional types to `SavedAccountData` (for data about timetable, grades, ...).
+- [ ] Save connected sessions
+  - [x] Use a `Session` class.
+  - [x] Make an export function.
+  - [ ] Store the exported data into the localForage and then get data from it at every refresh.
 - [ ] Multi-theme support
   - Create a 'theme' object key in localForage->pornote->(slug).
-  - This object will contains HEX color values for each objects.
-  - On load we add 'style' props to modified colors.
-  - If the color isn't modified => keep default (from Tailwind) 
+    This object will contains HEX color values for each objects.
+    On load we add 'style' props to modified colors.
+    If the color isn't modified => keep default (from Tailwind) 
 
 ## Warning
 
