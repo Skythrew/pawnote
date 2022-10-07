@@ -1,12 +1,12 @@
 // These utility functions are made for server-side usage only.
 
 import type { FetchEvent } from "solid-start/server";
-import type { PronoteApiSession } from "@/types/pronote";
+import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
 import type { ResponseError } from "@/types/api";
+import type { SessionData } from "@/types/session";
 
-import { HEADERS_PRONOTE, PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
-import { aes_decrypt, aes_encrypt } from "@/utils/encryption";
-import { PronoteApiAccountId } from "@/types/pronote";
+import { HEADERS_PRONOTE } from "@/utils/constants";
+
 import { json } from "solid-start/server";
 
 export const handleServerRequest = <T>(callback: (
@@ -52,22 +52,6 @@ export const cleanPronoteUrl = (url: string) => {
   return pronote_url.href.endsWith("/") ?
     pronote_url.href.slice(0, -1) :
     pronote_url.href;
-};
-
-/**
- * Allows you to request calls directly so you don't
- * have to manage orders/encryption/compression.
- */
-export const createPronoteApiCall = async (options: {
-  pronote_url: string;
-  account_type_id: PronoteApiAccountId;
-
-  cookies: Record<string, string>;
-}) => {
-  const pronote_url = cleanPronoteUrl(options.pronote_url);
-  const account_type = PRONOTE_ACCOUNT_TYPES[options.account_type_id];
-
-  console.info("// todo", pronote_url, account_type);
 };
 
 /**
@@ -183,15 +167,46 @@ export const extractPronoteSessionFromBody = (body: string): (
     );
 
     // Convert the relaxed JSON to something we can parse.
-    const session_data = relaxed_data
+    const session_data_string = relaxed_data
       .replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/gu, "\"$2\": ")
       .replace(/'/gu, "\"");
 
-    // Return parsed session data.
-    return JSON.parse(session_data) as PronoteApiSession;
+    const session_data_raw = JSON.parse(session_data_string) as PronoteApiSession;
+    return session_data_raw;
   }
   catch (error) {
     console.error("Error when trying to parse Pronote session.\nTrace:", error ?? "(no error)");
+    return null;
+  }
+};
+
+export const callPronoteAPI = async <T>(
+  function_name: PronoteApiFunctions,
+  data: {
+    payload: { order: string, data: T },
+    pronote_url: string;
+    session_data: SessionData;
+  }) => {
+  try {
+    const function_url = data.pronote_url + `/appelfonction/${data.session_data.account_type_id}/${data.session_data.session_id}/${data.payload.order}`;
+    const response = await fetch(function_url, {
+      method: "POST",
+      headers: {
+        ...HEADERS_PRONOTE,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        session: data.session_data.session_id,
+        numeroOrdre: data.payload.order,
+        nom: function_name,
+        donneesSec: data.payload.data
+      })
+    });
+
+    const json = await response.json();
+    return json;
+  }
+  catch {
     return null;
   }
 };
