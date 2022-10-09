@@ -203,10 +203,11 @@ export const callPronoteAPI = async <T>(
       })
     });
 
-    const json = await response.json();
-    return json;
+    const body = await response.text();
+    return body;
   }
-  catch {
+  catch (error) {
+    console.log("PASSED IN CATCH");
     return null;
   }
 };

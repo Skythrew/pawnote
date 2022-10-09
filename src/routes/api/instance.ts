@@ -83,7 +83,7 @@ export const post = handleServerRequest<ApiInstance["response"]>(async (req, res
     console.log(response);
 
     return res.success({
-      TODO: "DONE"
+      response
     });
 
     // Res.status(200).json({
@@ -93,6 +93,7 @@ export const post = handleServerRequest<ApiInstance["response"]>(async (req, res
     // });
   }
   catch (error) {
+    console.error("[/api/instance]", error);
     return res.error({
       message: "Request to Pronote failed.",
       debug: { trace: error }
