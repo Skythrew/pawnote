@@ -1,9 +1,9 @@
 import forge from "node-forge";
 
-type AesEncryptionOptions = {
-  key?: forge.util.ByteStringBuffer,
-  iv?: forge.util.ByteStringBuffer
-};
+interface AesEncryptionOptions {
+  key?: forge.util.ByteStringBuffer;
+  iv?: forge.util.ByteStringBuffer;
+}
 
 /**
  * Generates a MD5 ByteBuffer from another ByteBuffer.
@@ -14,7 +14,7 @@ export function md5 (buffer: forge.util.ByteStringBuffer) {
   return forge.md.md5.create().update(buffer.bytes()).digest();
 }
 
-export function aesDecrypt (data: string, {
+export function aes_decrypt (data: string, {
   key = forge.util.createBuffer(),
   iv
 }: AesEncryptionOptions) {
@@ -37,12 +37,14 @@ export function aesDecrypt (data: string, {
   return decipher.output.bytes();
 }
 
-export function aesEncrypt (data: string, {
+export function aes_encrypt (data: string, {
   key = forge.util.createBuffer(),
   iv
 }: AesEncryptionOptions) {
-  // Create cipher using 'AES-CBC' method and
-  // use an MD5 ButeBuffer of the given 'key'.
+  /**
+   * Create cipher using 'AES-CBC' method and
+   * use an MD5 ByteBuffer of the given 'key'.
+   */
   const cipher = forge.cipher.createCipher("AES-CBC", md5(key));
 
   // IV => Generate a MD5 ByteBuffer from current IV.
