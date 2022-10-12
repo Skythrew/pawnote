@@ -22,10 +22,11 @@ import type {
   Response,
   ResponseError,
 
-  ApiGeolocation
+  ApiGeolocation,
+  ApiInstance
 } from "@/types/api";
 
-// Helper ApiError class for easier error handling.
+/** Helper class for easier error handling. */
 export class ApiError extends Error {
   public debug?: ResponseError["debug"];
 
@@ -47,6 +48,20 @@ export const apiPostGeolocation = async (
   });
 
   const response = await request.json() as Response<ApiGeolocation["response"]>;
+  if (!response.success) throw new ApiError(response);
+  return response.data;
+};
+
+export const apiPostInstance = async (
+  body: ApiInstance["request"]
+): Promise<ApiInstance["response"]> => {
+  const request = await fetch("/api/instance", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  const response = await request.json() as Response<ApiInstance["response"]>;
   if (!response.success) throw new ApiError(response);
   return response.data;
 };

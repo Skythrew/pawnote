@@ -20,7 +20,7 @@ export const handleServerRequest = <T>(callback: (
     evt.request, ({
       error: (
         params,
-        options
+        options = { status: 500 }
       ) => json({
         success: false,
         message: params.message,
@@ -28,7 +28,7 @@ export const handleServerRequest = <T>(callback: (
       }, options),
       success: (
         data,
-        options = { status: 500 }
+        options = { status: 200 }
       ) => json({ success: true, data }, options)
     })
   );

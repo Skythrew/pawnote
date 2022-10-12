@@ -12,7 +12,8 @@ import {
 
 import {
   ApiError,
-  apiPostGeolocation
+  apiPostGeolocation,
+  apiPostInstance
 } from "@/utils/api";
 
 function classNames(...classes: (string | boolean | undefined)[]): string {
@@ -69,11 +70,15 @@ const LinkPronoteAccount: Component = () => {
     setState("pronote_url", url);
   };
 
-  const processInformations: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (evt) => {
+  const processInformations: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (evt) => {
     evt.preventDefault();
 
     try {
-      console.log("submit", state);
+      const response = await apiPostInstance({
+        pronote_url: state.pronote_url
+      });
+      console.log(response);
+
     }
     catch (err) {
       console.error(err);
