@@ -183,7 +183,8 @@ export const extractPronoteSessionFromBody = (body: string): (
 export const callPronoteAPI = async <T>(
   function_name: PronoteApiFunctions,
   data: {
-    payload: { order: string, data: T },
+    /** Returned value of `Session.writePronoteFunctionPayload`. */
+    payload: { order: string, data: T | string },
     pronote_url: string;
     session_data: SessionData;
   }) => {
@@ -199,6 +200,7 @@ export const callPronoteAPI = async <T>(
         session: data.session_data.session_id,
         numeroOrdre: data.payload.order,
         nom: function_name,
+
         donneesSec: data.payload.data
       })
     });
@@ -207,7 +209,6 @@ export const callPronoteAPI = async <T>(
     return body;
   }
   catch (error) {
-    console.log("PASSED IN CATCH");
     return null;
   }
 };

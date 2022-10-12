@@ -115,7 +115,7 @@ class Session {
 
     return {
       order: order_encrypted,
-      data
+      data: final_data
     };
   }
 

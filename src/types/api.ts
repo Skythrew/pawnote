@@ -1,17 +1,22 @@
-/** Helper typing for error responses. */
+import type {
+  PronoteApiInstance,
+  PronoteApiAccountId
+} from "@/types/pronote";
+
+/** Helper type for error responses. */
 export interface ResponseError {
   success: false;
   message: string;
   debug?: unknown;
 }
 
-/** Helper typing for successful responses. */
+/** Helper type for successful responses. */
 export interface ResponseSuccess<T> {
   success: true;
   data: T;
 }
 
-/** Helper type. */
+/** Helper type that includes success and error */
 export type Response<T> = ResponseSuccess<T> | ResponseError;
 
 export interface ApiGeolocation {
@@ -35,6 +40,8 @@ export interface ApiInstance {
   }
 
   response: {
-    TODO: string;
+    received: PronoteApiInstance["response"][PronoteApiAccountId.Commun];
+    pronote_url: string;
+    ent_url?: string;
   }
 }

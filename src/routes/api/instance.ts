@@ -73,24 +73,23 @@ export const post = handleServerRequest<ApiInstance["response"]>(async (req, res
     });
 
     const request_payload = session.writePronoteFunctionPayload<Record<string, never>>({});
+
     const response_payload = await callPronoteAPI("FonctionParametres", {
       pronote_url,
       payload: request_payload,
       session_data: session.data
     });
 
-    const response = session.readPronoteFunctionPayload(response_payload);
-    console.log(response);
+    const response = session.readPronoteFunctionPayload<ApiInstance["response"]["received"]>(response_payload);
+    if (typeof response === "string") return res.error({
+      message: response
+    }, { status: 400 });
 
     return res.success({
-      response
+      pronote_url,
+      received: response,
+      ent_url: ent.available ? ent.url : undefined
     });
-
-    // Res.status(200).json({
-    //   Request: pronoteRequest,
-    //   PronoteUrl,
-    //   PronoteEntUrl: entCheckData.entAvailable ? entCheckData.entUrl : undefined
-    // });
   }
   catch (error) {
     console.error("[/api/instance]", error);
