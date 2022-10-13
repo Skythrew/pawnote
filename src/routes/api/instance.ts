@@ -73,7 +73,6 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
     });
 
     const request_payload = session.writePronoteFunctionPayload<Record<string, never>>({});
-
     const response_payload = await callPronoteAPI("FonctionParametres", {
       pronote_url,
       payload: request_payload,

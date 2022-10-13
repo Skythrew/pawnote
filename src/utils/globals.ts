@@ -15,3 +15,7 @@ export const getGeolocationPosition = (options?: PositionOptions): Promise<Geolo
 
 /** Typed function to check if an object has a property. */
 export const objectHasProperty = <T extends Record<string, unknown>>(obj: T, prop: keyof T) => prop in obj;
+
+/** Helper for classes with TailwindCSS. */
+export const classNames = (...classes: (string | boolean | undefined)[]): string =>
+  classes.filter(Boolean).join(" ");

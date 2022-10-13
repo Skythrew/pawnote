@@ -2,6 +2,11 @@ import type { Component, JSX } from "solid-js";
 import type { ApiGeolocation } from "@/types/api";
 
 import {
+  classNames,
+  getGeolocationPosition
+} from "@/utils/globals";
+
+import {
   HeadlessDisclosureChild,
   Listbox,
   ListboxButton,
@@ -16,9 +21,7 @@ import {
   apiPostInstance
 } from "@/utils/api";
 
-function classNames(...classes: (string | boolean | undefined)[]): string {
-  return classes.filter(Boolean).join(" ");
-}
+
 
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
@@ -43,13 +46,18 @@ const LinkPronoteAccount: Component = () => {
   );
 
   const handleGeolocation = async () => {
-    try {
-      setState("geolocation_data", null);
+    setState("geolocation_data", null);
 
-      // TODO: use real lat and long.
-      const data = await apiPostGeolocation({ latitude: 45.83, longitude: 1.26 });
+    try {
+      const {
+        coords: {
+          latitude, longitude
+        }
+      } = await getGeolocationPosition();
+
+      const data = await apiPostGeolocation({ latitude, longitude });
       if (data.length <= 0) {
-        alert("Aucune instance Pronote proche de votre location n'a ete trouvee.");
+        alert("Aucune instance Pronote proche de votre location n'a été trouvée.");
         return;
       }
 
@@ -61,6 +69,7 @@ const LinkPronoteAccount: Component = () => {
     catch (err) {
       if (err instanceof ApiError) {
         console.error(err.message);
+        alert("Une erreur est survenue. Vérifiez la console.");
       }
     }
   };
