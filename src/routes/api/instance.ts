@@ -12,7 +12,7 @@ import {
   callPronoteAPI
 } from "@/utils/server";
 
-export const post = handleServerRequest<ApiInstance["response"]>(async (req, res) => {
+export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res) => {
   const body = await req.json() as ApiInstance["request"];
 
   if (!objectHasProperty(body, "pronote_url"))

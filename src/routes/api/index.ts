@@ -1,6 +1,6 @@
 import { json } from "solid-start/server";
 
-export const get = () => {
+export const GET = () => {
   return json({
     success: true,
     data: {

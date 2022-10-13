@@ -2,8 +2,6 @@ import { defineConfig } from "vite";
 import pkg from "./package.json";
 import path from "path";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import solid from "solid-start/vite";
 import vercel from "solid-start-vercel";
 
@@ -102,8 +100,8 @@ export default defineConfig ({
     APP_DESCRIPTION: JSON.stringify(pkg.description)
   },
 
-  build: {
-    target: "esnext"
+  server: {
+    strictPort: true
   },
 
   resolve: {

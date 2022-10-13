@@ -6,7 +6,7 @@ import { handleServerRequest } from "@/utils/server";
 import { objectHasProperty } from "@/utils/globals";
 import { decode } from "html-entities";
 
-export const post = handleServerRequest<ApiGeolocation["response"]>(async (req, res) => {
+export const POST = handleServerRequest<ApiGeolocation["response"]>(async (req, res) => {
   const body = await req.json() as ApiGeolocation["request"];
 
   if (!objectHasProperty(body, "latitude") || !objectHasProperty(body, "longitude"))
