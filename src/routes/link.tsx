@@ -17,6 +17,10 @@ import {
   ApiError
 } from "@/utils/client";
 
+import Session from "@/utils/session";
+import { objectHasProperty } from "@/utils/globals";
+import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
+
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
     geolocation_data: ApiGeolocation["response"] | null;
@@ -25,9 +29,10 @@ const LinkPronoteAccount: Component = () => {
     school_informations_commun: ApiInstance["response"] | null;
 
     login: {
-      username: string,
-      password: string,
-      use_ent: boolean
+      account_type: number | null;
+      username: string;
+      password: string;
+      use_ent: boolean;
     }
   }>({
     geolocation_data: null,
@@ -36,6 +41,7 @@ const LinkPronoteAccount: Component = () => {
     school_informations_commun: null,
 
     login: {
+      account_type: null,
       username: "",
       password: "",
       use_ent: false
@@ -93,7 +99,10 @@ const LinkPronoteAccount: Component = () => {
         pronote_url: state.pronote_url
       });
 
-      setState("school_informations_commun", response);
+      batch(() =>  {
+        setState("school_informations_commun", response);
+        setState("login", "account_type", response.received.donnees.espaces.V[0].G);
+      });
     }
     catch (err) {
       console.error(err);
@@ -102,14 +111,26 @@ const LinkPronoteAccount: Component = () => {
 
   const processUserAuthentication: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (evt) => {
     evt.preventDefault();
-    console.log(state);
 
-    // try {
+    if (!state.school_informations_commun) return;
 
-    // }
-    // catch (err) {
+    const account_type = state.login.account_type;
+    if (account_type === null || !objectHasProperty(PRONOTE_ACCOUNT_TYPES, account_type)) return;
 
-    // }
+    try {
+      const session = await Session.create({
+        pronote_url: state.school_informations_commun.pronote_url,
+        ent_url: state.school_informations_commun.ent_url,
+        login: {
+          ...state.login,
+          account_type
+        }
+      });
+    }
+    catch (err) {
+      console.error(err);
+      alert("check logs.");
+    }
   };
 
   return (
@@ -215,6 +236,14 @@ const LinkPronoteAccount: Component = () => {
               <Show when={instance.ent_url}>
                 <input type="checkbox" checked={state.login.use_ent} />
               </Show>
+
+              <select onChange={event => setState("login", "account_type", parseInt(event.currentTarget.value))}>
+                <For each={instance.received.donnees.espaces.V}>
+                  {espace => (
+                    <option value={espace.G}>{espace.L}</option>
+                  )}
+                </For>
+              </select>
 
               <input
                 type="text"

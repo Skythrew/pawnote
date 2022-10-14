@@ -1,4 +1,4 @@
-import type { PronoteApiSession, PronoteApiFunctionPayload } from "@/types/pronote";
+import type { PronoteApiSession, PronoteApiFunctionPayload, PronoteApiAccountId } from "@/types/pronote";
 import type { SessionData, SessionEncryption, SessionExported, SessionInstance } from "@/types/session";
 
 import { aes } from "@/utils/globals";
@@ -55,8 +55,19 @@ class Session {
     }, instance);
   }
 
-  static create (url: string, options: { username: string, password: string, ent: boolean }) {
-    console.log("// todo.", url, options);
+  static async create (options: {
+    pronote_url: string;
+    ent_url?: string;
+
+    login: {
+      /** Account Type ID from Pronote. */
+      account_type: number;
+      username: string;
+      password: string;
+      use_ent: boolean;
+    }
+  }) {
+    console.log(options);
   }
 
   /**
