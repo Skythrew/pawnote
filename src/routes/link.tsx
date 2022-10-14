@@ -1,10 +1,5 @@
 import type { Component, JSX } from "solid-js";
-import type { ApiGeolocation } from "@/types/api";
-
-import {
-  classNames,
-  getGeolocationPosition
-} from "@/utils/globals";
+import type { ApiGeolocation, ApiInstance } from "@/types/api";
 
 import {
   HeadlessDisclosureChild,
@@ -16,24 +11,35 @@ import {
 } from "solid-headless";
 
 import {
-  ApiError,
-  apiPostGeolocation,
-  apiPostInstance
-} from "@/utils/api";
-
-
+  classNames,
+  getGeolocationPosition,
+  callAPI,
+  ApiError
+} from "@/utils/client";
 
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
     geolocation_data: ApiGeolocation["response"] | null;
 
     pronote_url: string;
-    school_informations_commun: string | null;
+    school_informations_commun: ApiInstance["response"] | null;
+
+    login: {
+      username: string,
+      password: string,
+      use_ent: boolean
+    }
   }>({
     geolocation_data: null,
 
     pronote_url: "",
-    school_informations_commun: null
+    school_informations_commun: null,
+
+    login: {
+      username: "",
+      password: "",
+      use_ent: false
+    }
   });
 
   /**
@@ -55,7 +61,7 @@ const LinkPronoteAccount: Component = () => {
         }
       } = await getGeolocationPosition();
 
-      const data = await apiPostGeolocation({ latitude, longitude });
+      const data = await callAPI<ApiGeolocation>("/geolocation", { latitude, longitude });
       if (data.length <= 0) {
         alert("Aucune instance Pronote proche de votre location n'a été trouvée.");
         return;
@@ -83,15 +89,27 @@ const LinkPronoteAccount: Component = () => {
     evt.preventDefault();
 
     try {
-      const response = await apiPostInstance({
+      const response = await callAPI<ApiInstance>("/instance", {
         pronote_url: state.pronote_url
       });
-      console.log(response);
 
+      setState("school_informations_commun", response);
     }
     catch (err) {
       console.error(err);
     }
+  };
+
+  const processUserAuthentication: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (evt) => {
+    evt.preventDefault();
+    console.log(state);
+
+    // try {
+
+    // }
+    // catch (err) {
+
+    // }
   };
 
   return (
@@ -104,9 +122,7 @@ const LinkPronoteAccount: Component = () => {
       <main>
         <form onSubmit={processInformations}>
           <div class="flex">
-            <Show keyed
-              when={state.geolocation_data !== null}
-            >
+            <Show when={state.geolocation_data !== null}>
               <Listbox defaultOpen value={state.pronote_url} onSelectChange={instanceSelectChange}>
                 <div class="relative mt-1">
                   <ListboxButton type="button" class="relative w-full py-2 pl-3 pr-10 text-left bg-brand-white rounded-lg rounded-r-none cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-brand-primary focus-visible:ring-offset-2 focus-visible:border-brand-primary sm:text-sm">
@@ -170,18 +186,18 @@ const LinkPronoteAccount: Component = () => {
                   </HeadlessDisclosureChild>
                 </div>
               </Listbox>
-              <button class="bg-brand-light p-2 rounded-lg rounded-l-none" type="button" onClick={() => setState("geolocation_data", null)}>
+              <button class="bg-brand-light p-2 px-8 rounded-lg rounded-l-none" type="button" onClick={() => setState("geolocation_data", null)}>
                 Edit
               </button>
             </Show>
-            <Show keyed
-              when={state.geolocation_data === null}
-            >
+
+            <Show when={!state.geolocation_data}>
               <input
                 type="url"
                 value={state.pronote_url}
                 onChange={event => setState("pronote_url", event.currentTarget.value)}
               />
+
               <button class="bg-brand-light p-2 rounded-lg rounded-l-none" type="button" onClick={handleGeolocation}>
                 <IconMdiMapMarkerRadius />
               </button>
@@ -192,6 +208,29 @@ const LinkPronoteAccount: Component = () => {
             Valider le choix
           </button>
         </form>
+
+        <Show when={state.school_informations_commun} keyed>
+          {instance => (
+            <form onSubmit={processUserAuthentication}>
+              <Show when={instance.ent_url}>
+                <input type="checkbox" checked={state.login.use_ent} />
+              </Show>
+
+              <input
+                type="text"
+                value={state.login.username}
+                onChange={event => setState("login", "username", event.currentTarget.value)}
+              />
+              <input
+                type="password"
+                value={state.login.password}
+                onChange={event => setState("login", "password", event.currentTarget.value)}
+              />
+
+              <button type="submit">Tester la connexion</button>
+            </form>
+          )}
+        </Show>
       </main>
     </div>
   );

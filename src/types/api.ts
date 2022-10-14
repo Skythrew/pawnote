@@ -32,11 +32,13 @@ export interface ApiGeolocation {
     longitude: number;
     postal_code: number;
   }[]
+
+  path: "/geolocation"
 }
 
 export interface ApiInstance {
   request: {
-    pronote_url: string;
+    pronote_url: string
   }
 
   response: {
@@ -44,4 +46,6 @@ export interface ApiInstance {
     pronote_url: string;
     ent_url?: string;
   }
+
+  path: "/instance"
 }

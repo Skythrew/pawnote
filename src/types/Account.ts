@@ -14,4 +14,3 @@ export interface AccountInstanceCookies {
   pronote: string;
   ent?: string;
 }
-

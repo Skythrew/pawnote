@@ -1,7 +1,7 @@
 import type { PronoteApiSession, PronoteApiFunctionPayload } from "@/types/pronote";
 import type { SessionData, SessionEncryption, SessionExported, SessionInstance } from "@/types/session";
 
-import { aes_decrypt, aes_encrypt } from "@/utils/encryption";
+import { aes } from "@/utils/globals";
 import forge from "node-forge";
 import pako from "pako";
 
@@ -78,7 +78,7 @@ class Session {
     let final_data: Req | string = data;
     const { aes_iv, aes_key } = this.encryption_aes();
 
-    const order_encrypted = aes_encrypt(this.instance.order.toString(), {
+    const order_encrypted = aes.encrypt(this.instance.order.toString(), {
       // Iv: encryption?.only_use_iv_to_decrypt_returned_order ? undefined : aesIv,
       iv: aes_iv,
       key: aes_key
@@ -105,7 +105,7 @@ class Session {
       // Otherwise, we get the JSON as string.
         : forge.util.encodeUtf8("" + JSON.stringify(final_data));
 
-      const encrypted_data = aes_encrypt(data, {
+      const encrypted_data = aes.decrypt(data, {
         iv: aes_iv, key: aes_key
       });
 
@@ -139,7 +139,7 @@ class Session {
 
     // Check the local order number with the received one.
     this.instance.order++;
-    const decrypted_order = aes_decrypt(response.numeroOrdre, {
+    const decrypted_order = aes.decrypt(response.numeroOrdre, {
       iv: aes_iv, key: aes_key
     });
 
@@ -149,7 +149,7 @@ class Session {
     let final_data = response.donneesSec;
 
     if (!this.data.skip_encryption) {
-      const decrypted_data = aes_decrypt(final_data as string, {
+      const decrypted_data = aes.decrypt(final_data as string, {
         iv: aes_iv, key: aes_key
       });
 
