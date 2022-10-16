@@ -25,7 +25,10 @@ export interface SessionEncryption {
 
 export interface SessionInstance {
   pronote_url: string;
-  ent?: string;
+
+  ent_cookies: string[];
+  ent_url: string | null;
+  use_ent: boolean;
 
   order: number;
 }

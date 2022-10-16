@@ -25,7 +25,11 @@ class Session {
    * so it can be saved in the localForage for later usage.
    */
   exportToObject (): SessionExported {
-    return { data: this.data, encryption: this.encryption, instance: this.instance };
+    return {
+      data: this.data,
+      encryption: this.encryption,
+      instance: this.instance
+    };
   }
 
   /**
