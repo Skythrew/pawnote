@@ -74,8 +74,15 @@ class Session {
    * given in `this.encryption.aes`.
    */
   private encryption_aes () {
-    const aes_iv = this.encryption.aes.iv ? forge.util.createBuffer(this.encryption.aes.iv) : undefined;
-    const aes_key = this.encryption.aes.key ? forge.util.createBuffer(this.encryption.aes.key) : undefined;
+    // At the first order, we always take an undefined IV.
+    const aes_iv = this.encryption.aes.iv && this.instance.order !== 1
+      ? forge.util.createBuffer(this.encryption.aes.iv)
+      : undefined;
+
+    const aes_key = this.encryption.aes.key
+      ? forge.util.createBuffer(this.encryption.aes.key)
+      : undefined;
+
     return { aes_iv, aes_key };
   }
 
@@ -86,7 +93,6 @@ class Session {
     const { aes_iv, aes_key } = this.encryption_aes();
 
     const order_encrypted = aes.encrypt(this.instance.order.toString(), {
-      // Iv: encryption?.only_use_iv_to_decrypt_returned_order ? undefined : aesIv,
       iv: aes_iv,
       key: aes_key
     });
@@ -141,11 +147,11 @@ class Session {
       return "A mistake was done in the request payload, please retry.";
     }
 
+    this.instance.order++;
     const response = JSON.parse(response_body) as PronoteApiFunctionPayload<Res>;
-    const { aes_iv, aes_key } = this.encryption_aes();
 
     // Check the local order number with the received one.
-    this.instance.order++;
+    const { aes_iv, aes_key } = this.encryption_aes();
     const decrypted_order = aes.decrypt(response.numeroOrdre, {
       iv: aes_iv, key: aes_key
     });

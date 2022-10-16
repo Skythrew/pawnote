@@ -76,7 +76,6 @@ export interface ApiLoginInformations {
 	response: {
 		received: PronoteApiLoginInformations["response"];
 		session: SessionExported;
-    pronote_url: string;
 	}
 
   path: "/login/informations";

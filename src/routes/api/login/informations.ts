@@ -110,12 +110,16 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
 
     const response = session.readPronoteFunctionPayload<PronoteApiLoginInformations["response"]>(response_payload);
     if (typeof response === "string") return res.error({
-      message: response
+      message: response,
+      debug: {
+        request_payload,
+        response_payload,
+        cookies
+      }
     }, { status: 400 });
 
     return res.success({
       session: session.exportToObject(),
-      pronote_url,
       received: response
     });
   }
