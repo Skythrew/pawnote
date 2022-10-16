@@ -56,11 +56,9 @@ export const cleanPronoteUrl = (url: string) => {
 
 /**
  * @param url - URL to download the data from.
- * @param cookie - Cookies to send with the request (separated by `;`).
- * - When a login cookie is provided, the request will provide another
- * cookie that will be used on next login.
+ * @param cookies - Cookies to send with the request.
  */
-export const downloadPronotePage = async (url: string, cookie?: string): Promise<{
+export const downloadPronotePage = async (url: string, cookies?: string[]): Promise<{
   /** Data **as text** from the given URL. */
   body: string;
 
@@ -77,7 +75,7 @@ export const downloadPronotePage = async (url: string, cookie?: string): Promise
         ...HEADERS_PRONOTE,
 
         // Append cookies to the request.
-        "Cookie": cookie ?? ""
+        "Cookie": cookies?.join("; ") ?? ""
       }
     });
 
@@ -90,7 +88,7 @@ export const downloadPronotePage = async (url: string, cookie?: string): Promise
     };
   }
   catch (error) {
-    console.error("Error when trying to download", url, "with", cookie ?? "no cookies", "\nTrace:", error ?? "(none)");
+    console.error("Error when trying to download", url, "with", cookies ?? "no cookies", "\nTrace:", error ?? "(none)");
     return null;
   }
 };
@@ -187,6 +185,7 @@ export const callPronoteAPI = async <T>(
     payload: { order: string, data: T | string },
     pronote_url: string;
     session_data: SessionData;
+    cookies?: string[];
   }) => {
   try {
     const function_url = data.pronote_url + `/appelfonction/${data.session_data.account_type_id}/${data.session_data.session_id}/${data.payload.order}`;
@@ -194,7 +193,8 @@ export const callPronoteAPI = async <T>(
       method: "POST",
       headers: {
         ...HEADERS_PRONOTE,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Cookie": data.cookies?.join("; ") ?? ""
       },
       body: JSON.stringify({
         session: data.session_data.session_id,

@@ -1,4 +1,4 @@
-import type { PronoteApiSession, PronoteApiFunctionPayload, PronoteApiAccountId } from "@/types/pronote";
+import { PronoteApiSession, PronoteApiFunctionPayload, PronoteApiAccountId } from "@/types/pronote";
 import type { SessionData, SessionEncryption, SessionExported, SessionInstance } from "@/types/session";
 
 import { aes } from "@/utils/globals";
@@ -37,6 +37,13 @@ class Session {
    * to make it usable inside this class.
    **/
   static from_raw (session_data: PronoteApiSession, instance: SessionInstance) {
+    let aes_iv: string | undefined = undefined;
+
+    // Setup IV for our session when not in "Commun".
+    if (session_data.a !== PronoteApiAccountId.Commun) {
+      aes_iv = forge.random.getBytesSync(16);
+    }
+
     return new Session({
       session_id: parseInt(session_data.h),
       account_type_id: session_data.a,
@@ -48,7 +55,7 @@ class Session {
       ent_password: session_data.f
     }, {
       aes: {
-        iv: undefined,
+        iv: aes_iv,
         key: undefined
       },
 
@@ -57,21 +64,6 @@ class Session {
         modulus: session_data.MR
       }
     }, instance);
-  }
-
-  static async create (options: {
-    pronote_url: string;
-    ent_url?: string;
-
-    login: {
-      /** Account Type ID from Pronote. */
-      account_type: number;
-      username: string;
-      password: string;
-      use_ent: boolean;
-    }
-  }) {
-    console.log(options);
   }
 
   /**
@@ -188,3 +180,4 @@ class Session {
 }
 
 export default Session;
+

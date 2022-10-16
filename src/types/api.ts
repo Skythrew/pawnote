@@ -3,7 +3,8 @@ import type {
   PronoteApiAccountId,
   PronoteApiLoginInformations
 } from "@/types/pronote";
-import {SessionExported} from "./session";
+
+import type { SessionExported } from "@/types/session";
 
 /** Helper type for error responses. */
 export interface ResponseError {
@@ -35,7 +36,7 @@ export interface ApiGeolocation {
     postal_code: number;
   }[]
 
-  path: "/geolocation"
+  path: "/geolocation";
 }
 
 export interface ApiInstance {
@@ -49,7 +50,7 @@ export interface ApiInstance {
     ent_url?: string;
   }
 
-  path: "/instance"
+  path: "/instance";
 }
 
 export interface ApiLoginInformations {
@@ -63,7 +64,12 @@ export interface ApiLoginInformations {
       */
     raw_url?: boolean;
 
-    /** Add cookies to the request. */
+    /**
+     * Cookies used when downloading the Pronote page.
+     * Required when creating a new session from ENT or an already set-up session.
+     *
+     * This will append `e` and `f` in to the session object.
+     */
     cookies?: string[];
 	}
 
@@ -71,7 +77,7 @@ export interface ApiLoginInformations {
 		received: PronoteApiLoginInformations["response"];
 		session: SessionExported;
     pronote_url: string;
-	},
+	}
 
-  path: "/login/informations"
+  path: "/login/informations";
 }

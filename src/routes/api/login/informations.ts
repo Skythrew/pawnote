@@ -4,11 +4,16 @@ import {
   extractPronoteSessionFromBody,
   downloadPronotePage,
   handleServerRequest,
-  cleanPronoteUrl
+  cleanPronoteUrl,
+  callPronoteAPI
 } from "@/utils/server";
 
 import { objectHasProperty } from "@/utils/globals";
+import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
+
 import Session from "@/utils/session";
+import forge from "node-forge";
+import {PronoteApiLoginInformations} from "@/types/pronote";
 
 export const POST = handleServerRequest<ApiLoginInformations["response"]>(async (req, res) => {
   const body = await req.json() as ApiLoginInformations["request"];
@@ -20,22 +25,21 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
     }, { status: 400 });
 
   try {
+    const pronote_url = cleanPronoteUrl(body.pronote_url);
+    const account_type = PRONOTE_ACCOUNT_TYPES[body.account_type];
+
     // Don't clean the URL when `raw_url` is set to `true`.
-    const pronote_url_string = body.raw_url && body.raw_url === true
+    const pronote_page_url = body.raw_url && body.raw_url === true
       ? body.pronote_url
-      : cleanPronoteUrl(body.pronote_url);
+      : pronote_url + `/${account_type.path}?login=true`;
 
-    // We append `login=true` at the end to bypass any ENT.
-    const pronote_url = new URL(pronote_url_string);
-    pronote_url.searchParams.set("login", "true");
-
-    const pronote_page = await downloadPronotePage(pronote_url.href);
+    const pronote_page = await downloadPronotePage(pronote_page_url);
 
     // Check if the Pronote page has been correctly downloaded.
     if (pronote_page === null) return res.error({
       message: "Error while downloading the Pronote page.",
       debug: {
-        pronote_url: pronote_url.href,
+        pronote_page_url,
         pronote_page
       }
     });
@@ -45,7 +49,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
     if (typeof session_data === "string") return res.error({
       message: session_data,
       debug: {
-        pronote_url: pronote_url.href,
+        pronote_page_url,
         pronote_page
       }
     });
@@ -53,22 +57,66 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
     if (session_data === null) return res.error({
       message: "Error while parsing session data.",
       debug: {
-        pronote_url: pronote_url.href,
+        pronote_page_url,
         pronote_page
       }
     });
 
     const session = Session.from_raw(session_data, {
-      pronote_url: pronote_url.href,
+      pronote_url,
       order: 0,
 
-      ent: undefined
+      ent_cookies: [],
+      use_ent: false,
+      ent_url: null
     });
+
+    // Create RSA using given modulos.
+    const rsa_key = forge.pki.rsa.setPublicKey(
+      new forge.jsbn.BigInteger(session.encryption.rsa.modulus, 16),
+      new forge.jsbn.BigInteger(session.encryption.rsa.exponent, 16)
+    );
+
+    const aes_iv = session.encryption.aes.iv;
+    if (!aes_iv) return res.error({
+      message: "IV for the AES encryption wasn't created.",
+      debug: {
+        pronote_page,
+        pronote_page_url,
+        encryption: session.encryption
+      }
+    }, { status: 500 });
+
+    // Create "Uuid" property for the request.
+    const rsa_uuid = forge.util.encode64(rsa_key.encrypt(aes_iv), 64);
+
+    const cookies = body.cookies ?? [];
+    if (pronote_page.login_cookie) {
+      cookies.push(pronote_page.login_cookie.split(";")[0]);
+    }
+
+    const request_payload = session.writePronoteFunctionPayload<PronoteApiLoginInformations["request"]>({
+      donnees: {
+        identifiantNav: null,
+        Uuid: rsa_uuid
+      }
+    });
+    const response_payload = await callPronoteAPI("FonctionParametres", {
+      cookies,
+      pronote_url,
+      payload: request_payload,
+      session_data: session.data
+    });
+
+    const response = session.readPronoteFunctionPayload<PronoteApiLoginInformations["response"]>(response_payload);
+    if (typeof response === "string") return res.error({
+      message: response
+    }, { status: 400 });
 
     return res.success({
       session: session.exportToObject(),
-      pronote_url: pronote_url.href,
-      received: null
+      pronote_url,
+      received: response
     });
   }
   catch (error) {
