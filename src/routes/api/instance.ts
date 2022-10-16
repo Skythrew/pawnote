@@ -1,3 +1,4 @@
+import type { PronoteApiInstance } from "@/types/pronote";
 import type { ApiInstance } from "@/types/api";
 
 import { objectHasProperty } from "@/utils/globals";
@@ -69,17 +70,19 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
       pronote_url,
       order: 0,
 
-      ent: ent.available ? ent.url : undefined
+      use_ent: false,
+      ent_cookies: [],
+      ent_url: ent.available ? ent.url : null
     });
 
-    const request_payload = session.writePronoteFunctionPayload<Record<string, never>>({});
+    const request_payload = session.writePronoteFunctionPayload<PronoteApiInstance["request"]>({});
     const response_payload = await callPronoteAPI("FonctionParametres", {
       pronote_url,
       payload: request_payload,
       session_data: session.data
     });
 
-    const response = session.readPronoteFunctionPayload<ApiInstance["response"]["received"]>(response_payload);
+    const response = session.readPronoteFunctionPayload<PronoteApiInstance["response"]>(response_payload);
     if (typeof response === "string") return res.error({
       message: response
     }, { status: 400 });
