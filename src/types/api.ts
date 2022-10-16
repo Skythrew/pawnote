@@ -1,7 +1,9 @@
 import type {
   PronoteApiInstance,
-  PronoteApiAccountId
+  PronoteApiAccountId,
+  PronoteApiLoginInformations
 } from "@/types/pronote";
+import {SessionExported} from "./session";
 
 /** Helper type for error responses. */
 export interface ResponseError {
@@ -42,10 +44,34 @@ export interface ApiInstance {
   }
 
   response: {
-    received: PronoteApiInstance["response"][PronoteApiAccountId.Commun];
+    received: PronoteApiInstance["response"];
     pronote_url: string;
     ent_url?: string;
   }
 
   path: "/instance"
+}
+
+export interface ApiLoginInformations {
+	request: {
+    account_type: PronoteApiAccountId;
+		pronote_url: string;
+
+    /**
+      * Tells the server to not clean the Pronote URL.
+      * Defaults to `false`.
+      */
+    raw_url?: boolean;
+
+    /** Add cookies to the request. */
+    cookies?: string[];
+	}
+
+	response: {
+		received: PronoteApiLoginInformations["response"];
+		session: SessionExported;
+    pronote_url: string;
+	},
+
+  path: "/login/informations"
 }

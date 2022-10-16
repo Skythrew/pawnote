@@ -1,3 +1,5 @@
+import type { SessionExported } from "@/types/session";
+
 export enum PronoteApiAccountId {
   Commun = 0,
   Eleve = 3,
@@ -72,104 +74,104 @@ export interface PronoteApiGeolocation {
 }
 
 export interface PronoteApiInstance {
-  request: {
-    [PronoteApiAccountId.Commun]: Record<string, never>;
-  }
+  request: Record<string, never>;
 
   response: {
-    [PronoteApiAccountId.Commun]: {
-  nom: "FonctionParametres";
+		nom: "FonctionParametres";
 
-  _Signature_: {
-    ModeExclusif: boolean;
-  }
+		_Signature_: {
+			ModeExclusif: boolean;
+		}
 
-  donnees: {
-    identifiantNav: string;
+		donnees: {
+			identifiantNav: string;
 
-    /** Array of available fonts. */
-    listePolices: {
-      _T: 24;
-      V: {
-        L: string;
-      }[];
-    };
+			/** Array of available fonts. */
+			listePolices: {
+				_T: 24;
+				V: {
+					L: string;
+				}[];
+			};
 
-    avecMembre: boolean;
-    pourNouvelleCaledonie: boolean;
-    genreImageConnexion: number;
-    urlImageConnexion: string;
-    logoProduitCss: string;
+			avecMembre: boolean;
+			pourNouvelleCaledonie: boolean;
+			genreImageConnexion: number;
+			urlImageConnexion: string;
+			logoProduitCss: string;
 
-    Theme: number;
+			Theme: number;
 
-    mentionsPagesPubliques: {
-      lien: {
-        _T: 21;
-        V: string;
-      }
-    }
+			mentionsPagesPubliques: {
+				lien: {
+					_T: 21;
+					V: string;
+				}
+			}
 
-    NomEtablissement: string;
-    NomEtablissementConnexion: string;
+			NomEtablissement: string;
+			NomEtablissementConnexion: string;
 
-    logo: {
-      _T: 25;
-      V: number;
-    };
+			logo: {
+				_T: 25;
+				V: number;
+			};
 
-    /** Current school year. */
-    anneeScolaire: string;
+			/** Current school year. */
+			anneeScolaire: string;
 
-    urlSiteIndexEducation: {
-      _T: 23;
-      V: string;
-    };
+			urlSiteIndexEducation: {
+				_T: 23;
+				V: string;
+			};
 
-    urlSiteInfosHebergement: {
-      _T: 23;
-      V: string;
-    };
+			urlSiteInfosHebergement: {
+				_T: 23;
+				V: string;
+			};
 
-    /** Complete version with name of the app.  */
-    version: string;
-    /** Pronote version. */
-    versionPN: string;
+			/** Complete version with name of the app.  */
+			version: string;
+			/** Pronote version. */
+			versionPN: string;
 
-    /** Year of the version. */
-    millesime: string;
+			/** Year of the version. */
+			millesime: string;
 
-    /** Current language. */
-    langue: string;
-    /** Current language ID. */
-    langID: number;
+			/** Current language. */
+			langue: string;
+			/** Current language ID. */
+			langID: number;
 
-    /** List of available languages. */
-    listeLangues: {
-      _T: 24;
-      V: {
+			/** List of available languages. */
+			listeLangues: {
+				_T: 24;
+				V: {
           langID: number;
           description: string;
-      }[];
-    };
+				}[];
+			};
 
-    /** Path to the informations page. */
-    lienMentions: string;
+			/** Path to the informations page. */
+			lienMentions: string;
 
-    /** Available account types. */
-    espaces: {
-      _T: 24;
-      V: {
-        /** Acount type ID. */
-        G: number;
-        /** Acount type name. */
-        L: string;
-        /** Account type path. */
-        url: string;
-      }[];
-    }
+			/** Available account types. */
+			espaces: {
+				_T: 24;
+				V: {
+					/** Acount type ID. */
+					G: number;
+					/** Acount type name. */
+					L: string;
+					/** Account type path. */
+					url: string;
+				}[];
+			}
+		}
   }
+}
 
-    }
-  }
+export interface PronoteApiLoginInformations {
+	request: unknown;
+	response: unknown;
 }
