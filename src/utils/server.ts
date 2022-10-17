@@ -69,8 +69,9 @@ export const downloadPronotePage = async (url: string, cookies?: string[]): Prom
   login_cookie?: string;
 } | null> => {
   try {
+    console.log("from:", cookies?.join("; ") ?? "");
     const response = await fetch(url, {
-      redirect: "manual", // Bypass ENT redirection.
+      redirect: "manual", // Bypass redirections.
       headers: {
         ...HEADERS_PRONOTE,
 
@@ -79,11 +80,12 @@ export const downloadPronotePage = async (url: string, cookies?: string[]): Prom
       }
     });
 
-    // Check if Pronote responded with new cookies if provided.
-    const new_cookies = response.headers.get("set-cookie");
+    // Check if Pronote sent a cookie.
+    const new_cookie = response.headers.get("set-cookie");
 
     return {
-      login_cookie: new_cookies ? new_cookies[0] : undefined,
+      // We split to get only the cookie key/value.
+      login_cookie: new_cookie?.split(";")[0],
       body: await response.text()
     };
   }

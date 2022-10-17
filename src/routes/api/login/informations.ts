@@ -1,3 +1,4 @@
+import type { PronoteApiLoginInformations } from "@/types/pronote";
 import type { ApiLoginInformations } from "@/types/api";
 
 import {
@@ -13,7 +14,6 @@ import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
 import Session from "@/utils/session";
 import forge from "node-forge";
-import {PronoteApiLoginInformations} from "@/types/pronote";
 
 export const POST = handleServerRequest<ApiLoginInformations["response"]>(async (req, res) => {
   const body = await req.json() as ApiLoginInformations["request"];
@@ -33,7 +33,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
       ? body.pronote_url
       : pronote_url + `/${account_type.path}?login=true`;
 
-    const pronote_page = await downloadPronotePage(pronote_page_url);
+    const pronote_page = await downloadPronotePage(pronote_page_url, body.cookies);
 
     // Check if the Pronote page has been correctly downloaded.
     if (pronote_page === null) return res.error({
@@ -92,7 +92,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
 
     const cookies = body.cookies ?? [];
     if (pronote_page.login_cookie) {
-      cookies.push(pronote_page.login_cookie.split(";")[0]);
+      cookies.push(pronote_page.login_cookie);
     }
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiLoginInformations["request"]>({

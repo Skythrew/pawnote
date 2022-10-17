@@ -80,3 +80,17 @@ export interface ApiLoginInformations {
 
   path: "/login/informations";
 }
+
+export interface ApiLoginTicket {
+  request: {
+    ent_url: string;
+    cookies: string[];
+  }
+
+  response: {
+    /** URL with "identifiant" search parameter. */
+    pronote_url: string;
+  }
+
+  path: "/login/ticket";
+}
