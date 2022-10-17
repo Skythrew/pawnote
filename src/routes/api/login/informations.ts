@@ -91,8 +91,8 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
     const rsa_uuid = forge.util.encode64(rsa_key.encrypt(aes_iv), 64);
 
     const cookies = body.cookies ?? [];
-    if (pronote_page.login_cookie) {
-      cookies.push(pronote_page.login_cookie);
+    for (const cookie of pronote_page.cookies) {
+      cookies.push(cookie);
     }
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiLoginInformations["request"]>({

@@ -8,6 +8,7 @@ import type { SessionData } from "@/types/session";
 import { HEADERS_PRONOTE } from "@/utils/constants";
 
 import { json } from "solid-start/server";
+import set_cookie from "set-cookie-parser";
 
 export const handleServerRequest = <T>(callback: (
   req: FetchEvent["request"],
@@ -63,15 +64,14 @@ export const downloadPronotePage = async (url: string, cookies?: string[]): Prom
   body: string;
 
   /**
-   * Cookie given by Pronote for authentification step
+   * Cookies can be given by Pronote for authentification step
    * when a session is being restored OR when using ENT.
    */
-  login_cookie?: string;
+  cookies: string[];
 } | null> => {
   try {
-    console.log("from:", cookies?.join("; ") ?? "");
     const response = await fetch(url, {
-      redirect: "manual", // Bypass redirections.
+      //redirect: "manual", // Bypass redirections.
       headers: {
         ...HEADERS_PRONOTE,
 
@@ -80,12 +80,20 @@ export const downloadPronotePage = async (url: string, cookies?: string[]): Prom
       }
     });
 
-    // Check if Pronote sent a cookie.
-    const new_cookie = response.headers.get("set-cookie");
+    const response_cookies = response.headers.get("set-cookie");
+    const sent_cookies: string[] = [];
+
+    if (response_cookies) {
+      const splitted = set_cookie.splitCookiesString(response_cookies);
+      const cleaned = splitted.map(cookie => cookie.split(";")[0]);
+
+      for (const cookie of cleaned) {
+        sent_cookies.push(cookie);
+      }
+    }
 
     return {
-      // We split to get only the cookie key/value.
-      login_cookie: new_cookie?.split(";")[0],
+      cookies: sent_cookies,
       body: await response.text()
     };
   }
