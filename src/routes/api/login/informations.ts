@@ -119,7 +119,12 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
 
     return res.success({
       session: session.exportToObject(),
-      received: response
+      received: response,
+
+      setup: session_data.e && session_data.f ? {
+        username: session_data.e,
+        password: session_data.f
+      } : undefined
     });
   }
   catch (error) {
