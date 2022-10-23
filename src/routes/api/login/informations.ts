@@ -62,13 +62,12 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
       }
     });
 
+    // We explicitly don't use ENT but we will change this value
+    // on the client side to prevent useless API parameters.
     const session = Session.from_raw(session_data, {
       pronote_url,
-      order: 0,
-
-      ent_cookies: [],
-      use_ent: false,
-      ent_url: null
+      ent_url: null,
+      use_ent: false
     });
 
     // Create RSA using given modulos.
@@ -105,7 +104,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
       cookies,
       pronote_url,
       payload: request_payload,
-      session_data: session.data
+      session_instance: session.instance
     });
 
     const response = session.readPronoteFunctionPayload<PronoteApiLoginInformations["response"]>(response_payload);

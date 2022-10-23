@@ -118,14 +118,14 @@ const LinkPronoteAccount: Component = () => {
     if (account_type === null || !objectHasProperty(PRONOTE_ACCOUNT_TYPES, account_type)) return;
 
     try {
-      const session = await Session.create({
+      /*const session = await Session.create({
         pronote_url: state.school_informations_commun.pronote_url,
         ent_url: state.school_informations_commun.ent_url,
         login: {
           ...state.login,
           account_type
         }
-      });
+      }); */
     }
     catch (err) {
       console.error(err);

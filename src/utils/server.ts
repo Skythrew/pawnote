@@ -3,7 +3,7 @@
 import type { FetchEvent } from "solid-start/server";
 import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
 import type { ResponseError } from "@/types/api";
-import type { SessionData } from "@/types/session";
+import type { SessionData, SessionInstance } from "@/types/session";
 
 import { HEADERS_PRONOTE } from "@/utils/constants";
 
@@ -193,12 +193,14 @@ export const callPronoteAPI = async <T>(
   data: {
     /** Returned value of `Session.writePronoteFunctionPayload`. */
     payload: { order: string, data: T | string },
-    pronote_url: string;
-    session_data: SessionData;
+    /** Force to use this URL instead of the one in `session_instance` */
+    pronote_url?: string;
+    session_instance: SessionInstance;
     cookies?: string[];
   }) => {
   try {
-    const function_url = data.pronote_url + `/appelfonction/${data.session_data.account_type_id}/${data.session_data.session_id}/${data.payload.order}`;
+    const pronote_url = typeof data.pronote_url === "string" ? data.pronote_url : data.session_instance.pronote_url;
+    const function_url = pronote_url + `/appelfonction/${data.session_instance.account_type_id}/${data.session_instance.session_id}/${data.payload.order}`;
     const response = await fetch(function_url, {
       method: "POST",
       headers: {
@@ -207,7 +209,7 @@ export const callPronoteAPI = async <T>(
         "Cookie": data.cookies?.join("; ") ?? ""
       },
       body: JSON.stringify({
-        session: data.session_data.session_id,
+        session: data.session_instance.session_id,
         numeroOrdre: data.payload.order,
         nom: function_name,
 

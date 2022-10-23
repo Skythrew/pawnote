@@ -530,3 +530,23 @@ export interface PronoteApiLoginInformations {
     }
   }
 }
+
+export interface PronoteApiLoginIdentify {
+  request: {
+    donnees: {
+      genreConnexion: 0;
+      genreEspace: PronoteApiAccountId;
+      identifiant: string;
+      pourENT: boolean;
+      enConnexionAuto: false;
+      demandeConnexionAuto: false;
+      demandeConnexionAppliMobile: false;
+      demandeConnexionAppliMobileJeton: false;
+      uuidAppliMobile: string;
+      loginTokenSAV: string;
+    }
+  }
+
+  response: unknown;
+}
+

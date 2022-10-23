@@ -1,23 +1,20 @@
 import { PronoteApiSession, PronoteApiFunctionPayload, PronoteApiAccountId } from "@/types/pronote";
-import type { SessionData, SessionEncryption, SessionExported, SessionInstance } from "@/types/session";
+import type { SessionInstance, SessionEncryption, SessionExported } from "@/types/session";
 
 import { aes } from "@/utils/globals";
 import forge from "node-forge";
 import pako from "pako";
 
 class Session {
-  public data: SessionData;
-  public encryption: SessionEncryption;
   public instance: SessionInstance;
+  public encryption: SessionEncryption;
 
   constructor (
-    session_data: SessionData,
-    encryption_data: SessionEncryption,
-    instance_data: SessionInstance
+    instance_data: SessionInstance,
+    encryption_data: SessionEncryption
   ) {
-    this.data = session_data;
-    this.encryption = encryption_data;
     this.instance = instance_data;
+    this.encryption = encryption_data;
   }
 
   /**
@@ -26,17 +23,31 @@ class Session {
    */
   exportToObject (): SessionExported {
     return {
-      data: this.data,
-      encryption: this.encryption,
-      instance: this.instance
+      instance: this.instance,
+      encryption: this.encryption
     };
+  }
+
+  static importFromObject (session: SessionExported) {
+    return new Session(
+      session.instance,
+      session.encryption,
+    );
   }
 
   /**
    * Takes a raw Session extracted from Pronote then parses it
    * to make it usable inside this class.
    **/
-  static from_raw (session_data: PronoteApiSession, instance: SessionInstance) {
+  static from_raw (session_data: PronoteApiSession, instance: {
+    pronote_url: string;
+    ent_url: string | null;
+
+    ent_cookies?: string[];
+    pronote_cookies?: string[];
+
+    use_ent: boolean;
+  }) {
     let aes_iv: string | undefined = undefined;
 
     // Setup IV for our session when not in "Commun".
@@ -48,11 +59,17 @@ class Session {
       session_id: parseInt(session_data.h),
       account_type_id: session_data.a,
 
+      pronote_url: instance.pronote_url,
+      ent_url: instance.ent_url,
+
+      pronote_cookies: instance.pronote_cookies ?? [],
+      ent_cookies: instance.ent_cookies ?? [],
+
       skip_compression: session_data.sCoA,
       skip_encryption: session_data.sCrA,
 
-      ent_username: session_data.e,
-      ent_password: session_data.f
+      order: 0,
+      use_ent: instance.use_ent
     }, {
       aes: {
         iv: aes_iv,
@@ -63,7 +80,7 @@ class Session {
         exponent: session_data.ER,
         modulus: session_data.MR
       }
-    }, instance);
+    });
   }
 
   /**
@@ -97,7 +114,7 @@ class Session {
       key: aes_key
     });
 
-    if (!this.data.skip_compression) {
+    if (!this.instance.skip_compression) {
     // We get the JSON as string.
       final_data = forge.util.encodeUtf8("" + JSON.stringify(final_data));
       // We compress it using zlib, level 6, without headers.
@@ -110,8 +127,8 @@ class Session {
       final_data = forge.util.bytesToHex(final_data).toUpperCase();
     }
 
-    if (!this.data.skip_encryption) {
-      const data = !this.data.skip_compression
+    if (!this.instance.skip_encryption) {
+      const data = !this.instance.skip_compression
       // If the data has been compressed, we get the bytes
       // Of the compressed data (from HEX).
         ? forge.util.hexToBytes(final_data as string)
@@ -161,17 +178,17 @@ class Session {
 
     let final_data = response.donneesSec;
 
-    if (!this.data.skip_encryption) {
+    if (!this.instance.skip_encryption) {
       const decrypted_data = aes.decrypt(final_data as string, {
         iv: aes_iv, key: aes_key
       });
 
-      final_data = this.data.skip_compression
+      final_data = this.instance.skip_compression
         ? JSON.parse(decrypted_data)
         : forge.util.bytesToHex(decrypted_data);
     }
 
-    if (!this.data.skip_compression) {
+    if (!this.instance.skip_compression) {
       const compressed = Buffer.from(final_data as string, "hex");
       final_data = pako.inflateRaw(compressed, { to: "string" });
     }

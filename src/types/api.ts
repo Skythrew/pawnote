@@ -1,7 +1,8 @@
 import type {
   PronoteApiInstance,
   PronoteApiAccountId,
-  PronoteApiLoginInformations
+  PronoteApiLoginInformations,
+  PronoteApiLoginIdentify
 } from "@/types/pronote";
 
 import type { SessionExported } from "@/types/session";
@@ -79,6 +80,20 @@ export interface ApiLoginInformations {
 	}
 
   path: "/login/informations";
+}
+
+export interface ApiLoginIdentify {
+  request: {
+    pronote_username: string;
+    session: SessionExported;
+
+    /** Cookies given when sending `/api/informations` with `pronote_setup_account_cookie`. */
+    cookies?: string[];
+  }
+
+  response: {
+    received: PronoteApiLoginIdentify["response"];
+  }
 }
 
 export interface ApiLoginTicket {
