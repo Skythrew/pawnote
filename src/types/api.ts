@@ -42,7 +42,7 @@ export interface ApiGeolocation {
 
 export interface ApiInstance {
   request: {
-    pronote_url: string
+    pronote_url: string;
   }
 
   response: {
@@ -69,7 +69,7 @@ export interface ApiLoginInformations {
      * Cookies used when downloading the Pronote page.
      * Required when creating a new session from ENT or an already set-up session.
      *
-     * This will append `e` and `f` in to the session object.
+     * This will append `e` and `f` in to the `setup` object.
      */
     cookies?: string[];
 	}
@@ -77,6 +77,11 @@ export interface ApiLoginInformations {
 	response: {
 		received: PronoteApiLoginInformations["response"];
 		session: SessionExported;
+
+    setup?: {
+      username: string;
+      password: string;
+    }
 	}
 
   path: "/login/informations";
@@ -85,15 +90,16 @@ export interface ApiLoginInformations {
 export interface ApiLoginIdentify {
   request: {
     pronote_username: string;
-    session: SessionExported;
 
-    /** Cookies given when sending `/api/informations` with `pronote_setup_account_cookie`. */
+    session: SessionExported;
     cookies?: string[];
   }
 
   response: {
     received: PronoteApiLoginIdentify["response"];
   }
+
+  path: "/login/identify";
 }
 
 export interface ApiLoginTicket {

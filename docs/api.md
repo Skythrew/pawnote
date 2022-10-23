@@ -2,8 +2,8 @@
 
 > API used by Pornote to gather informations from Pronote.
 
-- This API is also used for the Discord bot.
-- Endpoint is, of course, `https://pornote.vercel.app/api`.
+- This API is also used for the Pornote Discord bot that is currently under paused development.
+- Pornote API base endpoint is located at `https://pornote.vercel.app/api`.
 
 ## Responses Helpers
 
@@ -79,11 +79,86 @@ type Request = {
 
 ### Successful Response
 
+You can find more informations about the `PronoteApiInstance` typing @ `/src/types/pronote.ts`.
+
 ```typescript
-type Request = {
+type Response = {
+  /** Response decrypted and/or uncompressed given by the function. */ 
   received: PronoteApiInstance;
+
   pronote_url: string; // Parsed URL of the instance.
   ent_url?: string; // URL of the ENT login page when available.
+};
+```
+
+## `POST /login/informations`
+
+### Request Body
+
+```typescript
+type Request = {  
+  account_type: PronoteApiAccountId;
+  pronote_url: string;
+
+  /**
+   * Tells the server to not clean the Pronote URL.
+   * Defaults to `false`.
+   */
+  raw_url?: boolean;
+
+  /**
+   * Cookies used when downloading the Pronote page.
+   * Required when creating a new session from ENT or an already set-up session.
+   *
+   * When correct, this will append `e` and `f` in to the `setup` object.
+   */
+  cookies?: string[];
+};
+```
+
+### Successful Response
+
+You can find more informations about the `PronoteApiLoginInformations` typing @ `/src/types/pronote.ts`.
+
+```typescript
+type Response = {
+  received: PronoteApiLoginInformations["response"];
+  session: SessionExported;
+
+  /** Available when using ENT or session recovery cookies. */
+  setup?: {
+    username: string;
+    password: string;
+  }
+};
+```
+
+## `POST /login/identify`
+
+Starts a new login process on the Pronote side. This is the *second* step to login into your Pronote account if you don't use ENT or old session recovery.
+
+### Request Body
+
+```typescript
+type Request = {
+  /**
+   * When the `/instance endpoint gave you an username, use it here
+   * instead of your real Pronote account username.
+   */
+  pronote_username: string;
+
+  session: SessionExported;
+  cookies?: string[];
+};
+```
+
+### Successful Response
+
+You can find more informations about the `PronoteApiLoginIdentify` typing @ `/src/types/pronote.ts`.
+
+```typescript
+type Response = {
+  received: PronoteApiLoginIdentify;
 };
 ```
 
