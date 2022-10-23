@@ -80,7 +80,10 @@ type Request = {
 ### Successful Response
 
 ```typescript
-// TODO: Write this type.
-type Request = unknown;
+type Request = {
+  received: PronoteApiInstance;
+  pronote_url: string; // Parsed URL of the instance.
+  ent_url?: string; // URL of the ENT login page when available.
+};
 ```
 
