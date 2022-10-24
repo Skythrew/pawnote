@@ -12,9 +12,9 @@ import Session from "@/utils/session";
 export const POST = handleServerRequest<ApiLoginIdentify["response"]>(async (req, res) => {
   const body = await req.json() as ApiLoginIdentify["request"];
 
-  if (!objectHasProperty(body, "session"))
+  if (!objectHasProperty(body, "session") || !objectHasProperty(body, "pronote_username"))
     return res.error({
-      message: "Missing 'session'.",
+      message: "Missing 'session' and/or 'pronote_username'.",
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -35,6 +35,7 @@ export const POST = handleServerRequest<ApiLoginIdentify["response"]>(async (req
         loginTokenSAV: ""
       }
     });
+
     const response_payload = await callPronoteAPI("Identification", {
       cookies: body.cookies ?? [],
       payload: request_payload,
