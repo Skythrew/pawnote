@@ -100,6 +100,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
         Uuid: rsa_uuid
       }
     });
+
     const response_payload = await callPronoteAPI("FonctionParametres", {
       cookies,
       pronote_url,
