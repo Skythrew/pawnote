@@ -1,7 +1,9 @@
-import { PronoteApiSession, PronoteApiFunctionPayload, PronoteApiAccountId } from "@/types/pronote";
+import type { PronoteApiSession, PronoteApiFunctionPayload } from "@/types/pronote";
 import type { SessionInstance, SessionEncryption, SessionExported } from "@/types/session";
 
+import { PronoteApiAccountId } from "@/types/pronote";
 import { aes } from "@/utils/globals";
+
 import forge from "node-forge";
 import pako from "pako";
 
@@ -49,6 +51,11 @@ class Session {
     use_ent: boolean;
   }) {
     let aes_iv: string | undefined = undefined;
+
+    // Sometimes, the "a" parameter is not available in "Commun".
+    if (typeof session_data.a !== "number") {
+      session_data.a = PronoteApiAccountId.Commun;
+    }
 
     // Setup IV for our session when not in "Commun".
     if (session_data.a !== PronoteApiAccountId.Commun) {
