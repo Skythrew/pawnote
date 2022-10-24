@@ -1,18 +1,3 @@
-export interface PronoteApiIdentification {
-  nom: "Identification";
-  donnees: {
-    /** String used in the challenge. */
-    alea: string;
-    /** Challenge for authentication. */
-    challenge: string;
-
-    /** Should lower username. */
-    modeCompLog: 0 | 1; // Boolean.
-    /** Should lower password. */
-    modeCompMdp: 0 | 1; // Boolean.
-  }
-}
-
 export interface PronoteApiAuthentication {
   nom: "Authentification";
   donnees: {

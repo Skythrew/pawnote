@@ -547,6 +547,19 @@ export interface PronoteApiLoginIdentify {
     }
   }
 
-  response: unknown;
+  response: {
+    nom: "Identification";
+    donnees: {
+      /** String used in the challenge. */
+      alea: string;
+      /** Challenge for authentication. */
+      challenge: string;
+
+      /** Should lowercase username. */
+      modeCompLog: 0 | 1; // Boolean.
+      /** Should lowercase password. */
+      modeCompMdp: 0 | 1; // Boolean.
+    }
+  }
 }
 
