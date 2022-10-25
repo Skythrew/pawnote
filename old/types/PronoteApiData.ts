@@ -1,21 +1,3 @@
-export interface PronoteApiAuthentication {
-  nom: "Authentification";
-  donnees: {
-    /** Key used to create new AES encryption key. */
-    cle: string;
-
-    /** Last authentication date. */
-    derniereConnexion: {
-      _T: 7;
-      V: string;
-    };
-
-    /** Name of the user. */
-    libelleUtil: string;
-    modeSecurisationParDefaut: number;
-  }
-}
-
 export interface PronoteApiUserDataStudent {
   donnees: {
     ressource: {
