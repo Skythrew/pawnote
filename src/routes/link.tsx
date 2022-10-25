@@ -1,5 +1,5 @@
 import type { Component, JSX } from "solid-js";
-import type { ApiGeolocation, ApiInstance } from "@/types/api";
+import { ApiGeolocation, ApiInstance, ApiLoginAuthenticate, ApiLoginIdentify, ApiLoginInformations } from "@/types/api";
 
 import {
   HeadlessDisclosureChild,
@@ -17,7 +17,10 @@ import {
   ApiError
 } from "@/utils/client";
 
+import forge from "node-forge";
+import { aes } from "@/utils/globals";
 import Session from "@/utils/session";
+
 import { objectHasProperty } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
@@ -118,14 +121,89 @@ const LinkPronoteAccount: Component = () => {
     if (account_type === null || !objectHasProperty(PRONOTE_ACCOUNT_TYPES, account_type)) return;
 
     try {
-      /*const session = await Session.create({
-        pronote_url: state.school_informations_commun.pronote_url,
-        ent_url: state.school_informations_commun.ent_url,
-        login: {
-          ...state.login,
-          account_type
+      const informations_response = await callAPI<ApiLoginInformations>("/login/informations", {
+        account_type,
+        pronote_url: state.school_informations_commun.pronote_url
+      });
+
+      let username = state.login.username;
+      let password = state.login.password;
+
+      // Updating the login credentials to use depending of the received response.
+      if (informations_response.setup) {
+        username = informations_response.setup.username;
+        password = informations_response.setup.password;
+      }
+
+      const identify_response = await callAPI<ApiLoginIdentify>("/login/identify", {
+        pronote_username: username,
+        session: informations_response.session
+      });
+
+      if (identify_response.received.donnees.modeCompLog) {
+        username = username.toLowerCase();
+      }
+
+      if (identify_response.received.donnees.modeCompMdp) {
+        password = password.toLowerCase();
+      }
+
+      /**
+       * Hash for the challenge key is an
+       * uppercase HEX representation
+       * of a SHA256 hash of "challengeData.alea"
+       * and the user password concatenated
+       * into a single string.
+       */
+      const challengeAesKeyHashCreation = forge.md.sha256.create();
+
+      // If we use credentials given by Pronote, we don't need to use `alea`.
+      const challengeAesKeyHashUpdate = informations_response.setup
+        ? challengeAesKeyHashCreation.update(identify_response.received.donnees.alea)
+        : challengeAesKeyHashCreation;
+
+      // Continue hashing...
+      const challengeAesKeyHash = challengeAesKeyHashUpdate
+        .update(forge.util.encodeUtf8(password))
+        .digest()
+        .toHex()
+        .toUpperCase();
+
+      /**
+       * Challenge key is an MD5 hash of the username,
+       * and the SHA256 hash created of "alea" and user password.
+       */
+      const challengeAesKeyHashUtf8 = forge.util.encodeUtf8(challengeAesKeyHash);
+      const challengeAesKey = informations_response.setup
+        ? username + challengeAesKeyHashUtf8
+        : challengeAesKeyHashUtf8;
+
+      const challengeAesKeyBuffer = forge.util.createBuffer(challengeAesKey);
+
+      const decrypted_bytes = aes.decrypt(identify_response.received.donnees.challenge, {
+        iv: forge.util.createBuffer(identify_response.session.encryption.aes.iv as string),
+        key: challengeAesKeyBuffer
+      });
+
+      const decrypted = forge.util.decodeUtf8(decrypted_bytes);
+      const unscrambled = new Array(decrypted.length);
+      for (let i = 0; i < decrypted.length; i += 1) {
+        if (i % 2 === 0) {
+          unscrambled.push(decrypted.charAt(i));
         }
-      }); */
+      }
+
+      const encrypted = aes.encrypt(unscrambled.join(""), {
+        iv: forge.util.createBuffer(identify_response.session.encryption.aes.iv as string),
+        key: challengeAesKeyBuffer
+      });
+
+      const authenticate_response = await callAPI<ApiLoginAuthenticate>("/login/authenticate", {
+        solved_challenge: encrypted,
+        session: identify_response.session
+      });
+
+
     }
     catch (err) {
       console.error(err);

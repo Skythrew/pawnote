@@ -45,10 +45,10 @@ const RootHomePage: Component = () => {
                   <Link href={`/app/${account.slug}/dashboard`}>
                     <div
                       class="
-                      bg-brand-white rounded-xl text-brand-primary
-                      p-4 cursor-pointer hover:bg-opacity-80 transition-colors
-                      hover:shadow-sm
-                    "
+												bg-brand-white rounded-xl text-brand-primary
+												p-4 cursor-pointer hover:bg-opacity-80 transition-colors
+												hover:shadow-sm
+											"
                     >
                       <h2 class="font-semibold">
                         {account.data.userInformations.ressource.L} ({account.data.userInformations.ressource.classeDEleve.L})
