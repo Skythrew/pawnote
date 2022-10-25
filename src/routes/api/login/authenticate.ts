@@ -30,24 +30,38 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
       }
     });
 
-    const response_payload = await callPronoteAPI(PronoteApiFunctions.Authenticate, {
+    const response = await callPronoteAPI(PronoteApiFunctions.Authenticate, {
       session_instance: session.instance,
       cookies: body.cookies ?? [],
       payload: request_payload
     });
 
-    const response = session.readPronoteFunctionPayload<PronoteApiLoginAuthenticate["response"]>(response_payload);
-    if (typeof response === "string") return res.error({
-      message: response,
+    if (response === null) return res.error({
+      message: "A network error happened, please retry."
+    }, { status: 500 });
+
+    const received = session.readPronoteFunctionPayload<PronoteApiLoginAuthenticate["response"]>(response.payload);
+    if (typeof received === "string") return res.error({
+      message: received,
       debug: {
+        received,
         request_payload,
-        response_payload,
         cookies: body.cookies
       }
     }, { status: 400 });
 
+    if (!received.donnees.cle) return res.error({
+      message: "Given username and/or password is incorrect.",
+      debug: {
+        received,
+        request_payload,
+        cookies: body.cookies
+      }
+    }, { status: 403 });
+
     return res.success({
-      received: response,
+      received,
+      cookies: response.cookies,
       session: session.exportToObject()
     });
   }

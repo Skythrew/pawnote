@@ -74,19 +74,24 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
     });
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiInstance["request"]>({});
-    const response_payload = await callPronoteAPI(PronoteApiFunctions.Instance, {
+
+    const response = await callPronoteAPI(PronoteApiFunctions.Instance, {
       payload: request_payload,
       session_instance: session.instance
     });
 
-    const response = session.readPronoteFunctionPayload<PronoteApiInstance["response"]>(response_payload);
-    if (typeof response === "string") return res.error({
-      message: response
+    if (response === null) return res.error({
+      message: "A network error happened, please retry."
+    }, { status: 500 });
+
+    const received = session.readPronoteFunctionPayload<PronoteApiInstance["response"]>(response.payload);
+    if (typeof received === "string") return res.error({
+      message: received
     }, { status: 400 });
 
     return res.success({
+      received,
       pronote_url,
-      received: response,
       ent_url: ent.available ? ent.url : undefined
     });
   }
