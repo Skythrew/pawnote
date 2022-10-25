@@ -116,6 +116,7 @@ export interface ApiLoginAuthenticate {
   response: {
     received: PronoteApiLoginAuthenticate["response"];
     session: SessionExported;
+    cookies: string[];
   }
 
   path: "/login/authenticate";
