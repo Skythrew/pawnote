@@ -1,5 +1,5 @@
 import type { Component, JSX } from "solid-js";
-import { ApiGeolocation, ApiInstance, ApiLoginAuthenticate, ApiLoginIdentify, ApiLoginInformations } from "@/types/api";
+import { ApiGeolocation, ApiInstance } from "@/types/api";
 
 import {
   HeadlessDisclosureChild,
@@ -11,18 +11,16 @@ import {
 } from "solid-headless";
 
 import {
+  callAPI,
   classNames,
   getGeolocationPosition,
-  callAPI,
+  connectToPronote,
+
   ApiError
 } from "@/utils/client";
 
-import forge from "node-forge";
-import { aes } from "@/utils/globals";
-
 import { objectHasProperty } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
-import Session from "@/utils/session";
 
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
@@ -114,108 +112,19 @@ const LinkPronoteAccount: Component = () => {
 
   const processUserAuthentication: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (evt) => {
     evt.preventDefault();
-
     if (!state.school_informations_commun) return;
+    if (!state.login.username || !state.login.password) return;
 
     const account_type = state.login.account_type;
     if (account_type === null || !objectHasProperty(PRONOTE_ACCOUNT_TYPES, account_type)) return;
 
     try {
-      const informations_response = await callAPI<ApiLoginInformations>("/login/informations", {
-        account_type,
-        pronote_url: state.school_informations_commun.pronote_url
+      await connectToPronote({
+        pronote_url: state.school_informations_commun.pronote_url,
+        username: state.login.username,
+        password: state.login.password,
+        account_type
       });
-
-      let username = state.login.username;
-      let password = state.login.password;
-
-      // Updating the login credentials to use depending of the received response.
-      if (informations_response.setup) {
-        username = informations_response.setup.username;
-        password = informations_response.setup.password;
-      }
-
-      const identify_response = await callAPI<ApiLoginIdentify>("/login/identify", {
-        pronote_username: username,
-        session: informations_response.session
-      });
-
-      if (identify_response.received.donnees.modeCompLog) {
-        username = username.toLowerCase();
-      }
-
-      if (identify_response.received.donnees.modeCompMdp) {
-        password = password.toLowerCase();
-      }
-
-      // Short-hand for later usage.
-      const aesIvBuffer = forge.util.createBuffer(identify_response.session.encryption.aes.iv as string);
-
-      /// Resolving the challenge - Part 1.
-      /// Decoding the challenge from hex to bytes and decrypting it with AES.
-
-      // Generate the hash for the AES key.
-      const challengeAesKeyHash = forge.md.sha256.create()
-        .update(informations_response.setup
-          ? "" // When using generated credentials, we don't have to use `alea`.
-          : identify_response.received.donnees.alea
-        )
-        .update(forge.util.encodeUtf8(password))
-        .digest();
-
-      const challengeAesKey = (informations_response.setup
-        ? "" // When using generated credentials, we don't have to lowercase.
-        : username.toLowerCase()
-      ) +  challengeAesKeyHash.toHex().toUpperCase();
-
-      const challengeAesKeyBuffer = forge.util.createBuffer(
-        forge.util.encodeUtf8(challengeAesKey)
-      );
-
-
-      const challengeDecryptedBytes = aes.decrypt(identify_response.received.donnees.challenge, {
-        iv: aesIvBuffer,
-        key: challengeAesKeyBuffer
-      });
-
-      const challengeDecrypted = forge.util.decodeUtf8(challengeDecryptedBytes);
-
-      /// Resolving the challenge - Part 2.
-      /// Modifying the plain text by removing every second character.
-
-      const challengeDecryptedUnscrambled = new Array(challengeDecrypted.length);
-      for (let i = 0; i < challengeDecrypted.length; i += 1) {
-        if (i % 2 === 0) {
-          challengeDecryptedUnscrambled.push(challengeDecrypted.charAt(i));
-        }
-      }
-
-      /// Resolving the challenge - Part 3.
-      /// Encrypting the modified text back with AES and encoding it as hex.
-
-      const challengeEncrypted = aes.encrypt(challengeDecryptedUnscrambled.join(""), {
-        iv: aesIvBuffer,
-        key: challengeAesKeyBuffer
-      });
-
-      // Send the resolved challenge.
-      const authenticate_response = await callAPI<ApiLoginAuthenticate>("/login/authenticate", {
-        solved_challenge: challengeEncrypted,
-        session: identify_response.session
-      });
-
-      const decryptedAuthKey = aes.decrypt(authenticate_response.received.donnees.cle, {
-        iv: aesIvBuffer,
-        key: challengeAesKeyBuffer
-      });
-
-      /** Get the new AES key that will be used in our requests. */
-      const authKeyBytesArray = new Uint8Array(decryptedAuthKey.split(",").map(a => parseInt(a)));
-      const authKey = forge.util.createBuffer(authKeyBytesArray).bytes();
-
-      // Update our authenticated session.
-      const session = Session.importFromObject(authenticate_response.session);
-      session.encryption.aes.key = authKey;
     }
     catch (err) {
       console.error("Wrong credentials.");
