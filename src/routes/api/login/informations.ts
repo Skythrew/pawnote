@@ -1,5 +1,6 @@
 import type { PronoteApiLoginInformations } from "@/types/pronote";
 import type { ApiLoginInformations } from "@/types/api";
+import { PronoteApiFunctions } from "@/types/pronote";
 
 import {
   extractPronoteSessionFromBody,
@@ -101,7 +102,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
       }
     });
 
-    const response_payload = await callPronoteAPI("FonctionParametres", {
+    const response_payload = await callPronoteAPI(PronoteApiFunctions.Informations, {
       cookies,
       pronote_url,
       payload: request_payload,

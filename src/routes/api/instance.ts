@@ -1,5 +1,6 @@
 import type { PronoteApiInstance } from "@/types/pronote";
 import type { ApiInstance } from "@/types/api";
+import { PronoteApiFunctions } from "@/types/pronote";
 
 import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
@@ -73,7 +74,7 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
     });
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiInstance["request"]>({});
-    const response_payload = await callPronoteAPI("FonctionParametres", {
+    const response_payload = await callPronoteAPI(PronoteApiFunctions.Instance, {
       payload: request_payload,
       session_instance: session.instance
     });
