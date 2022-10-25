@@ -1,6 +1,7 @@
 import type { Component } from "solid-js";
-
 import type { ApiUserData } from "@/types/api";
+
+import { A } from "solid-start";
 
 import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
@@ -62,15 +63,15 @@ const RootHomePage: Component = () => {
                   <p class="text-sm sm:text-base opacity-100 text-center">
                     Aucun compte sauvegardé localement !
                   </p>
-                  <Link href="/link">
+                  <A href="/link">
                     Ajouter un compte Pronote
-                  </Link>
+                  </A>
                 </div>
               }
             >
               <For each={sessions}>
                 {session => (
-                  <Link href={`/app/${session.slug}/dashboard`}>
+                  <A href={`/app/${session.slug}/dashboard`}>
                     <div
                       class="
 												bg-brand-white rounded-xl text-brand-primary
@@ -85,7 +86,7 @@ const RootHomePage: Component = () => {
                         {session.instance_name}
                       </p>
                     </div>
-                  </Link>
+                  </A>
                 )}
               </For>
             </Show>
