@@ -1,14 +1,14 @@
-// These utility functions are made for server-side usage only.
+/// These utility functions are made for server-side usage only.
+
+import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
+import type { SessionInstance } from "@/types/session";
+import type { ResponseError } from "@/types/api";
 
 import type { FetchEvent } from "solid-start/server";
-import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
-import type { ResponseError } from "@/types/api";
-import type { SessionData, SessionInstance } from "@/types/session";
-
-import { HEADERS_PRONOTE } from "@/utils/constants";
-
 import { json } from "solid-start/server";
 import set_cookie from "set-cookie-parser";
+
+import { HEADERS_PRONOTE } from "@/utils/constants";
 
 export const handleServerRequest = <T>(callback: (
   req: FetchEvent["request"],
