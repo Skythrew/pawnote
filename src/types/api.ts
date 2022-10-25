@@ -2,7 +2,8 @@ import type {
   PronoteApiInstance,
   PronoteApiAccountId,
   PronoteApiLoginInformations,
-  PronoteApiLoginIdentify
+  PronoteApiLoginIdentify,
+  PronoteApiLoginAuthenticate
 } from "@/types/pronote";
 
 import type { SessionExported } from "@/types/session";
@@ -97,9 +98,27 @@ export interface ApiLoginIdentify {
 
   response: {
     received: PronoteApiLoginIdentify["response"];
+    session: SessionExported;
   }
 
   path: "/login/identify";
+}
+
+export interface ApiLoginAuthenticate {
+  request: {
+    /** Challenge from `ApiLoginIdentify["response"]` solved. */
+    solved_challenge: string;
+
+    session: SessionExported;
+    cookies?: string[];
+  }
+
+  response: {
+    received: PronoteApiLoginAuthenticate["response"];
+    session: SessionExported;
+  }
+
+  path: "/login/authenticate";
 }
 
 export interface ApiLoginTicket {

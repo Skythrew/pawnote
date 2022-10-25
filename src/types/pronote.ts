@@ -10,9 +10,12 @@ export enum PronoteApiAccountId {
   Academie = 5
 }
 
-export type PronoteApiFunctions =
-  | "FonctionParametres"
-  | "Identification"
+export enum PronoteApiFunctions {
+  Instance = "FonctionParametres",
+  Informations = "FonctionParametres",
+  Identify = "Identification",
+  Authenticate = "Authentification"
+}
 
 export interface PronoteApiSession {
   /** Session ID as a **string**. */
@@ -75,7 +78,7 @@ export interface PronoteApiInstance {
   request: Record<string, never>;
 
   response: {
-		nom: "FonctionParametres";
+		nom: PronoteApiFunctions.Instance;
 
 		_Signature_: {
 			ModeExclusif: boolean;
@@ -178,7 +181,7 @@ export interface PronoteApiLoginInformations {
   }
 
 	response: {
-    nom: "FonctionParametres";
+    nom: PronoteApiFunctions.Informations;
 
     _Signature_: {
       ModeExclusif: boolean;
@@ -548,7 +551,7 @@ export interface PronoteApiLoginIdentify {
   }
 
   response: {
-    nom: "Identification";
+    nom: PronoteApiFunctions.Identify;
     donnees: {
       /** String used in the challenge. */
       alea: string;
@@ -563,3 +566,14 @@ export interface PronoteApiLoginIdentify {
   }
 }
 
+export interface PronoteApiLoginAuthenticate {
+  request: {
+    donnees: {
+      connexion: 0;
+      challenge: string;
+      espace: PronoteApiAccountId;
+    }
+  }
+
+  response: unknown;
+}
