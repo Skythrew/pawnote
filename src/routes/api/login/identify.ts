@@ -1,5 +1,6 @@
 import type { PronoteApiLoginIdentify } from "@/types/pronote";
 import type { ApiLoginIdentify } from "@/types/api";
+import { PronoteApiFunctions } from "@/types/pronote";
 
 import {
   handleServerRequest,
@@ -36,10 +37,10 @@ export const POST = handleServerRequest<ApiLoginIdentify["response"]>(async (req
       }
     });
 
-    const response_payload = await callPronoteAPI("Identification", {
+    const response_payload = await callPronoteAPI(PronoteApiFunctions.Identify, {
+      session_instance: session.instance,
       cookies: body.cookies ?? [],
-      payload: request_payload,
-      session_instance: session.instance
+      payload: request_payload
     });
 
     const response = session.readPronoteFunctionPayload<PronoteApiLoginIdentify["response"]>(response_payload);
@@ -53,7 +54,8 @@ export const POST = handleServerRequest<ApiLoginIdentify["response"]>(async (req
     }, { status: 400 });
 
     return res.success({
-      received: response
+      received: response,
+      session: session.exportToObject()
     });
   }
   catch (error) {
