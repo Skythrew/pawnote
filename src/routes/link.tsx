@@ -1,5 +1,7 @@
 import type { Component, JSX } from "solid-js";
-import { ApiGeolocation, ApiInstance } from "@/types/api";
+import { ApiGeolocation, ApiInstance, ApiUserData } from "@/types/api";
+
+import { unwrap } from "solid-js/store";
 
 import {
   HeadlessDisclosureChild,
@@ -23,6 +25,7 @@ import { objectHasProperty } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
 import sessions from "@/stores/sessions";
+import endpoints from "@/stores/endpoints";
 
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
@@ -37,6 +40,9 @@ const LinkPronoteAccount: Component = () => {
       password: string;
       use_ent: boolean;
     }
+
+    slug: string;
+    result: Awaited<ReturnType<typeof connectToPronote>> | null;
   }>({
     geolocation_data: null,
 
@@ -48,7 +54,10 @@ const LinkPronoteAccount: Component = () => {
       username: "",
       password: "",
       use_ent: false
-    }
+    },
+
+    slug: "",
+    result: null
   });
 
   /**
@@ -128,11 +137,19 @@ const LinkPronoteAccount: Component = () => {
         account_type
       });
 
-      sessions.upsert("user1", data.session);
+      setState("result", data);
     }
     catch (err) {
       console.error("Wrong credentials.");
     }
+  };
+
+  const processSlugSave: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
+    event.preventDefault();
+    if (!state.result || !state.slug) return;
+
+    const saved = await sessions.upsert(state.slug, state.result.session);
+    if (saved) await endpoints.upsert<ApiUserData>(state.slug, "/user/data", unwrap(state.result.user_data));
   };
 
   return (
@@ -263,6 +280,30 @@ const LinkPronoteAccount: Component = () => {
           )}
         </Show>
       </main>
+
+      <Show keyed when={state.result}>
+        {result => (
+          <div>
+            <h4>Connexion établie!</h4>
+            <p>Choissisez un nom d'utilisateur local pour facilement retrouver le compte (depuis l'URL par exemple)</p>
+            <span>Vous êtes connecté en tant que {result.user_data.donnees.ressource.L} à l'instance {result.user_data.donnees.listeInformationsEtablissements.V[0].L}</span>
+
+            <form onSubmit={processSlugSave}>
+              <input
+                type="text"
+                value={state.slug}
+                onInput={event => {
+                  const cleanedValue = event.currentTarget.value
+                    // Clean-up the value to make sure it's a slug.
+                    .toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+                  return setState("slug", cleanedValue);
+                }}
+              />
+              <button type="submit">Sauvegarder la session!</button>
+            </form>
+          </div>
+        )}
+      </Show>
     </div>
   );
 };

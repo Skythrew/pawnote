@@ -19,7 +19,7 @@ const upsert = async (slug: string, session: Session) => {
     return true;
   }
   catch (error) {
-    console.error("[stores:sessions:upsert]", error);
+    console.error(`[stores:sessions:upsert:${slug}]`, error);
     return false;
   }
 };
