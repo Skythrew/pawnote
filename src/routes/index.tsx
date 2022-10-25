@@ -71,7 +71,7 @@ const RootHomePage: Component = () => {
             >
               <For each={sessions}>
                 {session => (
-                  <A href={`/app/${session.slug}/dashboard`}>
+                  <A href={`/app/${session.slug}`}>
                     <div
                       class="
 												bg-brand-white rounded-xl text-brand-primary
