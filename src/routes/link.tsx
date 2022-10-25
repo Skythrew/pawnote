@@ -22,6 +22,8 @@ import {
 import { objectHasProperty } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
+import sessions from "@/stores/sessions";
+
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
     geolocation_data: ApiGeolocation["response"] | null;
@@ -119,12 +121,14 @@ const LinkPronoteAccount: Component = () => {
     if (account_type === null || !objectHasProperty(PRONOTE_ACCOUNT_TYPES, account_type)) return;
 
     try {
-      await connectToPronote({
+      const data = await connectToPronote({
         pronote_url: state.school_informations_commun.pronote_url,
         username: state.login.username,
         password: state.login.password,
         account_type
       });
+
+      sessions.upsert("user1", data.session);
     }
     catch (err) {
       console.error("Wrong credentials.");

@@ -165,14 +165,17 @@ export const connectToPronote = async (options: {
   const authKeyBytesArray = new Uint8Array(decryptedAuthKey.split(",").map(a => parseInt(a)));
   const authKey = forge.util.createBuffer(authKeyBytesArray).bytes();
 
-  // Update our authenticated session.
-  let session = Session.importFromObject(authenticate_response.session);
-  session.encryption.aes.key = authKey;
+  // Update the authenticated session we previously got.
+  authenticate_response.session.encryption.aes.key = authKey;
 
   const user_data_response = await callAPI<ApiUserData>("/user/data", {
-    session: session.exportToObject()
+    session: authenticate_response.session
   });
 
-  session = Session.importFromObject(user_data_response.session);
-
+  // Return reusable data that can be used later.
+  return {
+    session: Session.importFromObject(user_data_response.session),
+    user_data: user_data_response.received,
+    cookies: [] as string[]
+  } as const;
 };
