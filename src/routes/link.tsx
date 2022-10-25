@@ -19,7 +19,6 @@ import {
 
 import forge from "node-forge";
 import { aes } from "@/utils/globals";
-import Session from "@/utils/session";
 
 import { objectHasProperty } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
@@ -148,58 +147,59 @@ const LinkPronoteAccount: Component = () => {
         password = password.toLowerCase();
       }
 
-      /**
-       * Hash for the challenge key is an
-       * uppercase HEX representation
-       * of a SHA256 hash of "challengeData.alea"
-       * and the user password concatenated
-       * into a single string.
-       */
-      const challengeAesKeyHashCreation = forge.md.sha256.create();
+      // Short-hand for later usage.
+      const aesIvBuffer = forge.util.createBuffer(identify_response.session.encryption.aes.iv as string);
 
-      // If we use credentials given by Pronote, we don't need to use `alea`.
-      const challengeAesKeyHashUpdate = informations_response.setup
-        ? challengeAesKeyHashCreation.update(identify_response.received.donnees.alea)
-        : challengeAesKeyHashCreation;
+      /// Resolving the challenge - Part 1.
+      /// Decoding the challenge from hex to bytes and decrypting it with AES.
 
-      // Continue hashing...
-      const challengeAesKeyHash = challengeAesKeyHashUpdate
+      // Generate the hash for the AES key.
+      const challengeAesKeyHash = forge.md.sha256.create()
+        .update(informations_response.setup
+          ? "" // When using generated credentials, we don't have to use `alea`.
+          : identify_response.received.donnees.alea
+        )
         .update(forge.util.encodeUtf8(password))
-        .digest()
-        .toHex()
-        .toUpperCase();
+        .digest();
 
-      /**
-       * Challenge key is an MD5 hash of the username,
-       * and the SHA256 hash created of "alea" and user password.
-       */
-      const challengeAesKeyHashUtf8 = forge.util.encodeUtf8(challengeAesKeyHash);
-      const challengeAesKey = informations_response.setup
-        ? username + challengeAesKeyHashUtf8
-        : challengeAesKeyHashUtf8;
+      const challengeAesKey = (informations_response.setup
+        ? "" // When using generated credentials, we don't have to lowercase.
+        : username.toLowerCase()
+      ) +  challengeAesKeyHash.toHex().toUpperCase();
 
-      const challengeAesKeyBuffer = forge.util.createBuffer(challengeAesKey);
+      const challengeAesKeyBuffer = forge.util.createBuffer(
+        forge.util.encodeUtf8(challengeAesKey)
+      );
 
-      const decrypted_bytes = aes.decrypt(identify_response.received.donnees.challenge, {
-        iv: forge.util.createBuffer(identify_response.session.encryption.aes.iv as string),
+
+      const challengeDecryptedBytes = aes.decrypt(identify_response.received.donnees.challenge, {
+        iv: aesIvBuffer,
         key: challengeAesKeyBuffer
       });
 
-      const decrypted = forge.util.decodeUtf8(decrypted_bytes);
-      const unscrambled = new Array(decrypted.length);
-      for (let i = 0; i < decrypted.length; i += 1) {
+      const challengeDecrypted = forge.util.decodeUtf8(challengeDecryptedBytes);
+
+      /// Resolving the challenge - Part 2.
+      /// Modifying the plain text by removing every second character.
+
+      const challengeDecryptedUnscrambled = new Array(challengeDecrypted.length);
+      for (let i = 0; i < challengeDecrypted.length; i += 1) {
         if (i % 2 === 0) {
-          unscrambled.push(decrypted.charAt(i));
+          challengeDecryptedUnscrambled.push(challengeDecrypted.charAt(i));
         }
       }
 
-      const encrypted = aes.encrypt(unscrambled.join(""), {
-        iv: forge.util.createBuffer(identify_response.session.encryption.aes.iv as string),
+      /// Resolving the challenge - Part 3.
+      /// Encrypting the modified text back with AES and encoding it as hex.
+
+      const challengeEncrypted = aes.encrypt(challengeDecryptedUnscrambled.join(""), {
+        iv: aesIvBuffer,
         key: challengeAesKeyBuffer
       });
 
+      // Send the resolved challenge.
       const authenticate_response = await callAPI<ApiLoginAuthenticate>("/login/authenticate", {
-        solved_challenge: encrypted,
+        solved_challenge: challengeEncrypted,
         session: identify_response.session
       });
 
