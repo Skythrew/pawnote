@@ -55,6 +55,22 @@ export const cleanPronoteUrl = (url: string) => {
     pronote_url.href;
 };
 
+export const retrieveSentCookies = (response: Response) => {
+  const response_cookies = response.headers.get("set-cookie");
+  const sent_cookies: string[] = [];
+
+  if (response_cookies) {
+    const splitted = set_cookie.splitCookiesString(response_cookies);
+    const cleaned = splitted.map(cookie => cookie.split(";")[0]);
+
+    for (const cookie of cleaned) {
+      sent_cookies.push(cookie);
+    }
+  }
+
+  return sent_cookies;
+};
+
 /**
  * @param url - URL to download the data from.
  * @param cookies - Cookies to send with the request.
@@ -80,20 +96,8 @@ export const downloadPronotePage = async (url: string, cookies?: string[]): Prom
       }
     });
 
-    const response_cookies = response.headers.get("set-cookie");
-    const sent_cookies: string[] = [];
-
-    if (response_cookies) {
-      const splitted = set_cookie.splitCookiesString(response_cookies);
-      const cleaned = splitted.map(cookie => cookie.split(";")[0]);
-
-      for (const cookie of cleaned) {
-        sent_cookies.push(cookie);
-      }
-    }
-
     return {
-      cookies: sent_cookies,
+      cookies: retrieveSentCookies(response),
       body: await response.text()
     };
   }
@@ -217,8 +221,10 @@ export const callPronoteAPI = async <T>(
       })
     });
 
-    const body = await response.text();
-    return body;
+    const payload = await response.text();
+    const cookies = retrieveSentCookies(response);
+
+    return { payload, cookies };
   }
   catch (error) {
     return null;

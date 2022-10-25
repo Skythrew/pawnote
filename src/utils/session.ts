@@ -160,12 +160,7 @@ class Session {
    * Returns an object when the request was successful
    * and `string` if an error has been found.
    */
-  readPronoteFunctionPayload <Res>(response_body: string | null): Res | string {
-    if (response_body === null) {
-      this.instance.order--; // Prevent errored order.
-      return "A network error happened, please retry.";
-    }
-
+  readPronoteFunctionPayload <Res>(response_body: string): Res | string {
     if (response_body.includes("La page a expir")) {
       this.instance.order--; // Prevent broken response to take the order.
       return "A mistake was done in the request payload, please retry.";
