@@ -575,5 +575,21 @@ export interface PronoteApiLoginAuthenticate {
     }
   }
 
-  response: unknown;
+  response: {
+    nom: PronoteApiFunctions.Authenticate;
+    donnees: {
+      /** AES encryption key to use from now on. */
+      cle: string;
+
+      /** Last authentication date. */
+      derniereConnexion: {
+        _T: 7;
+        V: string;
+      };
+
+      /** Name of the authenticated user. */
+      libelleUtil: string;
+      modeSecurisationParDefaut: number;
+    }
+  }
 }
