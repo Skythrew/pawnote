@@ -3,7 +3,8 @@ import type {
   PronoteApiAccountId,
   PronoteApiLoginInformations,
   PronoteApiLoginIdentify,
-  PronoteApiLoginAuthenticate
+  PronoteApiLoginAuthenticate,
+  PronoteApiUserData
 } from "@/types/pronote";
 
 import type { SessionExported } from "@/types/session";
@@ -53,6 +54,20 @@ export interface ApiInstance {
   }
 
   path: "/instance";
+}
+
+export interface ApiLoginTicket {
+  request: {
+    ent_url: string;
+    cookies: string[];
+  }
+
+  response: {
+    /** URL with "identifiant" search parameter. */
+    pronote_url: string;
+  }
+
+  path: "/login/ticket";
 }
 
 export interface ApiLoginInformations {
@@ -122,16 +137,17 @@ export interface ApiLoginAuthenticate {
   path: "/login/authenticate";
 }
 
-export interface ApiLoginTicket {
+export interface ApiUserData {
   request: {
-    ent_url: string;
-    cookies: string[];
+    session: SessionExported;
+    cookies?: string[];
   }
 
   response: {
-    /** URL with "identifiant" search parameter. */
-    pronote_url: string;
+    received: PronoteApiUserData["response"];
+    session: SessionExported;
+    cookies: string[];
   }
 
-  path: "/login/ticket";
+  path: "/user/data";
 }
