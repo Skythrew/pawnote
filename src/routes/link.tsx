@@ -22,6 +22,7 @@ import { aes } from "@/utils/globals";
 
 import { objectHasProperty } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
+import Session from "@/utils/session";
 
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
@@ -203,11 +204,21 @@ const LinkPronoteAccount: Component = () => {
         session: identify_response.session
       });
 
+      const decryptedAuthKey = aes.decrypt(authenticate_response.received.donnees.cle, {
+        iv: aesIvBuffer,
+        key: challengeAesKeyBuffer
+      });
 
+      /** Get the new AES key that will be used in our requests. */
+      const authKeyBytesArray = new Uint8Array(decryptedAuthKey.split(",").map(a => parseInt(a)));
+      const authKey = forge.util.createBuffer(authKeyBytesArray).bytes();
+
+      // Update our authenticated session.
+      const session = Session.importFromObject(authenticate_response.session);
+      session.encryption.aes.key = authKey;
     }
     catch (err) {
-      console.error(err);
-      alert("check logs.");
+      console.error("Wrong credentials.");
     }
   };
 
