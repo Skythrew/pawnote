@@ -27,4 +27,4 @@ const upsert = async (slug: string, session: Session) => {
 /** Removes the given slug from the database. */
 const remove = (slug: string) => database.removeItem(slug);
 
-export default { get, upsert, remove };
+export default { get, upsert, remove, keys: database.keys };

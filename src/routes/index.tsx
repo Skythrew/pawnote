@@ -1,7 +1,35 @@
 import type { Component } from "solid-js";
 
+import type { ApiUserData } from "@/types/api";
+
+import sessions from "@/stores/sessions";
+import endpoints from "@/stores/endpoints";
+
+interface AvailableSession {
+  slug: string;
+  user_name: string;
+  instance_name: string;
+}
+
 const RootHomePage: Component = () => {
-  const accounts = [] as any[] | null; // TODO
+  const [availableSessions, setAvailableSessions] = createSignal<AvailableSession[] | null>(null);
+
+  onMount(async () => {
+    const available_sessions: AvailableSession[] = [];
+
+    const slugs = await sessions.keys();
+    for (const slug of slugs) {
+      const user_data = await endpoints.get<ApiUserData>(slug, "/user/data");
+      if (!user_data) continue;
+
+      const user_name = user_data.donnees.ressource.L;
+      const instance_name = user_data.donnees.listeInformationsEtablissements.V[0].L;
+
+      available_sessions.push({ slug, user_name, instance_name });
+    }
+
+    setAvailableSessions([...available_sessions]);
+  });
 
   return (
     <div class="h-screen w-screen bg-brand-primary dark:bg-brand-dark text-brand-white">
@@ -16,14 +44,14 @@ const RootHomePage: Component = () => {
 
       <section class="h-full w-full flex items-center justify-center py-32 px-4">
         <Show keyed
-          when={accounts !== null && accounts}
+          when={availableSessions()}
           fallback={
             <p>Chargement des comptes...</p>
           }
         >
-          { accounts => (
+          { sessions => (
             <Show
-              when={accounts.length > 0}
+              when={sessions.length > 0}
               fallback={
                 <div class="
                   flex flex-col justify-center items-center gap-4 max-w-md p-6 rounded-lg
@@ -40,9 +68,9 @@ const RootHomePage: Component = () => {
                 </div>
               }
             >
-              <For each={accounts}>
-                {account => (
-                  <Link href={`/app/${account.slug}/dashboard`}>
+              <For each={sessions}>
+                {session => (
+                  <Link href={`/app/${session.slug}/dashboard`}>
                     <div
                       class="
 												bg-brand-white rounded-xl text-brand-primary
@@ -51,10 +79,10 @@ const RootHomePage: Component = () => {
 											"
                     >
                       <h2 class="font-semibold">
-                        {account.data.userInformations.ressource.L} ({account.data.userInformations.ressource.classeDEleve.L})
+                        {session.user_name}
                       </h2>
                       <p class="text-opacity-60">
-                        {account.data.schoolInformations.General.NomEtablissement}
+                        {session.instance_name}
                       </p>
                     </div>
                   </Link>
