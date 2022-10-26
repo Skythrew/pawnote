@@ -163,7 +163,7 @@ class Session {
   readPronoteFunctionPayload <Res>(response_body: string): Res | string {
     if (response_body.includes("La page a expir")) {
       this.instance.order--; // Prevent broken response to take the order.
-      return "A mistake was done in the request payload, please retry.";
+      return "The session was expired. Restore the session and try again.";
     }
 
     this.instance.order++;
