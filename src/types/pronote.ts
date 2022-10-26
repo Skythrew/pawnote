@@ -906,6 +906,10 @@ export interface PronoteApiUserTimetable {
       avecRessourcesLibrePiedHoraire: boolean;
       estEDTPermanence: boolean;
     }
+
+    _Signature_: {
+      onglet: 16;
+    }
   }
 
   response: {
