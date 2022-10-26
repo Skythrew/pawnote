@@ -37,7 +37,7 @@ export const POST = handleServerRequest<ApiUserData["response"]>(async (req, res
     if (typeof received === "string") return res.error({
       message: received,
       debug: {
-        received,
+        response,
         request_payload,
         cookies: body.cookies
       }

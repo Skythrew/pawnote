@@ -44,7 +44,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
     if (typeof received === "string") return res.error({
       message: received,
       debug: {
-        received,
+        response,
         request_payload,
         cookies: body.cookies
       }

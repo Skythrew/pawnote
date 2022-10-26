@@ -56,7 +56,7 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
     if (typeof received === "string") return res.error({
       message: received,
       debug: {
-        received,
+        response,
         request_payload
       }
     }, { status: 400 });

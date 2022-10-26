@@ -86,7 +86,8 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
 
     const received = session.readPronoteFunctionPayload<PronoteApiInstance["response"]>(response.payload);
     if (typeof received === "string") return res.error({
-      message: received
+      message: received,
+      debug: { response }
     }, { status: 400 });
 
     return res.success({
