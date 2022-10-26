@@ -1,5 +1,5 @@
 import { SessionExported } from "@/types/session";
-import { ApiUserData } from "@/types/api";
+import { ApiLoginInformations, ApiUserData, ApiUserTimetable } from "@/types/api";
 
 /// This is the store used by the app when
 /// browsing the data of a specific slug.
@@ -12,7 +12,12 @@ const [current_user, setCurrentUser] = createStore<
     loaded: true,
     session: SessionExported,
     endpoints: {
-      "/user/data": ApiUserData["response"]["received"]
+      // Required data for other API calls.
+      "/user/data": ApiUserData["response"]["received"];
+      "/login/informations": ApiLoginInformations["response"]["received"];
+
+      // Not available when not cached/fetched.
+      "/user/timetable"?: ApiUserTimetable["response"]["received"];
     }
   }
 >({ loaded: false });

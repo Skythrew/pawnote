@@ -175,7 +175,10 @@ export const connectToPronote = async (options: {
   // Return reusable data that can be used later.
   return {
     session: Session.importFromObject(user_data_response.session),
-    user_data: user_data_response.received,
-    cookies: [] as string[]
-  } as const;
+    cookies: [] as string[],
+    endpoints: {
+      "/user/data": user_data_response.received,
+      "/login/informations": informations_response.received
+    }
+  };
 };

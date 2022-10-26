@@ -1,5 +1,5 @@
 import type { Component } from "solid-js";
-import type { ApiUserData } from "@/types/api";
+import type { ApiLoginInformations, ApiUserData } from "@/types/api";
 
 import { A } from "solid-start";
 import { appBannerMessageToString } from "@/i18n";
@@ -23,11 +23,15 @@ const AppSlugLayout: Component = () => {
     const user_data = await endpoints.get<ApiUserData>(slug(), "/user/data");
     if (!user_data) return navigate("/link");
 
+    const login_informations = await endpoints.get<ApiLoginInformations>(slug(), "/login/informations");
+    if (!login_informations) return navigate("/link");
+
     app.setCurrentUser({
       loaded: true,
       session,
       endpoints: {
-        "/user/data": user_data
+        "/user/data": user_data,
+        "/login/informations": login_informations
       }
     });
   });

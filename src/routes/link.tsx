@@ -1,5 +1,5 @@
 import type { Component, JSX } from "solid-js";
-import { ApiGeolocation, ApiInstance, ApiUserData } from "@/types/api";
+import { ApiGeolocation, ApiInstance, ApiLoginInformations, ApiUserData } from "@/types/api";
 
 import { unwrap } from "solid-js/store";
 
@@ -144,12 +144,25 @@ const LinkPronoteAccount: Component = () => {
     }
   };
 
+  /**
+   * When the user saves the session,
+   * we also save important endpoints that
+   * we'll use later.
+   */
   const processSlugSave: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
     event.preventDefault();
     if (!state.result || !state.slug) return;
 
-    const saved = await sessions.upsert(state.slug, state.result.session);
-    if (saved) await endpoints.upsert<ApiUserData>(state.slug, "/user/data", unwrap(state.result.user_data));
+    const is_saved = await sessions.upsert(state.slug, state.result.session);
+    if (is_saved) {
+      await endpoints.upsert<ApiUserData>(
+        state.slug, "/user/data", unwrap(state.result.endpoints["/user/data"])
+      );
+
+      await endpoints.upsert<ApiLoginInformations>(
+        state.slug, "/login/informations", unwrap(state.result.endpoints["/login/informations"])
+      );
+    }
   };
 
   return (
@@ -286,7 +299,7 @@ const LinkPronoteAccount: Component = () => {
           <div>
             <h4>Connexion établie!</h4>
             <p>Choissisez un nom d'utilisateur local pour facilement retrouver le compte (depuis l'URL par exemple)</p>
-            <span>Vous êtes connecté en tant que {result.user_data.donnees.ressource.L} à l'instance {result.user_data.donnees.listeInformationsEtablissements.V[0].L}</span>
+            <span>Vous êtes connecté en tant que {result.endpoints["/user/data"].donnees.ressource.L} à l'instance {result.endpoints["/user/data"].donnees.ressource.Etablissement.V.L}</span>
 
             <form onSubmit={processSlugSave}>
               <input
