@@ -4,7 +4,7 @@ import type Session from "@/utils/session";
 import localforage from "localforage";
 
 const database = localforage.createInstance({
-  name: "pornote",
+  name: "internals",
   storeName: "sessions"
 });
 
