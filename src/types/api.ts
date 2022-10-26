@@ -57,10 +57,23 @@ export interface ApiInstance {
   path: "/instance";
 }
 
+export interface ApiLoginEntCookies {
+  request: {
+    ent_url: string;
+    credentials: string;
+  }
+
+  response: {
+    ent_cookies: string[];
+  }
+
+  path: "/login/ent_cookies";
+}
+
 export interface ApiLoginTicket {
   request: {
     ent_url: string;
-    cookies: string[];
+    ent_cookies: string[];
   }
 
   response: {
