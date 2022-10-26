@@ -70,7 +70,7 @@ export interface ApiLoginEntCookies {
   path: "/login/ent_cookies";
 }
 
-export interface ApiLoginTicket {
+export interface ApiLoginEntTicket {
   request: {
     ent_url: string;
     ent_cookies: string[];
