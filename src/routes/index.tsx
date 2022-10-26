@@ -69,26 +69,31 @@ const RootHomePage: Component = () => {
                 </div>
               }
             >
-              <For each={sessions}>
-                {session => (
-                  <A href={`/app/${session.slug}`}>
-                    <div
-                      class="
-												bg-brand-white rounded-xl text-brand-primary
-												p-4 cursor-pointer hover:bg-opacity-80 transition-colors
-												hover:shadow-sm
-											"
-                    >
-                      <h2 class="font-semibold">
-                        {session.user_name}
-                      </h2>
-                      <p class="text-opacity-60">
-                        {session.instance_name}
-                      </p>
-                    </div>
-                  </A>
-                )}
-              </For>
+              <div class="flex flex-col gap-4">
+                <For each={sessions}>
+                  {session => (
+                    <A href={`/app/${session.slug}`}>
+                      <div
+                        class="
+                          bg-brand-white rounded-xl text-brand-primary
+                          p-4 cursor-pointer hover:bg-opacity-80 transition-colors
+                          hover:shadow-sm
+                        "
+                      >
+                        <h2 class="font-semibold">
+                          {session.user_name}
+                        </h2>
+                        <p class="text-opacity-60">
+                          {session.instance_name}
+                        </p>
+                      </div>
+                    </A>
+                  )}
+                </For>
+                <A href="/link">
+                  Ajouter un autre compte Pronote
+                </A>
+              </div>
             </Show>
           )}
         </Show>
