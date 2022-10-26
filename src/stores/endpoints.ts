@@ -1,10 +1,4 @@
-import type { ApiUserData } from "@/types/api";
-
 import localforage from "localforage";
-
-export interface StoredEndpoints {
-  "/user/data": ApiUserData["response"]["received"];
-}
 
 const database = (slug: string) => localforage.createInstance({
   name: "endpoints",
