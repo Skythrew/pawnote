@@ -16,6 +16,7 @@
     "@fontsource/poppins": "^4.5.10",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.5.0",
+    "dayjs": "^1.11.6",
     "got": "^12.5.2",
     "haversine-distance": "^1.2.1",
     "html-entities": "^2.3.3",

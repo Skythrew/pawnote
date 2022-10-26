@@ -39,9 +39,11 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
 
         Ressource: body.ressource,
         ressource: body.ressource
-      }
+      },
+
+      _Signature_: { onglet: 16 }
     });
-    const response = await callPronoteAPI(PronoteApiFunctions.UserData, {
+    const response = await callPronoteAPI(PronoteApiFunctions.Timetable, {
       session_instance: session.instance,
       payload: request_payload
     });
