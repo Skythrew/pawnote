@@ -155,8 +155,8 @@ export interface ApiUserData {
 
 export interface ApiUserTimetable {
   request: {
-    session: SessionExported;
     week_number: number;
+    session: SessionExported;
     ressource: ApiUserData["response"]["received"]["donnees"]["ressource"];
   }
 
