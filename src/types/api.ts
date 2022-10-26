@@ -4,7 +4,8 @@ import type {
   PronoteApiLoginInformations,
   PronoteApiLoginIdentify,
   PronoteApiLoginAuthenticate,
-  PronoteApiUserData
+  PronoteApiUserData,
+  PronoteApiUserTimetable
 } from "@/types/pronote";
 
 import type { SessionExported } from "@/types/session";
@@ -150,4 +151,19 @@ export interface ApiUserData {
   }
 
   path: "/user/data";
+}
+
+export interface ApiUserTimetable {
+  request: {
+    session: SessionExported;
+    week_number: number;
+    ressource: ApiUserData["response"]["received"]["donnees"]["ressource"];
+  }
+
+  response: {
+    received: PronoteApiUserTimetable["response"];
+    session: SessionExported;
+  }
+
+  path: "/user/timetable";
 }
