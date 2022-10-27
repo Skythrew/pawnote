@@ -81,7 +81,7 @@ export interface ApiLoginEntTicket {
     pronote_url: string;
   }
 
-  path: "/login/ticket";
+  path: "/login/ent_ticket";
 }
 
 export interface ApiLoginInformations {
@@ -107,6 +107,7 @@ export interface ApiLoginInformations {
 	response: {
 		received: PronoteApiLoginInformations["response"];
 		session: SessionExported;
+    cookies: string[];
 
     setup?: {
       username: string;
@@ -145,7 +146,6 @@ export interface ApiLoginAuthenticate {
   response: {
     received: PronoteApiLoginAuthenticate["response"];
     session: SessionExported;
-    cookies: string[];
   }
 
   path: "/login/authenticate";
@@ -154,13 +154,11 @@ export interface ApiLoginAuthenticate {
 export interface ApiUserData {
   request: {
     session: SessionExported;
-    cookies?: string[];
   }
 
   response: {
     received: PronoteApiUserData["response"];
     session: SessionExported;
-    cookies: string[];
   }
 
   path: "/user/data";

@@ -1,19 +1,23 @@
 import type {
+  ApiLoginEntTicket,
   Response,
-  ResponseError
-} from "@/types/api";
-
-import type {
+  ResponseError,
   ApiLoginAuthenticate,
   ApiLoginIdentify,
   ApiLoginInformations,
+  ApiLoginEntCookies,
   ApiUserData
 } from "@/types/api";
 
+
+import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 import { PronoteApiAccountId } from "@/types/pronote";
 
+import app, { AppBannerMessage } from "@/stores/app";
+import sessions from "@/stores/sessions";
+import endpoints from "@/stores/endpoints";
+
 import { aes } from "@/utils/globals";
-import Session from "@/utils/session";
 
 import forge from "node-forge";
 
@@ -44,7 +48,59 @@ export const callAPI = async <Api extends {
   });
 
   const response = await request.json() as Response<Api["response"]>;
-  if (!response.success) throw new ApiError(response);
+  if (!response.success) {
+    if (response.message === "The session was expired. Restore the session and try again.") {
+      const user = app.current_user();
+
+      // When the session expired while connected to a user
+      // we try to restore the session.
+      if (user) {
+        app.setBannerMessage({ message: AppBannerMessage.RestoringSession, is_loader: true });
+        const old_session = user.session;
+
+        const data = await connectToPronote({
+          pronote_url: old_session.instance.pronote_url,
+          use_credentials: false,
+          ...(old_session.instance.use_ent
+            ? { // When creating a new session using ENT cookies.
+              use_ent: true,
+              ent_cookies: old_session.instance.ent_cookies,
+              ent_url: old_session.instance.ent_url as string
+            }
+            : { // When restoring a session using Pronote cookies.
+              use_ent: false,
+              account_type: old_session.instance.account_type_id,
+              pronote_cookies: old_session.instance.pronote_cookies
+            }
+          )
+        });
+
+        if (!data) {
+          response.message = "Error while trying to restore the session.";
+          throw new ApiError(response);
+        }
+
+        const is_saved = await sessions.upsert(user.slug, data.session);
+
+        if (is_saved) {
+          await endpoints.upsert<ApiUserData>(
+            user.slug, "/user/data", data.endpoints["/user/data"]
+          );
+
+          await endpoints.upsert<ApiLoginInformations>(
+            user.slug, "/login/informations", data.endpoints["/login/informations"]
+          );
+        }
+
+        app.setBannerToIdle();
+        return;
+      }
+      else response.message = "A mistake was made in the request payload.";
+    }
+
+    throw new ApiError(response);
+  }
+
   return response.data;
 };
 
@@ -67,37 +123,133 @@ export const getGeolocationPosition = (options?: PositionOptions): Promise<Geolo
 export const classNames = (...classes: (string | boolean | undefined)[]): string =>
   classes.filter(Boolean).join(" ");
 
+export const guessPronoteAccountTypeFromUrl = (raw_url: string) => {
+  const pronote_url = new URL(raw_url);
+  const account_type_path = pronote_url.pathname.split("/").pop();
+
+  const result = Object.entries(PRONOTE_ACCOUNT_TYPES).find(
+    entry => entry[1].path === account_type_path
+  );
+
+  if (!result) return null;
+  const account_type_id = parseInt(result[0]) as PronoteApiAccountId;
+  return account_type_id;
+};
+
 export const connectToPronote = async (options: {
-  account_type: PronoteApiAccountId;
+  // We always need the base Pronote URL,
+  // in case it has been modified.
   pronote_url: string;
-  username: string;
-  password: string;
-}) => {
+} & (
+  | {
+    use_ent: false;
+    use_credentials: true;
+
+    username: string;
+    password: string;
+    account_type: PronoteApiAccountId;
+  }
+  | {
+    use_ent: true;
+    use_credentials: true;
+
+    username: string;
+    password: string;
+    ent_url: string;
+  }
+  | {
+    use_ent: true;
+    use_credentials: false;
+
+    ent_cookies: string[];
+    ent_url: string;
+  }
+  | {
+    use_ent: false;
+    use_credentials: false;
+
+    pronote_cookies: string[];
+    account_type: PronoteApiAccountId;
+  }
+)) => {
+  let pronote_username = !options.use_ent && options.use_credentials ? options.username : "";
+  let pronote_password = !options.use_ent && options.use_credentials ? options.password : "";
+
+  let ent_cookies: string[] = options.use_ent && !options.use_credentials
+    // Use given cookies when not using credentials.
+    ? options.ent_cookies
+    : []; // Empty array since we gonna fetch them later.
+
+  if (options.use_ent && options.use_credentials) {
+    const ent_cookies_response = await callAPI<ApiLoginEntCookies>("/login/ent_cookies", {
+      ent_url: options.ent_url,
+      credentials: forge.util.createBuffer(`${forge.util.encode64(options.username)}:${forge.util.encode64(options.password)}`)
+        // My own encrypting method, inspired by Pronote developers.
+        .toHex().toUpperCase().split("").reverse().join("")
+    });
+
+    ent_cookies = ent_cookies_response.ent_cookies;
+  }
+
+  // When we fetch a Pronote ticket, we'll need to use the RAW given URL.
+  let pronote_url = options.pronote_url;
+
+  if (options.use_ent) {
+    const ent_ticket_response = await callAPI<ApiLoginEntTicket>("/login/ent_ticket", {
+      ent_url: options.ent_url,
+      ent_cookies
+    });
+
+    pronote_url = ent_ticket_response.pronote_url;
+  }
+
+  const account_type = options.use_ent
+    // Guess the account type using the constants we have.
+    ? guessPronoteAccountTypeFromUrl(pronote_url)
+    // When not using ENT, just use the given account type.
+    : options.account_type;
+
+  // When we can't guess the account type, just abort.
+  // TODO: Find a way to handle this. I don't know how, but I will.
+  if (account_type === null) return null;
+
+  let pronote_cookies: string[] = !options.use_ent && !options.use_credentials
+    // Use given cookies if we're restoring a basic session.
+    ? options.pronote_cookies
+    : []; // We'll define some cookies for session restoring, later.
+
   const informations_response = await callAPI<ApiLoginInformations>("/login/informations", {
-    account_type: options.account_type,
-    pronote_url: options.pronote_url
+    cookies: pronote_cookies,
+    account_type,
+    pronote_url,
+
+    // If the URL is not the same, we should use it as raw.
+    raw_url: options.pronote_url !== pronote_url
   });
 
-  let username = options.username;
-  let password = options.password;
+  // Add cookies we got from the request.
+  for (const cookie of informations_response.cookies) {
+    pronote_cookies.push(cookie);
+  }
 
   // Updating the login credentials to use depending of the received response.
   if (informations_response.setup) {
-    username = informations_response.setup.username;
-    password = informations_response.setup.password;
+    pronote_username = informations_response.setup.username;
+    pronote_password = informations_response.setup.password;
   }
 
   const identify_response = await callAPI<ApiLoginIdentify>("/login/identify", {
-    pronote_username: username,
+    pronote_username,
+    cookies: pronote_cookies,
     session: informations_response.session
   });
 
   if (identify_response.received.donnees.modeCompLog) {
-    username = username.toLowerCase();
+    pronote_username = pronote_username.toLowerCase();
   }
 
   if (identify_response.received.donnees.modeCompMdp) {
-    password = password.toLowerCase();
+    pronote_password = pronote_password.toLowerCase();
   }
 
   // Short-hand for later usage.
@@ -112,18 +264,17 @@ export const connectToPronote = async (options: {
       ? "" // When using generated credentials, we don't have to use `alea`.
       : identify_response.received.donnees.alea
     )
-    .update(forge.util.encodeUtf8(password))
+    .update(forge.util.encodeUtf8(pronote_password))
     .digest();
 
   const challengeAesKey = (informations_response.setup
     ? "" // When using generated credentials, we don't have to lowercase.
-    : username.toLowerCase()
+    : pronote_username.toLowerCase()
   ) +  challengeAesKeyHash.toHex().toUpperCase();
 
   const challengeAesKeyBuffer = forge.util.createBuffer(
     forge.util.encodeUtf8(challengeAesKey)
   );
-
 
   const challengeDecryptedBytes = aes.decrypt(identify_response.received.donnees.challenge, {
     iv: aesIvBuffer,
@@ -153,8 +304,12 @@ export const connectToPronote = async (options: {
   // Send the resolved challenge.
   const authenticate_response = await callAPI<ApiLoginAuthenticate>("/login/authenticate", {
     solved_challenge: challengeEncrypted,
-    session: identify_response.session
+    session: identify_response.session,
+    cookies: pronote_cookies
   });
+
+  // Remove the stored cookie "CASTJU" if exists.
+  pronote_cookies = pronote_cookies.filter(cookie => !cookie.startsWith("CASTJU="));
 
   const decryptedAuthKey = aes.decrypt(authenticate_response.received.donnees.cle, {
     iv: aesIvBuffer,
@@ -165,20 +320,32 @@ export const connectToPronote = async (options: {
   const authKeyBytesArray = new Uint8Array(decryptedAuthKey.split(",").map(a => parseInt(a)));
   const authKey = forge.util.createBuffer(authKeyBytesArray).bytes();
 
-  // Update the authenticated session we previously got.
+  /// Update the authenticated session we previously got
+  /// and let the "/user/data" endpoint do the final touches.
+
   authenticate_response.session.encryption.aes.key = authKey;
+  authenticate_response.session.instance.pronote_cookies = pronote_cookies;
+
+  authenticate_response.session.instance.use_ent = options.use_ent;
+  authenticate_response.session.instance.ent_cookies = ent_cookies;
+  authenticate_response.session.instance.ent_url = options.use_ent ? options.ent_url : null;
 
   const user_data_response = await callAPI<ApiUserData>("/user/data", {
     session: authenticate_response.session
   });
 
-  // Return reusable data that can be used later.
+  /// Preparing to export datas.
+  /// We export a method to directly store the data with a slug
+  /// and we export also the endpoints and the session to use without saving.
+
+  const _session = user_data_response.session;
+  const _endpoints = {
+    "/user/data": user_data_response.received,
+    "/login/informations": informations_response.received
+  };
+
   return {
-    session: Session.importFromObject(user_data_response.session),
-    cookies: [] as string[],
-    endpoints: {
-      "/user/data": user_data_response.received,
-      "/login/informations": informations_response.received
-    }
+    session: _session,
+    endpoints: _endpoints
   };
 };

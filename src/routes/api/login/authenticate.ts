@@ -61,7 +61,6 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
 
     return res.success({
       received,
-      cookies: response.cookies,
       session: session.exportToObject()
     });
   }

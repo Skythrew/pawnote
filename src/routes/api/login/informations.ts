@@ -125,6 +125,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
 
     return res.success({
       session: session.exportToObject(),
+      cookies: response.cookies,
       received,
 
       setup: session_data.e && session_data.f ? {

@@ -41,14 +41,10 @@ const OpenENT: AvailableENT = {
 
     async process_ticket ({ ent_cookies }) {
       try {
-        const callbackParam = url.searchParams.get("callback") as string;
-        const callbackValue = decodeURIComponent(callbackParam);
-        const service = callbackValue.substring(callbackValue.indexOf("=") + 1);
-
         const { headers } = await got.get(`${url.protocol}//${url.hostname}/cas/login`, {
           maxRedirects: 1,
           followRedirect: true,
-          searchParams: { service },
+          searchParams: url.searchParams,
           headers: { "Cookie": ent_cookies.join("; ") }
         });
 
@@ -61,6 +57,7 @@ const OpenENT: AvailableENT = {
           return error.response.headers["location"] as string;
         }
 
+        console.error("ent:process_ticket:catch", error);
         return null;
       }
     }

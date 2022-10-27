@@ -132,15 +132,27 @@ const LinkPronoteAccount: Component = () => {
     try {
       const data = await connectToPronote({
         pronote_url: state.school_informations_commun.pronote_url,
+        use_credentials: true,
+
         username: state.login.username,
         password: state.login.password,
-        account_type
+
+        ...(state.login.use_ent
+          ? {
+            use_ent: true,
+            ent_url: state.school_informations_commun.ent_url as string
+          }
+          : {
+            use_ent: false,
+            account_type
+          }
+        )
       });
 
       setState("result", data);
     }
     catch (err) {
-      console.error("Wrong credentials.");
+      console.error(err);
     }
   };
 
@@ -151,16 +163,18 @@ const LinkPronoteAccount: Component = () => {
    */
   const processSlugSave: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
     event.preventDefault();
-    if (!state.result || !state.slug) return;
 
-    const is_saved = await sessions.upsert(state.slug, state.result.session);
+    if (!state.result || !state.slug) return;
+    const result = unwrap(state.result);
+
+    const is_saved = await sessions.upsert(state.slug, result.session);
     if (is_saved) {
       await endpoints.upsert<ApiUserData>(
-        state.slug, "/user/data", unwrap(state.result.endpoints["/user/data"])
+        state.slug, "/user/data", result.endpoints["/user/data"]
       );
 
       await endpoints.upsert<ApiLoginInformations>(
-        state.slug, "/login/informations", unwrap(state.result.endpoints["/login/informations"])
+        state.slug, "/login/informations", result.endpoints["/login/informations"]
       );
     }
   };
@@ -266,7 +280,11 @@ const LinkPronoteAccount: Component = () => {
           {instance => (
             <form onSubmit={processUserAuthentication}>
               <Show when={instance.ent_url}>
-                <input type="checkbox" checked={state.login.use_ent} />
+                <input
+                  type="checkbox"
+                  checked={state.login.use_ent}
+                  onChange={event => setState("login", "use_ent", event.currentTarget.checked)}
+                />
               </Show>
 
               <select onChange={event => setState("login", "account_type", parseInt(event.currentTarget.value))}>

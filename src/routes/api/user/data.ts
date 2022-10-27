@@ -15,7 +15,7 @@ export const POST = handleServerRequest<ApiUserData["response"]>(async (req, res
 
   if (!objectHasProperty(body, "session"))
     return res.error({
-      message: "Missing 'session' and/or 'solved_challenge'.",
+      message: "Missing 'session'.",
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -25,7 +25,7 @@ export const POST = handleServerRequest<ApiUserData["response"]>(async (req, res
     const request_payload = session.writePronoteFunctionPayload<PronoteApiUserData["request"]>({});
     const response = await callPronoteAPI(PronoteApiFunctions.UserData, {
       session_instance: session.instance,
-      cookies: body.cookies ?? [],
+      cookies: session.instance.pronote_cookies,
       payload: request_payload
     });
 
@@ -38,14 +38,19 @@ export const POST = handleServerRequest<ApiUserData["response"]>(async (req, res
       message: received,
       debug: {
         response,
-        request_payload,
-        cookies: body.cookies
+        request_payload
       }
     }, { status: 400 });
 
+    // This is the authenticated cookie that will be used to restore sessions!
+    const pronote_session_cookie = response.cookies.find(cookie => cookie.startsWith("CASTGC="));
+    if (pronote_session_cookie) {
+      // Define the golden cookie in the session to export.
+      session.instance.pronote_cookies = [pronote_session_cookie];
+    }
+
     return res.success({
       received,
-      cookies: response.cookies,
       session: session.exportToObject()
     });
   }
