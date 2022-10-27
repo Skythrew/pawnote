@@ -4,13 +4,11 @@ import { ApiLoginInformations, ApiUserData, ApiUserTimetable } from "@/types/api
 /// This is the store used by the app when
 /// browsing the data of a specific slug.
 
-const [current_user, setCurrentUser] = createStore<
-  | { // When data hasn't been fetched yet.
-    loaded: false
-  }
-  | { // When data is ready to be shown.
-    loaded: true,
-    session: SessionExported,
+type CurrentUserStore =
+  | {
+    slug: string;
+    session: SessionExported;
+
     endpoints: {
       // Required data for other API calls.
       "/user/data": ApiUserData["response"]["received"];
@@ -20,23 +18,28 @@ const [current_user, setCurrentUser] = createStore<
       "/user/timetable"?: ApiUserTimetable["response"]["received"];
     }
   }
->({ loaded: false });
-
-const cleanCurrentUser = () => {
-  const keys = Object.keys(current_user);
-  const obj: { [key: string]: undefined | boolean } = {};
-
-  for (const key of keys) {
-    obj[key] = undefined;
+  | {
+    slug: null;
+    session: null;
+    endpoints: null;
   }
 
-  obj.loaded = false;
-  setCurrentUser({ ...obj });
-};
+const [current_user, setCurrentUser] = createStore<CurrentUserStore>({
+  slug: null,
+  session: null,
+  endpoints: null
+});
+
+const cleanCurrentUser = () => setCurrentUser({
+  slug: null,
+  session: null,
+  endpoints: null
+});
 
 /// Message that we use to show in the UI.
 export enum AppBannerMessage {
   Idle,
+  RestoringSession,
   FetchingTimetable
 }
 

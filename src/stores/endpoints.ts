@@ -1,5 +1,7 @@
 import localforage from "localforage";
 
+import app from "@/stores/app";
+
 const database = (slug: string) => localforage.createInstance({
   name: "endpoints",
   storeName: slug
@@ -7,13 +9,29 @@ const database = (slug: string) => localforage.createInstance({
 
 const get = <Api extends { path: string, response: { received: unknown } }>(
   slug: string, endpoint: Api["path"]
-) => database(slug).getItem<Api["response"]["received"]>(endpoint);
+) => {
+  const user = app.current_user;
+  if (user.slug && user.slug === slug) {
+    const cached_data = user.endpoints[endpoint as keyof (typeof user.endpoints)];
+    if (cached_data) return cached_data as Api["response"]["received"];
+  }
+
+  return database(slug).getItem<Api["response"]["received"]>(endpoint);
+};
 
 const upsert = async <Api extends { path: string, response: { received: unknown } }>(
   slug: string, endpoint: Api["path"], data: Api["response"]["received"]
 ) => {
   try {
     await database(slug).setItem(endpoint, data);
+
+    const user = app.current_user;
+    if (user.slug && user.slug === slug) {
+      app.setCurrentUser("endpoints", {
+        [endpoint as keyof (typeof user.endpoints)]: data
+      });
+    }
+
     return true;
   }
   catch (error) {
@@ -22,9 +40,4 @@ const upsert = async <Api extends { path: string, response: { received: unknown 
   }
 };
 
-/** Removes the given slug from the database. */
-const remove = <Api extends { path: string }>(
-  slug: string, endpoint: Api["path"]
-) => database(slug).removeItem(endpoint);
-
-export default { get, upsert, remove };
+export default { get, upsert };

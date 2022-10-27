@@ -6,5 +6,7 @@ export const appBannerMessageToString = (message: AppBannerMessage) => {
     return "Données à jour.";
   case AppBannerMessage.FetchingTimetable:
     return "Récupération de l'emploi du temps...";
+  case AppBannerMessage.RestoringSession:
+    return "Récupération de la session...";
   }
 };
