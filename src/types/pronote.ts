@@ -956,7 +956,7 @@ export interface PronoteApiUserTimetable {
         CouleurFond: string;
         ListeContenus: {
           _T: 24,
-          V: { L: string } & (
+          V: ({ L: string } & (
             | {
               G: PronoteApiUserTimetableContentType.Subject;
               N: string;
@@ -968,7 +968,7 @@ export interface PronoteApiUserTimetable {
             | {
               G: PronoteApiUserTimetableContentType.Teacher;
             }
-          )[];
+          ))[];
         };
 
         N: string;
