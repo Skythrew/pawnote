@@ -5,7 +5,8 @@ import type {
   PronoteApiLoginIdentify,
   PronoteApiLoginAuthenticate,
   PronoteApiUserData,
-  PronoteApiUserTimetable
+  PronoteApiUserTimetable,
+  PronoteApiUserHomeworks
 } from "@/types/pronote";
 
 import type { SessionExported } from "@/types/session";
@@ -187,6 +188,7 @@ export interface ApiUserData {
   path: "/user/data";
 }
 
+type ApiUserTimetablePath = `/user/timetable/${number}`;
 export interface ApiUserTimetable {
   request: {
     session: SessionExported;
@@ -198,5 +200,19 @@ export interface ApiUserTimetable {
     session: SessionExported;
   }
 
-  path: `/user/timetable/${number}`;
+  path: ApiUserTimetablePath;
+}
+
+type ApiUserHomeworksPath = `/user/homeworks/${number}`;
+export interface ApiUserHomeworks {
+  request: {
+    session: SessionExported;
+  }
+
+  response: {
+    received: PronoteApiUserHomeworks["response"];
+    session: SessionExported;
+  }
+
+  path: ApiUserHomeworksPath;
 }
