@@ -1,46 +1,71 @@
 import type { Component } from "solid-js";
-import type { ApiUserTimetable } from "@/types/api";
 
-import { callAPI } from "@/utils/client";
-import sessions from "@/stores/sessions";
-import app from "@/stores/app";
+import {
+  callUserTimetableAPI,
+  getCurrentWeekNumber,
+  parseTimetableLessons
+} from "@/utils/client";
 
-import dayjsCustomParse from "dayjs/plugin/customParseFormat";
-import dayjs from "dayjs";
-import endpoints from "@/stores/endpoints";
+import { ApiUserTimetable } from "@/types/api";
 
-dayjs.extend(dayjsCustomParse);
+import { A } from "solid-start";
 
 const AppHome: Component = () => {
-  onMount(async () => {
-    const user = app.current_user;
-    if (!user.slug) return;
+  const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
+  const [weekTimetable, setWeekTimetable] = createSignal<ApiUserTimetable["response"]["received"] | null>(null);
 
-    if (!user.endpoints["/user/timetable"]) {
-      const first_date_raw = user.endpoints["/login/informations"].donnees.General.PremierLundi.V;
-      const first_date = dayjs(first_date_raw, "DD-MM-YYYY");
-      const days_since_first = dayjs().diff(first_date, "days");
-      const week_number = 1 + Math.round(days_since_first / 7);
-
-      const timetable_response = await callAPI<ApiUserTimetable>("/user/timetable", {
-        ressource: user.endpoints["/user/data"].donnees.ressource,
-        session: user.session,
-        week_number
-      });
-
-      await sessions.upsert(user.slug, timetable_response.session);
-      await endpoints.upsert<ApiUserTimetable>(user.slug, "/user/timetable", timetable_response.received);
-
-      app.setCurrentUser("endpoints", "/user/timetable", timetable_response.received);
-    }
-  });
+  /**
+   * Reload the timetable depending
+   * on the week number.
+   */
+  createEffect(on(weekNumber, async (week_number) => {
+    const data = await callUserTimetableAPI(week_number);
+    setWeekTimetable(data);
+  }));
 
   return (
     <div>
-      <h1>EDT!</h1>
-      <Show keyed when={app.current_user.slug !== null && app.current_user.endpoints["/user/timetable"]}>
+      <h2>EDT de la semaine {weekNumber()} !</h2>
+
+      <button onClick={() => setWeekNumber(prev => prev - 1)}>Avant</button>
+      <button onClick={() => setWeekNumber(prev => prev + 1)}>Après</button>
+
+      <Show keyed when={weekTimetable()}
+        fallback={
+          <span>Récupération de l'emploi du temps...</span>
+        }
+      >
         {timetable => (
-          <p>Vous avez {timetable.donnees.ListeCours.length} cours cette semaine.</p>
+          <div>
+            <p>Vous avez {timetable.donnees.ListeCours.length} cours cette semaine.</p>
+
+            <div class="flex">
+              <For each={parseTimetableLessons(timetable.donnees.ListeCours)}>
+                {days => (
+                  <div class="flex flex-col">
+                    <Index each={days}>
+                      {lesson => (
+                        <div class="mb-2">
+                          à {lesson().date.hour()}h
+
+                          <Show when={lesson().name}>
+                            <p>{lesson().name}</p>
+                          </Show>
+                          <Show when={lesson().teacher}>
+                            <p>{lesson().teacher}</p>
+                          </Show>
+                          <Show when={lesson().room}>
+                            <p>{lesson().room}</p>
+                          </Show>
+
+                        </div>
+                      )}
+                    </Index>
+                  </div>
+                )}
+              </For>
+            </div>
+          </div>
         )}
       </Show>
     </div>

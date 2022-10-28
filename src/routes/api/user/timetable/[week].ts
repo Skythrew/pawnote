@@ -12,10 +12,16 @@ import Session from "@/utils/session";
 
 export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req, res) => {
   const body = await req.json() as ApiUserTimetable["request"];
+  const week_number = parseInt(new URL(req.url).pathname.split("/").pop() as string);
 
-  if (!objectHasProperty(body, "session") || !objectHasProperty(body, "ressource") || !objectHasProperty(body, "week_number"))
+  if (Number.isNaN(week_number)) return res.error({
+    message: "Incorrect 'week' value (NaN) in URL parameters.",
+    debug: { url: req.url }
+  });
+
+  if (!objectHasProperty(body, "session") || !objectHasProperty(body, "ressource"))
     return res.error({
-      message: "Missing 'session' and/or 'ressource' and/or 'week_number'.",
+      message: "Missing 'session' and/or 'ressource'.",
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -34,8 +40,8 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
         avecCoursSortiePeda: true,
         avecDisponibilites: true,
 
-        NumeroSemaine: body.week_number,
-        numeroSemaine: body.week_number,
+        NumeroSemaine: week_number,
+        numeroSemaine: week_number,
 
         Ressource: body.ressource,
         ressource: body.ressource
