@@ -1,35 +1,43 @@
 import type {
-  ApiLoginEntTicket,
   Response,
   ResponseError,
-  ApiLoginAuthenticate,
-  ApiLoginIdentify,
   ApiLoginInformations,
+  ApiLoginIdentify,
+  ApiLoginAuthenticate,
   ApiLoginEntCookies,
+  ApiLoginEntTicket,
+  ApiUserTimetable,
   ApiUserData
 } from "@/types/api";
 
-
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
-import { PronoteApiAccountId } from "@/types/pronote";
+
+import { PronoteApiAccountId, PronoteApiUserTimetableContentType } from "@/types/pronote";
+import { ResponseErrorMessage } from "@/types/api";
 
 import app, { AppBannerMessage } from "@/stores/app";
-import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
-
+import sessions from "@/stores/sessions";
 import { aes } from "@/utils/globals";
 
 import forge from "node-forge";
+import dayjs from "dayjs";
+
+import dayjsCustomParse from "dayjs/plugin/customParseFormat";
+import { SessionExported } from "@/types/session";
+dayjs.extend(dayjsCustomParse);
 
 /** Helper class for easier error handling. */
 export class ApiError extends Error {
   public debug?: ResponseError["debug"];
+  public message: ResponseErrorMessage;
 
-  constructor (response: ResponseError) {
+  constructor (response: Omit<ResponseError, "success">) {
     super(response.message);
 
     this.name = "ApiError";
     this.debug = response.debug;
+    this.message = response.message;
   }
 }
 
@@ -39,7 +47,11 @@ export const callAPI = async <Api extends {
   response: unknown;
 }>(
   path: Api["path"],
-  body: Api["request"]
+  body: Api["request"],
+  options = {
+    /** Prevents the response from being saved in the localForage. */
+    prevent_cache: false
+  }
 ): Promise<Api["response"]> => {
   const request = await fetch("/api" + path, {
     method: "POST",
@@ -47,58 +59,90 @@ export const callAPI = async <Api extends {
     body: JSON.stringify(body)
   });
 
+  const user = app.current_user;
   const response = await request.json() as Response<Api["response"]>;
-  if (!response.success) {
-    if (response.message === "The session was expired. Restore the session and try again.") {
-      const user = app.current_user();
 
+  if (!response.success) {
+    if (response.message === ResponseErrorMessage.SessionExpired) {
       // When the session expired while connected to a user
       // we try to restore the session.
-      if (user) {
+      if (user.slug) {
         app.setBannerMessage({ message: AppBannerMessage.RestoringSession, is_loader: true });
         const old_session = user.session;
 
-        const data = await connectToPronote({
-          pronote_url: old_session.instance.pronote_url,
-          use_credentials: false,
-          ...(old_session.instance.use_ent
-            ? { // When creating a new session using ENT cookies.
-              use_ent: true,
-              ent_cookies: old_session.instance.ent_cookies,
-              ent_url: old_session.instance.ent_url as string
-            }
-            : { // When restoring a session using Pronote cookies.
-              use_ent: false,
-              account_type: old_session.instance.account_type_id,
-              pronote_cookies: old_session.instance.pronote_cookies
-            }
-          )
-        });
+        try {
+          const data = await connectToPronote({
+            pronote_url: old_session.instance.pronote_url,
+            use_credentials: false,
+            ...(old_session.instance.use_ent
+              ? { // When creating a new session using ENT cookies.
+                use_ent: true,
+                ent_cookies: old_session.instance.ent_cookies,
+                ent_url: old_session.instance.ent_url as string
+              }
+              : { // When restoring a session using Pronote cookies.
+                use_ent: false,
+                account_type: old_session.instance.account_type_id,
+                pronote_cookies: old_session.instance.pronote_cookies
+              }
+            )
+          });
 
-        if (!data) {
-          response.message = "Error while trying to restore the session.";
-          throw new ApiError(response);
+          if (!data) {
+            throw new ApiError({
+              message: ResponseErrorMessage.SessionCantRestore
+            });
+          }
+
+          const is_saved = await sessions.upsert(user.slug, data.session);
+          if (is_saved) {
+            await endpoints.upsert<ApiUserData>(
+              user.slug, "/user/data", data.endpoints["/user/data"]
+            );
+
+            await endpoints.upsert<ApiLoginInformations>(
+              user.slug, "/login/informations", data.endpoints["/login/informations"]
+            );
+          }
+
+          app.setBannerToIdle();
+
+          throw new ApiError({
+            message: ResponseErrorMessage.NewSessionAvailable
+          });
         }
+        catch (error) {
+          if (error instanceof ApiError) {
+            if (error.message === ResponseErrorMessage.NewSessionAvailable) {
+              // Ignore the session restore modal.
+              throw error;
+            }
+          }
 
-        const is_saved = await sessions.upsert(user.slug, data.session);
-
-        if (is_saved) {
-          await endpoints.upsert<ApiUserData>(
-            user.slug, "/user/data", data.endpoints["/user/data"]
-          );
-
-          await endpoints.upsert<ApiLoginInformations>(
-            user.slug, "/login/informations", data.endpoints["/login/informations"]
-          );
+          app.setModal("needs_scratch_session", true);
+          throw error;
         }
-
-        app.setBannerToIdle();
-        return;
       }
-      else response.message = "A mistake was made in the request payload.";
+      else {
+        throw new ApiError({
+          message: ResponseErrorMessage.RequestPayloadBroken
+        });
+      }
     }
 
     throw new ApiError(response);
+  }
+
+  // When we want to store the data, we also need a slug.
+  // When the response contains a session or a Pronote response, we store it.
+  if (!options.prevent_cache && user.slug) {
+    const typed_response = response.data as unknown as {
+      session?: SessionExported;
+      received?: unknown;
+    };
+
+    typed_response.session && await sessions.upsert(user.slug, typed_response.session);
+    typed_response.received && await endpoints.upsert(user.slug, path, typed_response.received);
   }
 
   return response.data;
@@ -186,7 +230,7 @@ export const connectToPronote = async (options: {
       credentials: forge.util.createBuffer(`${forge.util.encode64(options.username)}:${forge.util.encode64(options.password)}`)
         // My own encrypting method, inspired by Pronote developers.
         .toHex().toUpperCase().split("").reverse().join("")
-    });
+    }, { prevent_cache : true });
 
     ent_cookies = ent_cookies_response.ent_cookies;
   }
@@ -198,7 +242,7 @@ export const connectToPronote = async (options: {
     const ent_ticket_response = await callAPI<ApiLoginEntTicket>("/login/ent_ticket", {
       ent_url: options.ent_url,
       ent_cookies
-    });
+    }, { prevent_cache : true });
 
     pronote_url = ent_ticket_response.pronote_url;
   }
@@ -225,6 +269,8 @@ export const connectToPronote = async (options: {
 
     // If the URL is not the same, we should use it as raw.
     raw_url: options.pronote_url !== pronote_url
+  }, { // Here, we prevent the cache even if we'll cache it later.
+    prevent_cache : true
   });
 
   // Add cookies we got from the request.
@@ -242,7 +288,7 @@ export const connectToPronote = async (options: {
     pronote_username,
     cookies: pronote_cookies,
     session: informations_response.session
-  });
+  }, { prevent_cache : true });
 
   if (identify_response.received.donnees.modeCompLog) {
     pronote_username = pronote_username.toLowerCase();
@@ -306,7 +352,7 @@ export const connectToPronote = async (options: {
     solved_challenge: challengeEncrypted,
     session: identify_response.session,
     cookies: pronote_cookies
-  });
+  }, { prevent_cache : true });
 
   // Remove the stored cookie "CASTJU" if exists.
   pronote_cookies = pronote_cookies.filter(cookie => !cookie.startsWith("CASTJU="));
@@ -332,6 +378,8 @@ export const connectToPronote = async (options: {
 
   const user_data_response = await callAPI<ApiUserData>("/user/data", {
     session: authenticate_response.session
+  }, { // Here, we prevent the cache even if we'll cache it later.
+    prevent_cache : true
   });
 
   /// Preparing to export datas.
@@ -348,4 +396,99 @@ export const connectToPronote = async (options: {
     session: _session,
     endpoints: _endpoints
   };
+};
+
+/** Gets the current week number based on current user's session. */
+export const getCurrentWeekNumber = (): number => {
+  const user = app.current_user;
+  if (!user.slug) return 0;
+
+  const first_date_raw = user.endpoints["/login/informations"].donnees.General.PremierLundi.V;
+  const first_date = dayjs(first_date_raw, "DD-MM-YYYY");
+  const days_since_first = dayjs().diff(first_date, "days");
+  const week_number = 1 + Math.round(days_since_first / 7);
+
+  return week_number;
+};
+
+export const callUserTimetableAPI = async (week: number) => {
+  const user = app.current_user;
+  if (!user.slug) throw new ApiError ({
+    message: ResponseErrorMessage.UserUnavailable
+  });
+
+  const endpoint: ApiUserTimetable["path"] = `/user/timetable/${week}`;
+  const local_response = await endpoints.get<ApiUserTimetable>(user.slug, endpoint);
+  if (local_response && local_response !== null) return local_response;
+
+  try {
+    const data = await callAPI<ApiUserTimetable>(endpoint, {
+      ressource: user.endpoints["/user/data"].donnees.ressource,
+      session: user.session
+    });
+
+    return data.received;
+  }
+  catch (error) {
+    if (error instanceof ApiError) {
+      if (error.message === ResponseErrorMessage.NewSessionAvailable) {
+        const user_data = await endpoints.get<ApiUserData>(user.slug, "/user/data");
+        if (!user_data) throw error;
+
+        const data = await callAPI<ApiUserTimetable>(endpoint, {
+          ressource: user_data.donnees.ressource,
+          session: user.session
+        });
+
+        return data.received;
+      }
+    }
+
+    throw error;
+  }
+};
+
+export const parseTimetableLessons = (
+  lessons: ApiUserTimetable["response"]["received"]["donnees"]["ListeCours"]
+) => {
+  interface ParsedTimetableLesson {
+    date: dayjs.Dayjs;
+
+    name?: string;
+    room?: string;
+    teacher?: string;
+  }
+
+  /**
+   * Lessons are stored in an array for each day.
+   * So the structure is basically `dayOfWeek[lesson[]]`,
+   * where `dayOfWeek` is a number and starts from 0 for Monday.
+   */
+  const parsed_lessons: ParsedTimetableLesson[][] = [...Array.from(Array(7), () => [])];
+
+  for (const lesson of lessons) {
+    const date = dayjs(lesson.DateDuCours.V, "DD-MM-YYYY HH:mm:ss");
+    const dayOfWeek = date.day();
+
+    const parsed_lesson: ParsedTimetableLesson = { date };
+
+    for (const content of lesson.ListeContenus.V) {
+      switch (content.G) {
+      case PronoteApiUserTimetableContentType.Subject:
+        parsed_lesson.name = content.L;
+        break;
+      case PronoteApiUserTimetableContentType.Room:
+        parsed_lesson.room = content.L;
+        break;
+      case PronoteApiUserTimetableContentType.Teacher:
+        parsed_lesson.teacher = content.L;
+        break;
+      }
+    }
+
+    // Add the lesson to that day.
+    parsed_lessons[dayOfWeek].push(parsed_lesson);
+  }
+
+  return parsed_lessons;
 };
