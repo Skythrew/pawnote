@@ -1,7 +1,5 @@
 import type { Component, JSX } from "solid-js";
-import { ApiGeolocation, ApiInstance, ApiLoginInformations, ApiUserData } from "@/types/api";
-
-import { unwrap } from "solid-js/store";
+import { ApiGeolocation, ApiInstance } from "@/types/api";
 
 import {
   HeadlessDisclosureChild,
@@ -16,16 +14,13 @@ import {
   callAPI,
   classNames,
   getGeolocationPosition,
-  connectToPronote,
 
   ApiError
 } from "@/utils/client";
 
-import { objectHasProperty } from "@/utils/globals";
-import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
+import app from "@/stores/app";
 
-import sessions from "@/stores/sessions";
-import endpoints from "@/stores/endpoints";
+import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
@@ -33,31 +28,11 @@ const LinkPronoteAccount: Component = () => {
 
     pronote_url: string;
     school_informations_commun: ApiInstance["response"] | null;
-
-    login: {
-      account_type: number | null;
-      username: string;
-      password: string;
-      use_ent: boolean;
-    }
-
-    slug: string;
-    result: Awaited<ReturnType<typeof connectToPronote>> | null;
   }>({
     geolocation_data: null,
 
     pronote_url: "",
-    school_informations_commun: null,
-
-    login: {
-      account_type: null,
-      username: "",
-      password: "",
-      use_ent: false
-    },
-
-    slug: "",
-    result: null
+    school_informations_commun: null
   });
 
   /**
@@ -65,7 +40,7 @@ const LinkPronoteAccount: Component = () => {
    * if a school in the geolocation_data have
    * that URL stored.
    */
-  const checkMatchPronoteUrl = () => state.geolocation_data && state.geolocation_data.find(
+  const checkMatchPronoteUrl = () => state.geolocation_data && state.geolocation_data.find (
     instance => instance.url === state.pronote_url
   );
 
@@ -113,69 +88,11 @@ const LinkPronoteAccount: Component = () => {
 
       batch(() =>  {
         setState("school_informations_commun", response);
-        setState("login", "account_type", response.received.donnees.espaces.V[0].G);
+        app.setModal("needs_scratch_session", true);
       });
     }
     catch (err) {
       console.error(err);
-    }
-  };
-
-  const processUserAuthentication: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (evt) => {
-    evt.preventDefault();
-    if (!state.school_informations_commun) return;
-    if (!state.login.username || !state.login.password) return;
-
-    const account_type = state.login.account_type;
-    if (account_type === null || !objectHasProperty(PRONOTE_ACCOUNT_TYPES, account_type)) return;
-
-    try {
-      const data = await connectToPronote({
-        pronote_url: state.school_informations_commun.pronote_url,
-        use_credentials: true,
-
-        username: state.login.username,
-        password: state.login.password,
-
-        ...(state.login.use_ent
-          ? {
-            use_ent: true,
-            ent_url: state.school_informations_commun.ent_url as string
-          }
-          : {
-            use_ent: false,
-            account_type
-          }
-        )
-      });
-
-      setState("result", data);
-    }
-    catch (err) {
-      console.error(err);
-    }
-  };
-
-  /**
-   * When the user saves the session,
-   * we also save important endpoints that
-   * we'll use later.
-   */
-  const processSlugSave: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
-    event.preventDefault();
-
-    if (!state.result || !state.slug) return;
-    const result = unwrap(state.result);
-
-    const is_saved = await sessions.upsert(state.slug, result.session);
-    if (is_saved) {
-      await endpoints.upsert<ApiUserData>(
-        state.slug, "/user/data", result.endpoints["/user/data"]
-      );
-
-      await endpoints.upsert<ApiLoginInformations>(
-        state.slug, "/login/informations", result.endpoints["/login/informations"]
-      );
     }
   };
 
@@ -277,64 +194,13 @@ const LinkPronoteAccount: Component = () => {
         </form>
 
         <Show when={state.school_informations_commun} keyed>
-          {instance => (
-            <form onSubmit={processUserAuthentication}>
-              <Show when={instance.ent_url}>
-                <input
-                  type="checkbox"
-                  checked={state.login.use_ent}
-                  onChange={event => setState("login", "use_ent", event.currentTarget.checked)}
-                />
-              </Show>
-
-              <select onChange={event => setState("login", "account_type", parseInt(event.currentTarget.value))}>
-                <For each={instance.received.donnees.espaces.V}>
-                  {espace => (
-                    <option value={espace.G}>{espace.L}</option>
-                  )}
-                </For>
-              </select>
-
-              <input
-                type="text"
-                value={state.login.username}
-                onChange={event => setState("login", "username", event.currentTarget.value)}
-              />
-              <input
-                type="password"
-                value={state.login.password}
-                onChange={event => setState("login", "password", event.currentTarget.value)}
-              />
-
-              <button type="submit">Tester la connexion</button>
-            </form>
-          )}
+          {instance => <SessionFromScratchModal
+            available_accounts={instance.received.donnees.espaces.V}
+            pronote_url={instance.pronote_url}
+            ent_url={instance.ent_url}
+          />}
         </Show>
       </main>
-
-      <Show keyed when={state.result}>
-        {result => (
-          <div>
-            <h4>Connexion établie!</h4>
-            <p>Choissisez un nom d'utilisateur local pour facilement retrouver le compte (depuis l'URL par exemple)</p>
-            <span>Vous êtes connecté en tant que {result.endpoints["/user/data"].donnees.ressource.L} à l'instance {result.endpoints["/user/data"].donnees.ressource.Etablissement.V.L}</span>
-
-            <form onSubmit={processSlugSave}>
-              <input
-                type="text"
-                value={state.slug}
-                onInput={event => {
-                  const cleanedValue = event.currentTarget.value
-                    // Clean-up the value to make sure it's a slug.
-                    .toLowerCase().replace(/[^a-z0-9-]+/g, "-");
-                  return setState("slug", cleanedValue);
-                }}
-              />
-              <button type="submit">Sauvegarder la session!</button>
-            </form>
-          </div>
-        )}
-      </Show>
     </div>
   );
 };
