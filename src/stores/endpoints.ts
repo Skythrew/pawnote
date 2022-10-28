@@ -7,7 +7,7 @@ const database = (slug: string) => localforage.createInstance({
   storeName: slug
 });
 
-const get = <Api extends { path: string, response: { received: unknown } }>(
+const get = async <Api extends { path: string, response: { received: unknown } }>(
   slug: string, endpoint: Api["path"]
 ) => {
   const user = app.current_user;
@@ -16,7 +16,14 @@ const get = <Api extends { path: string, response: { received: unknown } }>(
     if (cached_data) return cached_data as Api["response"]["received"];
   }
 
-  return database(slug).getItem<Api["response"]["received"]>(endpoint);
+  const data = await database(slug).getItem<Api["response"]["received"]>(endpoint);
+  if (data && user.slug && user.slug === slug) {
+    app.setCurrentUser("endpoints", {
+      [endpoint as keyof (typeof user.endpoints)]: data as Api["response"]["received"]
+    });
+  }
+
+  return data;
 };
 
 const upsert = async <Api extends { path: string, response: { received: unknown } }>(

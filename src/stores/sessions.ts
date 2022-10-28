@@ -20,7 +20,7 @@ const upsert = async (slug: string, session: Session | SessionExported) => {
 
     const user = app.current_user;
     if (user.slug && user.slug === slug) {
-      app.setCurrentUser({ session });
+      app.setCurrentUser("session", session);
     }
 
     return true;

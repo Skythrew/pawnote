@@ -4,7 +4,7 @@ import { ApiLoginInformations, ApiUserData, ApiUserTimetable } from "@/types/api
 /// This is the store used by the app when
 /// browsing the data of a specific slug.
 
-type CurrentUserStore =
+export type CurrentUserStore =
   | {
     slug: string;
     session: SessionExported;
@@ -15,7 +15,7 @@ type CurrentUserStore =
       "/login/informations": ApiLoginInformations["response"]["received"];
 
       // Not available when not cached/fetched.
-      "/user/timetable"?: ApiUserTimetable["response"]["received"];
+      [key: ApiUserTimetable["path"]]: ApiUserTimetable["response"]["received"] | undefined;
     }
   }
   | {
@@ -34,6 +34,11 @@ const cleanCurrentUser = () => setCurrentUser({
   slug: null,
   session: null,
   endpoints: null
+});
+
+const [modal, setModal] = createStore({
+  /** When a session restore has failed. */
+  needs_scratch_session: false
 });
 
 /// Message that we use to show in the UI.
@@ -60,6 +65,7 @@ const setBannerToIdle = () => setBannerMessage({
 });
 
 export default {
+  modal, setModal,
   current_user, setCurrentUser, cleanCurrentUser,
   banner_message, setBannerMessage, setBannerToIdle
 };
