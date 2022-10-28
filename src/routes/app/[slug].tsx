@@ -8,7 +8,13 @@ import app, { AppBannerMessage } from "@/stores/app";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
 
-import { getCurrentWeekNumber, callUserTimetableAPI } from "@/utils/client";
+import {
+  getCurrentWeekNumber,
+
+  callUserTimetableAPI,
+  callUserHomeworksAPI
+} from "@/utils/client";
+
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
 const AppLayout: Component = () => {
@@ -41,9 +47,12 @@ const AppLayout: Component = () => {
 
     const week_number = getCurrentWeekNumber();
     const user_timetable = await callUserTimetableAPI(week_number);
+    const user_homeworks = await callUserHomeworksAPI(week_number);
 
     batch(() => {
       app.setCurrentUser("endpoints", `/user/timetable/${week_number}`, user_timetable);
+      app.setCurrentUser("endpoints", `/user/homeworks/${week_number}`, user_homeworks);
+
       app.setBannerToIdle();
     });
   });

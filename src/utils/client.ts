@@ -7,6 +7,7 @@ import type {
   ApiLoginEntCookies,
   ApiLoginEntTicket,
   ApiUserTimetable,
+  ApiUserHomeworks,
   ApiUserData
 } from "@/types/api";
 
@@ -512,4 +513,44 @@ export const parseTimetableLessons = (
   }
 
   return parsed_lessons;
+};
+
+export const callUserHomeworksAPI = async (week: number) => {
+  const user = app.current_user;
+  if (!user.slug) throw new ApiError ({
+    message: ResponseErrorMessage.UserUnavailable
+  });
+
+  const endpoint: ApiUserHomeworks["path"] = `/user/homeworks/${week}`;
+  const local_response = await endpoints.get<ApiUserHomeworks>(user.slug, endpoint);
+  if (local_response && local_response !== null) return local_response;
+
+  app.setBannerMessage({
+    message: AppBannerMessage.FetchingTimetable,
+    is_loader: true
+  });
+
+  try {
+    const data = await callAPI<ApiUserHomeworks>(endpoint, {
+      session: user.session
+    });
+
+    return data.received;
+  }
+  catch (error) {
+    if (error instanceof ApiError) {
+      if (error.message === ResponseErrorMessage.NewSessionAvailable) {
+        const user_data = await endpoints.get<ApiUserData>(user.slug, "/user/data");
+        if (!user_data) throw error;
+
+        const data = await callAPI<ApiUserHomeworks>(endpoint, {
+          session: user.session
+        });
+
+        return data.received;
+      }
+    }
+
+    throw error;
+  }
 };

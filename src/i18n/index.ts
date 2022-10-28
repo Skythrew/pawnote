@@ -6,11 +6,13 @@ export const appBannerMessageToString = (message: AppBannerMessage) => {
     return "Données à jour.";
   case AppBannerMessage.FetchingTimetable:
     return "Récupération de l'emploi du temps...";
+  case AppBannerMessage.FetchingHomeworks:
+    return "Récupération des devoirs...";
   case AppBannerMessage.RestoringSession:
     return "Récupération de la session...";
   case AppBannerMessage.UnknownError:
     return "Une erreur inconnue est survenue.";
   case AppBannerMessage.NeedCredentials:
-    return "Session expiré, entrez vos identifiants.";
+    return "Session expirée, entrez vos identifiants.";
   }
 };

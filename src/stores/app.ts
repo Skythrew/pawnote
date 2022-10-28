@@ -1,5 +1,11 @@
 import { SessionExported } from "@/types/session";
-import { ApiLoginInformations, ApiUserData, ApiUserTimetable } from "@/types/api";
+
+import {
+  ApiLoginInformations,
+  ApiUserData,
+  ApiUserHomeworks,
+  ApiUserTimetable
+} from "@/types/api";
 
 /// This is the store used by the app when
 /// browsing the data of a specific slug.
@@ -16,6 +22,7 @@ export type CurrentUserStore =
 
       // Not available when not cached/fetched.
       [key: ApiUserTimetable["path"]]: ApiUserTimetable["response"]["received"] | undefined;
+      [key: ApiUserHomeworks["path"]]: ApiUserHomeworks["response"]["received"] | undefined;
     }
   }
   | {
@@ -46,6 +53,7 @@ export enum AppBannerMessage {
   Idle,
   RestoringSession,
   FetchingTimetable,
+  FetchingHomeworks,
   NeedCredentials,
   UnknownError
 }
