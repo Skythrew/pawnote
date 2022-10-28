@@ -1,48 +1,45 @@
-# [Pornote (formerly `pronote-evolution`)](https://pornote.vercel.app)
+<h1 align="center">Pornote</h1>
 
-> Project still in development.
+<p align="center">
+  <b align="center">IN ACTIVE DEVELOPMENT</b> - <a href="https://github.com/users/Vexcited/projects/5">ROADMAP</a> <br />
+  <kbd>SolidJS</kbd> - <kbd>WindiCSS</kbd> - <kbd>TypeScript</kbd> - <kbd>Vercel</kbd> <br />
+</p>
 
-Remake of Pronote using real data from their functions.
-It provides a better UI - *currently this is not true because the UI isn't finished* -,
-local saves to access even offline - *this works* - and notifications - *currently not finished*.
+<hr />
 
-## Features
+Unofficial client for [Pronote](https://www.index-education.com/fr/logiciel-gestion-vie-scolaire.php)
+includes many features such as...
 
-- [x] Multi-accounts (using **slugs**)
-- [x] Local save of informations fetched (with **localForage**)
-- [ ] Updating informations after timeout.
-
-## ENT Available
-
-### OpenENT
-  - [x] `mon.lyceeconnecte.fr`
-
-### Missing ?
-
-If your ENT is missing, please feel free to do a pull request or open
-an Issue to see if it can be added.
-
-ENT files and configurations are [here](./utils/api/cas).
-
-## TO-DO
-
-- [ ] Save connected sessions
-  - [x] Use a `Session` class.
-  - [x] Make an export function.
-  - [ ] Store the exported data into the localForage and then get data from it at every refresh.
-- [ ] Multi-theme support
-  - Create a 'theme' object key in localForage->pornote->(slug).
-    This object will contains HEX color values for each objects.
-    On load we add 'style' props to modified colors.
-    If the color isn't modified => keep default (from Tailwind) 
+- [x] Offline access thanks to `vite-plugin-pwa`.
+- [x] Multi-accounts stored under unique *slugs* locally.
+- [x] Local save of endpoints for each account - with `localForage`.
+- [x] Speed and performance under the hood thanks to [SolidJS](https://solidjs.com)' reactivity.
+- [x] ENT support without having to open new tabs everywhere.
+  <details>
+   <summary><b>Supported ENTs</b></summary>
+   <details>
+     <summary><b>OpenENT</b></summary>
+     <ul>
+      <li><a href="https://mon.lyceeconnecte.fr/auth/login">mon.lyceeconnecte.fr</a></li>
+     </ul>
+    </details>
+  </details>
 
 ## Warning
 
 This project is made for educational purposes.
-That means that the project will not really be
-maintained. You can still use this app, to do
-everyday tasks, but when it comes to start a quiz,
+That means that the client will not really be maintained in long terms.
+You can still use this client, to do everyday tasks, but when it comes to start a quiz,
 or record yourself, or whatever that isn't in the
 `Features` part, you should use the **real** Pronote
 application. Note that **Index-Education** can take down
 this project at anytime.
+
+## Ressources
+
+Without these very useful ressources, I wouldn't be able to write this whole client by myself.
+
+- [Pronote Protocol](https://github.com/bain3/pronotepy/blob/master/PRONOTE%20protocol.md) written by developers of `pronotepy`.
+- [`pronote-api`](https://github.com/dorian-eydoux/pronote-api/tree/master/src)'s (forked/archived) source code.
+- [`pronotepy`](https://github.com/bain3/pronotepy)'s source code.
+
