@@ -811,9 +811,9 @@ export interface PronoteApiUserData {
         /** Allow messages with the teachers. */
         AvecDiscussionProfesseurs: boolean;
 
-        incidents: any;
-        intendance: any;
-        services: any;
+        incidents: unknown;
+        intendance: unknown;
+        services: unknown;
 
         cours: {
           domaineConsultationEDT: {
@@ -853,7 +853,7 @@ export interface PronoteApiUserData {
       };
 
       autorisationKiosque: boolean;
-      tabEtablissementsModeleGrille: any[];
+      tabEtablissementsModeleGrille: unknown[];
 
       listeOnglets: {
         G: number;

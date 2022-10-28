@@ -1,6 +1,8 @@
 import type { PronoteApiLoginAuthenticate } from "@/types/pronote";
 import type { ApiLoginAuthenticate } from "@/types/api";
+
 import { PronoteApiFunctions } from "@/types/pronote";
+import { ResponseErrorMessage } from "@/types/api";
 
 import {
   handleServerRequest,
@@ -15,7 +17,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
 
   if (!objectHasProperty(body, "session") || !objectHasProperty(body, "solved_challenge"))
     return res.error({
-      message: "Missing 'session' and/or 'solved_challenge'.",
+      message: ResponseErrorMessage.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -37,7 +39,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
     });
 
     if (response === null) return res.error({
-      message: "A network error happened, please retry."
+      message: ResponseErrorMessage.NetworkFail
     }, { status: 500 });
 
     const received = session.readPronoteFunctionPayload<PronoteApiLoginAuthenticate["response"]>(response.payload);
@@ -51,7 +53,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
     }, { status: 400 });
 
     if (!received.donnees.cle) return res.error({
-      message: "Given username and/or password is incorrect.",
+      message: ResponseErrorMessage.IncorrectCredentials,
       debug: {
         received,
         request_payload,
@@ -67,7 +69,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
   catch (error) {
     console.error("[/api/login/authenticate]", error);
     return res.error({
-      message: "Request to Pronote failed.",
+      message: ResponseErrorMessage.ServerSideError,
       debug: { trace: error }
     });
   }

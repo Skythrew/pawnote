@@ -11,16 +11,13 @@ import sessions from "@/stores/sessions";
 import { getCurrentWeekNumber, callUserTimetableAPI } from "@/utils/client";
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
-const AppSlugLayout: Component = () => {
+const AppLayout: Component = () => {
   const navigate = useNavigate();
 
   const params = useParams();
   const slug = () => params.slug;
 
-  console.info("[[slug].tsx] re-render");
-
   createEffect(async () => {
-    console.info("[[slug].tsx] new effect");
     onCleanup(() => app.cleanCurrentUser());
     app.setBannerMessage({ message: AppBannerMessage.RestoringSession, is_loader: true });
 
@@ -96,4 +93,4 @@ const AppSlugLayout: Component = () => {
   );
 };
 
-export default AppSlugLayout;
+export default AppLayout;

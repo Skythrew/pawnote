@@ -8,9 +8,7 @@ import {
 
 import { ApiUserTimetable } from "@/types/api";
 
-import { A } from "solid-start";
-
-const AppHome: Component = () => {
+const AppTimetable: Component = () => {
   const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
   const [weekTimetable, setWeekTimetable] = createSignal<ApiUserTimetable["response"]["received"] | null>(null);
 
@@ -72,4 +70,4 @@ const AppHome: Component = () => {
   );
 };
 
-export default AppHome;
+export default AppTimetable;

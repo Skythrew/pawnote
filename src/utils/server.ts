@@ -8,6 +8,7 @@ import type { FetchEvent } from "solid-start/server";
 import { json } from "solid-start/server";
 import set_cookie from "set-cookie-parser";
 
+import { ResponseErrorMessage } from "@/types/api";
 import { HEADERS_PRONOTE } from "@/utils/constants";
 
 export const handleServerRequest = <T>(callback: (
@@ -154,15 +155,15 @@ export const checkAvailableENT = async (url: string): Promise<(
  */
 export const extractPronoteSessionFromBody = (body: string): (
   | PronoteApiSession // Actual session.
-  | string // Error message.
+  | ResponseErrorMessage // Error message.
   | null // Nothing returned.
 ) => {
   if (body.includes("Votre adresse IP est provisoirement suspendue")) {
-    return "Your IP address has been temporary banned.";
+    return ResponseErrorMessage.PronoteBannedIP;
   }
 
   if (body.includes("Le site n'est pas disponible")) {
-    return "This Pronote instance is closed.";
+    return ResponseErrorMessage.PronoteClosedInstance;
   }
 
   try {

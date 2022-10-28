@@ -1,4 +1,5 @@
 import type { ApiLoginEntTicket } from "@/types/api";
+import { ResponseErrorMessage } from "@/types/api";
 
 import { handleServerRequest } from "@/utils/server";
 import { objectHasProperty } from "@/utils/globals";
@@ -9,14 +10,14 @@ export const POST = handleServerRequest<ApiLoginEntTicket["response"]>(async (re
 
   if (!objectHasProperty(body, "ent_url") || !objectHasProperty(body, "ent_cookies"))
     return res.error({
-      message: "Missing 'ent_url' and/or 'ent_cookies'.",
+      message: ResponseErrorMessage.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
   try {
     const service = findENT(body.ent_url);
     if (!service) return res.error({
-      message: "ENT not available. If you're a developer, please contribute to make a support for your ENT!"
+      message: ResponseErrorMessage.NotFoundENT
     }, { status: 404 });
 
     const pronote_url = await service.process_ticket({
@@ -24,15 +25,15 @@ export const POST = handleServerRequest<ApiLoginEntTicket["response"]>(async (re
     });
 
     if (pronote_url === null) return res.error({
-      message: "Error while fetching the Pronote URL ticket. Please, try again."
-    }, { status: 500 });
+      message: ResponseErrorMessage.PronoteTicketFetch
+    });
 
     return res.success({ pronote_url });
   }
   catch (error) {
     console.error("[/api/login/ent_ticket]", error);
     return res.error({
-      message: "Not able to get Pronote URL ticket.",
+      message: ResponseErrorMessage.PronoteTicketFetch,
       debug: { trace: error, body }
     });
   }

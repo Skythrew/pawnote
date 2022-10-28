@@ -1,5 +1,7 @@
 import type { PronoteApiInstance } from "@/types/pronote";
 import type { ApiInstance } from "@/types/api";
+
+import { ResponseErrorMessage } from "@/types/api";
 import { PronoteApiFunctions } from "@/types/pronote";
 
 import { objectHasProperty } from "@/utils/globals";
@@ -19,7 +21,7 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
 
   if (!objectHasProperty(body, "pronote_url"))
     return res.error({
-      message: "Missing pronote_url.",
+      message: ResponseErrorMessage.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -31,7 +33,7 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
 
     // Check if the Pronote page has been correctly downloaded.
     if (pronote_page === null) return res.error({
-      message: "Error while downloading the Pronote page.",
+      message: ResponseErrorMessage.PronotePageDownload,
       debug: {
         pronote_url,
         pronote_page
@@ -43,7 +45,7 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
 
     // Check if the ENT check has been successful.
     if (ent === null) return res.error({
-      message: "Error while checking if ENT is available.",
+      message: ResponseErrorMessage.ENTAvailableCheck,
       debug: {
         pronote_url
       }
@@ -60,7 +62,7 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
     });
 
     if (session_data === null) return res.error({
-      message: "Error while parsing session data.",
+      message: ResponseErrorMessage.SessionReadData,
       debug: {
         pronote_url,
         pronote_page
@@ -81,8 +83,8 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
     });
 
     if (response === null) return res.error({
-      message: "A network error happened, please retry."
-    }, { status: 500 });
+      message: ResponseErrorMessage.NetworkFail
+    });
 
     const received = session.readPronoteFunctionPayload<PronoteApiInstance["response"]>(response.payload);
     if (typeof received === "string") return res.error({
@@ -99,7 +101,7 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
   catch (error) {
     console.error("[/api/instance]", error);
     return res.error({
-      message: "Request to Pronote failed.",
+      message: ResponseErrorMessage.ServerSideError,
       debug: { trace: error }
     });
   }

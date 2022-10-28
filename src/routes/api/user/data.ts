@@ -1,6 +1,8 @@
 import type { PronoteApiUserData } from "@/types/pronote";
 import type { ApiUserData } from "@/types/api";
+
 import { PronoteApiFunctions } from "@/types/pronote";
+import { ResponseErrorMessage } from "@/types/api";
 
 import {
   handleServerRequest,
@@ -15,7 +17,7 @@ export const POST = handleServerRequest<ApiUserData["response"]>(async (req, res
 
   if (!objectHasProperty(body, "session"))
     return res.error({
-      message: "Missing 'session'.",
+      message: ResponseErrorMessage.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -30,7 +32,7 @@ export const POST = handleServerRequest<ApiUserData["response"]>(async (req, res
     });
 
     if (response === null) return res.error({
-      message: "A network error happened, please retry."
+      message: ResponseErrorMessage.NetworkFail
     }, { status: 500 });
 
     const received = session.readPronoteFunctionPayload<PronoteApiUserData["response"]>(response.payload);
@@ -57,7 +59,7 @@ export const POST = handleServerRequest<ApiUserData["response"]>(async (req, res
   catch (error) {
     console.error("[/api/user/data]", error);
     return res.error({
-      message: "Request to Pronote failed.",
+      message: ResponseErrorMessage.ServerSideError,
       debug: { trace: error }
     });
   }

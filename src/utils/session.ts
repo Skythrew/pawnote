@@ -6,6 +6,7 @@ import { aes } from "@/utils/globals";
 
 import forge from "node-forge";
 import pako from "pako";
+import { ResponseErrorMessage } from "@/types/api";
 
 class Session {
   public instance: SessionInstance;
@@ -160,10 +161,10 @@ class Session {
    * Returns an object when the request was successful
    * and `string` if an error has been found.
    */
-  readPronoteFunctionPayload <Res>(response_body: string): Res | string {
+  readPronoteFunctionPayload <Res>(response_body: string): Res | ResponseErrorMessage {
     if (response_body.includes("La page a expir")) {
       this.instance.order--; // Prevent broken response to take the order.
-      return "The session was expired. Restore the session and try again.";
+      return ResponseErrorMessage.SessionExpired;
     }
 
     this.instance.order++;
@@ -176,7 +177,7 @@ class Session {
     });
 
     if (this.instance.order !== parseInt(decrypted_order))
-      return "Received and local orders aren't matching.";
+      return ResponseErrorMessage.NotMatchingOrders;
 
     let final_data = response.donneesSec;
 

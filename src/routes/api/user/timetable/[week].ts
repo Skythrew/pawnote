@@ -1,6 +1,8 @@
 import type { PronoteApiUserTimetable } from "@/types/pronote";
 import type { ApiUserTimetable } from "@/types/api";
+
 import { PronoteApiFunctions } from "@/types/pronote";
+import { ResponseErrorMessage } from "@/types/api";
 
 import {
   handleServerRequest,
@@ -15,13 +17,13 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
   const week_number = parseInt(new URL(req.url).pathname.split("/").pop() as string);
 
   if (Number.isNaN(week_number)) return res.error({
-    message: "Incorrect 'week' value (NaN) in URL parameters.",
+    message: ResponseErrorMessage.IncorrectParameters,
     debug: { url: req.url }
   });
 
   if (!objectHasProperty(body, "session") || !objectHasProperty(body, "ressource"))
     return res.error({
-      message: "Missing 'session' and/or 'ressource'.",
+      message: ResponseErrorMessage.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -55,7 +57,7 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
     });
 
     if (response === null) return res.error({
-      message: "A network error happened, please retry."
+      message: ResponseErrorMessage.NetworkFail
     }, { status: 500 });
 
     const received = session.readPronoteFunctionPayload<PronoteApiUserTimetable["response"]>(response.payload);
@@ -75,7 +77,7 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
   catch (error) {
     console.error("[/api/user/timetable]", error);
     return res.error({
-      message: "Request to Pronote failed.",
+      message: ResponseErrorMessage.ServerSideError,
       debug: { trace: error }
     });
   }
