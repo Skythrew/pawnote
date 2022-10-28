@@ -45,7 +45,9 @@ const [modal, setModal] = createStore({
 export enum AppBannerMessage {
   Idle,
   RestoringSession,
-  FetchingTimetable
+  FetchingTimetable,
+  NeedCredentials,
+  UnknownError
 }
 
 const [banner_message, setBannerMessage] = createStore<{

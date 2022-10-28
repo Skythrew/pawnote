@@ -67,8 +67,12 @@ export const callAPI = async <Api extends {
       // When the session expired while connected to a user
       // we try to restore the session.
       if (user.slug) {
-        app.setBannerMessage({ message: AppBannerMessage.RestoringSession, is_loader: true });
         const old_session = user.session;
+
+        app.setBannerMessage({
+          message: AppBannerMessage.RestoringSession,
+          is_loader: true
+        });
 
         try {
           const data = await connectToPronote({
@@ -105,8 +109,6 @@ export const callAPI = async <Api extends {
             );
           }
 
-          app.setBannerToIdle();
-
           throw new ApiError({
             message: ResponseErrorMessage.NewSessionAvailable
           });
@@ -115,20 +117,33 @@ export const callAPI = async <Api extends {
           if (error instanceof ApiError) {
             if (error.message === ResponseErrorMessage.NewSessionAvailable) {
               // Ignore the session restore modal.
+              app.setBannerToIdle();
               throw error;
             }
           }
+
+          app.setBannerMessage({
+            is_error: true,
+            message: AppBannerMessage.NeedCredentials
+          });
 
           app.setModal("needs_scratch_session", true);
           throw error;
         }
       }
+
+      // Should be a first-time login.
       else {
         throw new ApiError({
           message: ResponseErrorMessage.RequestPayloadBroken
         });
       }
     }
+
+    app.setBannerMessage({
+      is_error: true,
+      message: AppBannerMessage.UnknownError
+    });
 
     throw new ApiError(response);
   }
@@ -145,6 +160,7 @@ export const callAPI = async <Api extends {
     typed_response.received && await endpoints.upsert(user.slug, path, typed_response.received);
   }
 
+  app.setBannerToIdle();
   return response.data;
 };
 
@@ -420,6 +436,11 @@ export const callUserTimetableAPI = async (week: number) => {
   const endpoint: ApiUserTimetable["path"] = `/user/timetable/${week}`;
   const local_response = await endpoints.get<ApiUserTimetable>(user.slug, endpoint);
   if (local_response && local_response !== null) return local_response;
+
+  app.setBannerMessage({
+    message: AppBannerMessage.FetchingTimetable,
+    is_loader: true
+  });
 
   try {
     const data = await callAPI<ApiUserTimetable>(endpoint, {
