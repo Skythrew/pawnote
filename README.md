@@ -28,12 +28,13 @@ includes many features such as...
 ## Warning
 
 This project is made for educational purposes.
-That means that the client will not really be maintained in long terms.
-You can still use this client, to do everyday tasks, but when it comes to start a quiz,
-or record yourself, or whatever that isn't in the
-`Features` part, you should use the **real** Pronote
-application. Note that **Index-Education** can take down
-this project at anytime.
+That means that the project will not really be maintained in long terms.
+
+You can use this client to do basic tasks
+like watching your timetable, homeworks, etc...
+
+Just don't **currently** use this client for very specific
+tasks such as doing a quizz, upload a file and things like that.
 
 ## Ressources
 
