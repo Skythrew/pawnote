@@ -37,6 +37,47 @@ The `debug` property is optional so not always present in the response.
 When there's a `debug` property, most of the time, it's a simple object with data that
 have been processed server-side.
 
+## Session Typings
+
+The `SessionExported` typing is always used when the trying to use authenticated routes - or even in the authentication process.
+
+```typescript
+export interface SessionInstance {
+  pronote_url: string;
+  ent_url: string | null;
+
+  session_id: number;
+  account_type_id: PronoteApiAccountId;
+
+  ent_cookies: string[];
+  pronote_cookies: string[];
+
+  skip_encryption: boolean;
+  skip_compression: boolean;
+
+  use_ent: boolean;
+  order: number;
+}
+
+export interface SessionEncryption {
+  aes: {
+    iv?: string;
+    key?: string;
+  }
+
+  rsa: {
+    modulus: string;
+    exponent: string;
+  }
+}
+
+/** This is what we use in the requests and responses. */
+export interface SessionExported {
+  instance: SessionInstance;
+  encryption: SessionEncryption;
+}
+```
+
 ## `POST /geolocation`
 
 A small request to proxy the `https://www.index-education.com/swie/geoloc.php` endpoint gived by Index-Education.
@@ -119,7 +160,7 @@ type Request = {
 };
 ```
 
-### Response Body
+### Successful Response
 
 ```typescript
 type Response = {
@@ -127,7 +168,34 @@ type Response = {
 };
 ```
 
+## `POST /login/ent_ticket`
+
+This is used to get the Pronote URL ticket that allows you to login to a Pronote account using ENT cookies - that you can get from the `/login/ent_cookies` endpoint.
+
+The `pronote_url` that is given in the response needs to be used as raw in `/login/informations` endpoint.
+
+### Request Body
+
+```typescript
+type Request = {
+  ent_url: string;
+  ent_cookies: string[];
+};
+```
+
+### Successful Response
+
+```typescript
+type Response = {
+  /** URL with "identifiant" search params. */
+  pronote_url: string;
+};
+```
+
 ## `POST /login/informations`
+
+This endpoint can create new sessions.
+It responds with the first `session` object.
 
 ### Request Body
 
@@ -160,6 +228,7 @@ You can find more informations about the `PronoteApiLoginInformations` typing @ 
 type Response = {
   received: PronoteApiLoginInformations["response"];
   session: SessionExported;
+  cookies: string[];
 
   /** Available when using ENT or session recovery cookies. */
   setup?: {
@@ -170,8 +239,6 @@ type Response = {
 ```
 
 ## `POST /login/identify`
-
-Starts a new login process on the Pronote side. This is the *second* step to login into your Pronote account if you don't use ENT or old session recovery.
 
 ### Request Body
 
@@ -195,6 +262,32 @@ You can find more informations about the `PronoteApiLoginIdentify` typing @ `/sr
 ```typescript
 type Response = {
   received: PronoteApiLoginIdentify;
+  session: SessionExported;
+};
+```
+
+## `POST /login/authenticate`
+
+To get the `solved_challenge` property, you'll need to do some tricks that are fully explained in [this documentation written by the authors of `pronotepy`](https://github.com/bain3/pronotepy/blob/master/PRONOTE%20protocol.md).
+
+### Request Body
+
+```typescript
+type Request = {
+  /** Challenge from `ApiLoginIdentify["response"]` solved. */
+  solved_challenge: string;
+
+  session: SessionExported;
+  cookies?: string[];
+};
+```
+
+### Successful Response
+
+```typescript
+type Response = {
+  received: PronoteApiLoginAuthenticate["response"];
+  session: SessionExported;
 };
 ```
 
