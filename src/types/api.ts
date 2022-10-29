@@ -65,6 +65,8 @@ export interface ApiGeolocation {
     latitude: number;
     longitude: number;
     postal_code: number;
+    /** Distance in meters. */
+    distance: number;
   }[]
 
   path: "/geolocation";

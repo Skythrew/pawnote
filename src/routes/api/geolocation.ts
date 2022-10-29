@@ -6,6 +6,8 @@ import { ResponseErrorMessage } from "@/types/api";
 
 import { handleServerRequest } from "@/utils/server";
 import { objectHasProperty } from "@/utils/globals";
+
+import haversine from "haversine-distance";
 import { decode } from "html-entities";
 
 export const POST = handleServerRequest<ApiGeolocation["response"]>(async (req, res) => {
@@ -47,7 +49,13 @@ export const POST = handleServerRequest<ApiGeolocation["response"]>(async (req, 
 
       latitude: parseFloat(result.lat),
       longitude: parseFloat(result.long),
-      postal_code: parseInt(result.cp)
+
+      postal_code: parseInt(result.cp),
+
+      distance: haversine(
+        { latitude: body.latitude, longitude: body.longitude },
+        { latitude: parseFloat(result.lat), longitude: parseFloat(result.long) }
+      )
     }));
 
     return res.success(results);
