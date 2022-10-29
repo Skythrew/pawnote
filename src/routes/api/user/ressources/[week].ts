@@ -1,7 +1,7 @@
 import type { PronoteApiUserRessources } from "@/types/pronote";
 import type { ApiUserRessources } from "@/types/api";
 
-import { PronoteApiFunctions } from "@/types/pronote";
+import { PronoteApiFunctions, PronoteApiOnglets } from "@/types/pronote";
 import { ResponseErrorMessage } from "@/types/api";
 
 import {
@@ -38,7 +38,7 @@ export const POST = handleServerRequest<ApiUserRessources["response"]>(async (re
         }
       },
 
-      _Signature_: { onglet: 89 }
+      _Signature_: { onglet: PronoteApiOnglets.Ressources }
     });
     const response = await callPronoteAPI(PronoteApiFunctions.Homeworks, {
       session_instance: session.instance,

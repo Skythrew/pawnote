@@ -1,7 +1,7 @@
 import type { PronoteApiUserTimetable } from "@/types/pronote";
 import type { ApiUserTimetable } from "@/types/api";
 
-import { PronoteApiFunctions } from "@/types/pronote";
+import { PronoteApiFunctions, PronoteApiOnglets } from "@/types/pronote";
 import { ResponseErrorMessage } from "@/types/api";
 
 import {
@@ -49,7 +49,7 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
         ressource: body.ressource
       },
 
-      _Signature_: { onglet: 16 }
+      _Signature_: { onglet: PronoteApiOnglets.Timetable }
     });
     const response = await callPronoteAPI(PronoteApiFunctions.Timetable, {
       session_instance: session.instance,
