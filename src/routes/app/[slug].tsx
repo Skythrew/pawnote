@@ -10,13 +10,16 @@ import sessions from "@/stores/sessions";
 
 import {
   getCurrentWeekNumber,
+  getDefaultPeriodOnglet,
 
   callUserTimetableAPI,
   callUserHomeworksAPI,
-  callUserRessourcesAPI
+  callUserRessourcesAPI,
+  callUserGradesAPI
 } from "@/utils/client";
 
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
+import { PronoteApiOnglets } from "@/types/pronote";
 
 const AppLayout: Component = () => {
   const navigate = useNavigate();
@@ -47,14 +50,18 @@ const AppLayout: Component = () => {
     });
 
     const week_number = getCurrentWeekNumber();
+    const grades_period = getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
+
     const user_timetable = await callUserTimetableAPI(week_number);
     const user_homeworks = await callUserHomeworksAPI(week_number);
     const user_ressources = await callUserRessourcesAPI(week_number);
+    const user_grades = await callUserGradesAPI(grades_period);
 
     batch(() => {
       app.setCurrentUser("endpoints", `/user/timetable/${week_number}`, user_timetable);
       app.setCurrentUser("endpoints", `/user/homeworks/${week_number}`, user_homeworks);
       app.setCurrentUser("endpoints", `/user/ressources/${week_number}`, user_ressources);
+      app.setCurrentUser("endpoints", `/user/grades/${grades_period}`, user_grades);
 
       app.setBannerToIdle();
     });
