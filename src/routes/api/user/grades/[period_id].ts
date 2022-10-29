@@ -1,5 +1,5 @@
-import type { PronoteApiUserRessources } from "@/types/pronote";
-import type { ApiUserRessources } from "@/types/api";
+import type { PronoteApiUserGrades } from "@/types/pronote";
+import type { ApiUserGrades } from "@/types/api";
 
 import { PronoteApiFunctions, PronoteApiOnglets } from "@/types/pronote";
 import { ResponseErrorMessage } from "@/types/api";
@@ -12,16 +12,11 @@ import {
 import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
-export const POST = handleServerRequest<ApiUserRessources["response"]>(async (req, res) => {
-  const body = await req.json() as ApiUserRessources["request"];
-  const week_number = parseInt(new URL(req.url).pathname.split("/").pop() as string);
+export const POST = handleServerRequest<ApiUserGrades["response"]>(async (req, res) => {
+  const body = await req.json() as ApiUserGrades["request"];
+  const period_id = parseInt(new URL(req.url).pathname.split("/").pop() as string);
 
-  if (Number.isNaN(week_number)) return res.error({
-    message: ResponseErrorMessage.IncorrectParameters,
-    debug: { url: req.url }
-  });
-
-  if (!objectHasProperty(body, "session"))
+  if (!objectHasProperty(body, "session") || !objectHasProperty(body, "period") || !period_id)
     return res.error({
       message: ResponseErrorMessage.MissingParameters,
       debug: { received_body: body }
@@ -30,17 +25,14 @@ export const POST = handleServerRequest<ApiUserRessources["response"]>(async (re
   try {
     const session = Session.importFromObject(body.session);
 
-    const request_payload = session.writePronoteFunctionPayload<PronoteApiUserRessources["request"]>({
+    const request_payload = session.writePronoteFunctionPayload<PronoteApiUserGrades["request"]>({
       donnees: {
-        domaine: {
-          _T: 8,
-          V: `[${week_number}]`
-        }
+        Periode: body.period
       },
 
-      _Signature_: { onglet: PronoteApiOnglets.Ressources }
+      _Signature_: { onglet: PronoteApiOnglets.Grades }
     });
-    const response = await callPronoteAPI(PronoteApiFunctions.Ressources, {
+    const response = await callPronoteAPI(PronoteApiFunctions.Grades, {
       session_instance: session.instance,
       payload: request_payload
     });
@@ -49,7 +41,7 @@ export const POST = handleServerRequest<ApiUserRessources["response"]>(async (re
       message: ResponseErrorMessage.NetworkFail
     }, { status: 500 });
 
-    const received = session.readPronoteFunctionPayload<PronoteApiUserRessources["response"]>(response.payload);
+    const received = session.readPronoteFunctionPayload<PronoteApiUserGrades["response"]>(response.payload);
     if (typeof received === "string") return res.error({
       message: received,
       debug: {
@@ -64,7 +56,7 @@ export const POST = handleServerRequest<ApiUserRessources["response"]>(async (re
     });
   }
   catch (error) {
-    console.error("[/api/user/ressources]", error);
+    console.error("[/api/user/homeworks]", error);
     return res.error({
       message: ResponseErrorMessage.ServerSideError,
       debug: { trace: error }

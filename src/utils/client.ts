@@ -9,12 +9,13 @@ import type {
   ApiUserTimetable,
   ApiUserHomeworks,
   ApiUserData,
-  ApiUserRessources
+  ApiUserRessources,
+  ApiUserGrades
 } from "@/types/api";
 
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
-import { PronoteApiAccountId, PronoteApiUserTimetableContentType } from "@/types/pronote";
+import { PronoteApiAccountId, PronoteApiOnglets, PronoteApiUserTimetableContentType } from "@/types/pronote";
 import { ResponseErrorMessage } from "@/types/api";
 
 import app, { AppBannerMessage } from "@/stores/app";
@@ -586,6 +587,74 @@ export const callUserRessourcesAPI = async (week: number) => {
 
         const data = await callAPI<ApiUserRessources>(endpoint, {
           session: user.session
+        });
+
+        return data.received;
+      }
+    }
+
+    throw error;
+  }
+};
+
+export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
+  const user = app.current_user;
+  if (!user.slug) throw new ApiError ({
+    message: ResponseErrorMessage.UserUnavailable
+  });
+
+  const user_data = user.endpoints["/user/data"];
+  const onglet = user_data.donnees.ressource.listeOngletsPourPeriodes.V.find(
+    onglet => onglet.G === onglet_id
+  );
+
+  if (!onglet) throw new ApiError ({
+    message: ResponseErrorMessage.OngletUnauthorized
+  });
+
+  const period = onglet.listePeriodes.V.find(
+    period => period.N === onglet.periodeParDefaut.V.N
+  );
+
+  if (!period) throw new ApiError ({
+    message: ResponseErrorMessage.OngletUnauthorized
+  });
+
+  return period;
+};
+
+export const callUserGradesAPI = async (period: ApiUserGrades["request"]["period"]) => {
+  const user = app.current_user;
+  if (!user.slug) throw new ApiError ({
+    message: ResponseErrorMessage.UserUnavailable
+  });
+
+  const endpoint: ApiUserGrades["path"] = `/user/grades/${period.N}`;
+  const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint);
+  if (local_response && local_response !== null) return local_response;
+
+  app.setBannerMessage({
+    message: AppBannerMessage.FetchingGrades,
+    is_loader: true
+  });
+
+  try {
+    const data = await callAPI<ApiUserGrades>(endpoint, {
+      session: user.session,
+      period
+    });
+
+    return data.received;
+  }
+  catch (error) {
+    if (error instanceof ApiError) {
+      if (error.message === ResponseErrorMessage.NewSessionAvailable) {
+        const user_data = await endpoints.get<ApiUserData>(user.slug, "/user/data");
+        if (!user_data) throw error;
+
+        const data = await callAPI<ApiUserGrades>(endpoint, {
+          session: user.session,
+          period
         });
 
         return data.received;

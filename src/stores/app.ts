@@ -5,7 +5,8 @@ import {
   ApiUserData,
   ApiUserHomeworks,
   ApiUserTimetable,
-  ApiUserRessources
+  ApiUserRessources,
+  ApiUserGrades
 } from "@/types/api";
 
 /// This is the store used by the app when
@@ -25,6 +26,7 @@ export type CurrentUserStore =
       [key: ApiUserTimetable["path"]]: ApiUserTimetable["response"]["received"] | undefined;
       [key: ApiUserHomeworks["path"]]: ApiUserHomeworks["response"]["received"] | undefined;
       [key: ApiUserRessources["path"]]: ApiUserRessources["response"]["received"] | undefined;
+      [key: ApiUserGrades["path"]]: ApiUserGrades["response"]["received"] | undefined;
     }
   }
   | {
@@ -57,6 +59,7 @@ export enum AppBannerMessage {
   FetchingTimetable,
   FetchingHomeworks,
   FetchingRessources,
+  FetchingGrades,
   NeedCredentials,
   UnknownError
 }

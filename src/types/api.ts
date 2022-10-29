@@ -33,7 +33,8 @@ export enum ResponseErrorMessage {
   NotFoundENT = "ENT not available. If you're a developer, please contribute to make a support for your ENT!",
   PronoteTicketFetch = "Error while fetching the Pronote URL ticket. Please, try again.",
   ENTCookiesFetch = "Error while fetching the ENT cookies. Maybe bad credentials, please try again.",
-  IncorrectCredentials = "Incorrect username and/or password."
+  IncorrectCredentials = "Incorrect username and/or password.",
+  OngletUnauthorized = "User is not authorized to access this onglet."
 }
 
 /** Helper type for error responses. */
@@ -234,10 +235,11 @@ export interface ApiUserRessources {
   path: ApiUserRessourcesPath;
 }
 
-type ApiUserGradesPath = `/user/ressources/${number}`;
+type ApiUserGradesPath = `/user/grades/${string}`;
 export interface ApiUserGrades {
   request: {
     session: SessionExported;
+    period: PronoteApiUserGrades["request"]["donnees"]["Periode"];
   }
 
   response: {

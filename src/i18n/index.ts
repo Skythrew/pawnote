@@ -12,6 +12,8 @@ export const appBannerMessageToString = (message: AppBannerMessage) => {
     return "Récupération de la session...";
   case AppBannerMessage.FetchingRessources:
     return "Récupération des ressources pédagogiques...";
+  case AppBannerMessage.FetchingGrades:
+    return "Récupération des notes...";
   case AppBannerMessage.UnknownError:
     return "Une erreur inconnue est survenue.";
   case AppBannerMessage.NeedCredentials:

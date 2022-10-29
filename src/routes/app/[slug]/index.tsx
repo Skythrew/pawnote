@@ -1,11 +1,17 @@
 import type { Component } from "solid-js";
+import { PronoteApiOnglets } from "@/types/pronote";
 
 import app from "@/stores/app";
 import { A } from "@solidjs/router";
-import { getCurrentWeekNumber } from "@/utils/client";
+
+import {
+  getCurrentWeekNumber,
+  getDefaultPeriodOnglet
+} from "@/utils/client";
 
 const AppHome: Component = () => {
   const week_number = getCurrentWeekNumber();
+  const period_grades = getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
 
   return (
     <div>
@@ -28,10 +34,17 @@ const AppHome: Component = () => {
       </Show>
 
       <Show
-        fallback={<A href="ressources">Les ressources pédagogiques n'ont pas encore été récupérés.</A>}
+        fallback={<A href="ressources">Les ressources pédagogiques n'ont pas encore été récupérées.</A>}
         when={app.current_user.slug !== null && app.current_user.endpoints[`/user/ressources/${week_number}`]}
       >
         <A href="ressources">Voir les ressources pédagogiques de cette semaine.</A>
+      </Show>
+
+      <Show
+        fallback={<A href="grades">Les notes n'ont pas encore été récupérées.</A>}
+        when={app.current_user.slug !== null && app.current_user.endpoints[`/user/grades/${period_grades.N}`]}
+      >
+        <A href="grades">Voir les notes du {period_grades.L}.</A>
       </Show>
     </div>
   );

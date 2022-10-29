@@ -22,6 +22,13 @@ export enum PronoteApiFunctions {
   Grades = "DernieresNotes"
 }
 
+export enum PronoteApiOnglets {
+  Grades = 198,
+  Ressources = 89,
+  Homeworks = 88,
+  Timetable = 16
+}
+
 export interface PronoteApiSession {
   /** Session ID as a **string**. */
   h: string;
@@ -706,14 +713,13 @@ export interface PronoteApiUserData {
         listeOngletsPourPeriodes: {
           _T: 24;
           V: {
-            G: number;
+            G: PronoteApiOnglets;
 
             listePeriodes: {
               T: 24;
               V: {
-                /** Name. */
+                /** Name of the period. */
                 L: string;
-                /** ID. */
                 N: string;
 
                 G: number;
@@ -726,9 +732,8 @@ export interface PronoteApiUserData {
             periodeParDefaut: {
               _T: 24;
               V: {
-                /** Name. */
+                /** Name of the period. */
                 L: string;
-                /** ID. */
                 N: string;
               };
             };
@@ -911,7 +916,7 @@ export interface PronoteApiUserTimetable {
     }
 
     _Signature_: {
-      onglet: 16;
+      onglet: PronoteApiOnglets.Timetable;
     }
   }
 
@@ -987,7 +992,7 @@ export interface PronoteApiUserTimetable {
 export interface PronoteApiUserHomeworks {
   request: {
     _Signature_: {
-      onglet: 88;
+      onglet: PronoteApiOnglets.Homeworks;
     }
 
     donnees: {
@@ -1084,7 +1089,7 @@ export interface PronoteApiUserHomeworks {
 export interface PronoteApiUserRessources {
   request: {
     _Signature_: {
-      onglet: 89;
+      onglet: PronoteApiOnglets.Ressources;
     }
 
     donnees: {
@@ -1270,15 +1275,11 @@ export interface PronoteApiUserRessources {
 export interface PronoteApiUserGrades {
   request: {
     _Signature_: {
-      onglet: 198
+      onglet: PronoteApiOnglets.Grades;
     }
 
     donnees: {
-      Periode: {
-        N: string;
-        G: number;
-        L: string;
-      }
+      Periode: PronoteApiUserData["response"]["donnees"]["ressource"]["listeOngletsPourPeriodes"]["V"][number]["listePeriodes"]["V"][number];
     }
   }
 
