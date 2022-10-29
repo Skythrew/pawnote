@@ -54,7 +54,7 @@ const LinkPronoteAccount: Component = () => {
         }
       } = await getGeolocationPosition();
 
-      const data = await callAPI<ApiGeolocation>("/geolocation", { latitude, longitude });
+      const data = await callAPI<ApiGeolocation>("/geolocation", () => ({ latitude, longitude }));
       if (data.length <= 0) {
         alert("Aucune instance Pronote proche de votre location n'a été trouvée.");
         return;
@@ -82,9 +82,9 @@ const LinkPronoteAccount: Component = () => {
     evt.preventDefault();
 
     try {
-      const response = await callAPI<ApiInstance>("/instance", {
+      const response = await callAPI<ApiInstance>("/instance", () => ({
         pronote_url: state.pronote_url
-      });
+      }));
 
       batch(() =>  {
         setState("school_informations_commun", response);
@@ -149,7 +149,7 @@ const LinkPronoteAccount: Component = () => {
                                         "block",
                                       )}
                                     >
-                                      {instance.name}
+                                      {instance.name} ({Math.floor(instance.distance / 1000)}km)
                                     </span>
                                     {isSelected() ? (
                                       <span

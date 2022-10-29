@@ -56,7 +56,19 @@ export const POST = handleServerRequest<ApiGeolocation["response"]>(async (req, 
         { latitude: body.latitude, longitude: body.longitude },
         { latitude: parseFloat(result.lat), longitude: parseFloat(result.long) }
       )
-    }));
+    }))
+    // Sort the distance by the nearest and also by school's name.
+      .sort((a, b) => a.distance > b.distance
+        ? 1
+        : a.distance < b.distance
+          ? -1
+          : a.name > b.name
+            ? 1
+            : a.name < b.name
+              ? -1
+              : 0
+      );
+
 
     return res.success(results);
   }
