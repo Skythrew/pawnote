@@ -2,10 +2,8 @@ import type { ApiLoginEntCookies } from "@/types/api";
 import { ResponseErrorMessage } from "@/types/api";
 
 import { handleServerRequest } from "@/utils/server";
-import { objectHasProperty } from "@/utils/globals";
+import { objectHasProperty, credentials } from "@/utils/globals";
 import { findENT } from "@/utils/ent";
-
-import forge from "node-forge";
 
 export const POST = handleServerRequest<ApiLoginEntCookies["response"]>(async (req, res) => {
   const body = await req.json() as ApiLoginEntCookies["request"];
@@ -17,11 +15,7 @@ export const POST = handleServerRequest<ApiLoginEntCookies["response"]>(async (r
     }, { status: 400 });
 
   try {
-    const [username, password] = forge.util.encodeUtf8(
-      forge.util.hexToBytes(
-        body.credentials.split("").reverse().join("")
-      )
-    ).split(":").map(str => forge.util.decode64(str));
+    const { username, password } = credentials.decode(body.credentials);
 
     const service = findENT(body.ent_url);
     if (!service) return res.error({

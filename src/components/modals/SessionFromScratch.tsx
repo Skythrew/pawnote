@@ -10,6 +10,7 @@ import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 import app from "@/stores/app";
 import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
+import credentials_store from "@/stores/credentials";
 
 const SessionFromScratchModal: Component<{
   pronote_url: string,
@@ -37,10 +38,13 @@ const SessionFromScratchModal: Component<{
 
     username: string;
     password: string;
+    save: boolean;
   }>({
     use_ent: false,
     username: "",
     password: "",
+    save: false,
+
     slug: "",
 
     account_type: app.current_user.slug
@@ -108,6 +112,16 @@ const SessionFromScratchModal: Component<{
     await endpoints.upsert<ApiLoginInformations>(
       slug, "/login/informations", data.endpoints["/login/informations"]
     );
+
+    // Make sure to delete the old credentials when
+    // user don't want to save them.
+    if (!credentials.save) await credentials_store.remove(slug);
+    else {
+      await credentials_store.upsert(slug, {
+        username: credentials.username,
+        password: credentials.password
+      });
+    }
   };
 
   const processSlugSave: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
@@ -136,8 +150,9 @@ const SessionFromScratchModal: Component<{
           <p>
             {app.current_user.slug
               ? `
-              Comme Pornote ne sauvegarde pas vos identifiants,
-              vous devez les renseigner de nouveau lors d'une perte de connexion à une session.
+              Renseignez de nouveau vos identifiants pour créer
+              une nouvelle session en fonction de l'ancienne.
+              Vos données ne seront pas perdues.
             `
               : `
               Créez une nouvelle session sur cette instance en entrant vos identifiants.
@@ -175,6 +190,12 @@ const SessionFromScratchModal: Component<{
               type="password"
               value={credentials.password}
               onChange={event => setCredentials("password", event.currentTarget.value)}
+            />
+
+            <input
+              type="checkbox"
+              checked={credentials.save}
+              onChange={(event) => setCredentials("save", event.currentTarget.checked)}
             />
 
             <button type="submit">Valider!</button>

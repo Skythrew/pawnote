@@ -1,3 +1,6 @@
+import type { Accessor } from "solid-js";
+import type { SessionExported } from "@/types/session";
+
 import type {
   Response,
   ResponseError,
@@ -13,21 +16,21 @@ import type {
   ApiUserGrades
 } from "@/types/api";
 
+import { aes, credentials as credentials_utility } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
 import { PronoteApiAccountId, PronoteApiOnglets, PronoteApiUserTimetableContentType } from "@/types/pronote";
 import { ResponseErrorMessage } from "@/types/api";
 
 import app, { AppBannerMessage } from "@/stores/app";
+import credentials from "@/stores/credentials";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
-import { aes } from "@/utils/globals";
 
 import forge from "node-forge";
 import dayjs from "dayjs";
 
 import dayjsCustomParse from "dayjs/plugin/customParseFormat";
-import { SessionExported } from "@/types/session";
 dayjs.extend(dayjsCustomParse);
 
 /** Helper class for easier error handling. */
@@ -50,7 +53,7 @@ export const callAPI = async <Api extends {
   response: unknown;
 }>(
   path: Api["path"],
-  body: Api["request"],
+  body: Accessor<Api["request"]>,
   options = {
     /** Prevents the response from being saved in the localForage. */
     prevent_cache: false
@@ -59,7 +62,7 @@ export const callAPI = async <Api extends {
   const request = await fetch("/api" + path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body())
   });
 
   const user = app.current_user;
@@ -67,8 +70,6 @@ export const callAPI = async <Api extends {
 
   if (!response.success) {
     if (response.message === ResponseErrorMessage.SessionExpired) {
-      // When the session expired while connected to a user
-      // we try to restore the session.
       if (user.slug) {
         const old_session = user.session;
 
@@ -77,23 +78,49 @@ export const callAPI = async <Api extends {
           is_loader: true
         });
 
+        // When the session expired while connected to a user.
         try {
-          const data = await connectToPronote({
-            pronote_url: old_session.instance.pronote_url,
-            use_credentials: false,
-            ...(old_session.instance.use_ent
-              ? { // When creating a new session using ENT cookies.
-                use_ent: true,
-                ent_cookies: old_session.instance.ent_cookies,
-                ent_url: old_session.instance.ent_url as string
-              }
-              : { // When restoring a session using Pronote cookies.
-                use_ent: false,
-                account_type: old_session.instance.account_type_id,
-                pronote_cookies: old_session.instance.pronote_cookies
-              }
-            )
-          });
+          const creds = await credentials.get(user.slug);
+          let data: Awaited<ReturnType<typeof connectToPronote>> | undefined;
+
+          // Directly use the crendentials when we have them.
+          if (creds) {
+            data = await connectToPronote({
+              pronote_url: old_session.instance.pronote_url,
+              use_credentials: true,
+              username: creds.username,
+              password: creds.password,
+              ...(old_session.instance.use_ent
+                ? { // When creating a new session using ENT cookies.
+                  use_ent: true,
+                  ent_url: old_session.instance.ent_url as string
+                }
+                : { // When restoring a session using Pronote cookies.
+                  use_ent: false,
+                  account_type: old_session.instance.account_type_id
+                }
+              )
+            });
+          }
+          // Use the cookies otherwise, but session restoring can fail.
+          else {
+            data = await connectToPronote({
+              pronote_url: old_session.instance.pronote_url,
+              use_credentials: false,
+              ...(old_session.instance.use_ent
+                ? { // When creating a new session using ENT cookies.
+                  use_ent: true,
+                  ent_cookies: old_session.instance.ent_cookies,
+                  ent_url: old_session.instance.ent_url as string
+                }
+                : { // When restoring a session using Pronote cookies.
+                  use_ent: false,
+                  account_type: old_session.instance.account_type_id,
+                  pronote_cookies: old_session.instance.pronote_cookies
+                }
+              )
+            });
+          }
 
           if (!data) {
             throw new ApiError({
@@ -112,21 +139,14 @@ export const callAPI = async <Api extends {
             );
           }
 
-          throw new ApiError({
-            message: ResponseErrorMessage.NewSessionAvailable
-          });
+          return callAPI<Api>(path, body, options);
         }
         catch (error) {
-          if (error instanceof ApiError) {
-            if (error.message === ResponseErrorMessage.NewSessionAvailable) {
-              // Ignore the session restore modal.
-              app.setBannerToIdle();
-              throw error;
-            }
-          }
-
+          // Ask for new credentials.
+          // User can choose if they'll be saved or not.
           app.setBannerMessage({
             is_error: true,
+            is_loader: false,
             message: AppBannerMessage.NeedCredentials
           });
 
@@ -244,12 +264,13 @@ export const connectToPronote = async (options: {
     : []; // Empty array since we gonna fetch them later.
 
   if (options.use_ent && options.use_credentials) {
-    const ent_cookies_response = await callAPI<ApiLoginEntCookies>("/login/ent_cookies", {
+    const ent_cookies_response = await callAPI<ApiLoginEntCookies>("/login/ent_cookies", () => ({
       ent_url: options.ent_url,
-      credentials: forge.util.createBuffer(`${forge.util.encode64(options.username)}:${forge.util.encode64(options.password)}`)
-        // My own encrypting method, inspired by Pronote developers.
-        .toHex().toUpperCase().split("").reverse().join("")
-    }, { prevent_cache : true });
+      credentials: credentials_utility.encode({
+        username: options.username,
+        password: options.password
+      })
+    }), { prevent_cache : true });
 
     ent_cookies = ent_cookies_response.ent_cookies;
   }
@@ -258,10 +279,10 @@ export const connectToPronote = async (options: {
   let pronote_url = options.pronote_url;
 
   if (options.use_ent) {
-    const ent_ticket_response = await callAPI<ApiLoginEntTicket>("/login/ent_ticket", {
+    const ent_ticket_response = await callAPI<ApiLoginEntTicket>("/login/ent_ticket", () => ({
       ent_url: options.ent_url,
       ent_cookies
-    }, { prevent_cache : true });
+    }), { prevent_cache : true });
 
     pronote_url = ent_ticket_response.pronote_url;
   }
@@ -281,14 +302,14 @@ export const connectToPronote = async (options: {
     ? options.pronote_cookies
     : []; // We'll define some cookies for session restoring, later.
 
-  const informations_response = await callAPI<ApiLoginInformations>("/login/informations", {
+  const informations_response = await callAPI<ApiLoginInformations>("/login/informations", () => ({
     cookies: pronote_cookies,
     account_type,
     pronote_url,
 
     // If the URL is not the same, we should use it as raw.
     raw_url: options.pronote_url !== pronote_url
-  }, { // Here, we prevent the cache even if we'll cache it later.
+  }), { // Here, we prevent the cache even if we'll cache it later.
     prevent_cache : true
   });
 
@@ -303,11 +324,15 @@ export const connectToPronote = async (options: {
     pronote_password = informations_response.setup.password;
   }
 
-  const identify_response = await callAPI<ApiLoginIdentify>("/login/identify", {
+  if (!pronote_username || !pronote_password) throw new ApiError({
+    message: ResponseErrorMessage.SessionCantRestore
+  });
+
+  const identify_response = await callAPI<ApiLoginIdentify>("/login/identify", () => ({
     pronote_username,
     cookies: pronote_cookies,
     session: informations_response.session
-  }, { prevent_cache : true });
+  }), { prevent_cache : true });
 
   if (identify_response.received.donnees.modeCompLog) {
     pronote_username = pronote_username.toLowerCase();
@@ -367,11 +392,11 @@ export const connectToPronote = async (options: {
   });
 
   // Send the resolved challenge.
-  const authenticate_response = await callAPI<ApiLoginAuthenticate>("/login/authenticate", {
+  const authenticate_response = await callAPI<ApiLoginAuthenticate>("/login/authenticate", () => ({
     solved_challenge: challengeEncrypted,
     session: identify_response.session,
     cookies: pronote_cookies
-  }, { prevent_cache : true });
+  }), { prevent_cache : true });
 
   // Remove the stored cookie "CASTJU" if exists.
   pronote_cookies = pronote_cookies.filter(cookie => !cookie.startsWith("CASTJU="));
@@ -395,9 +420,9 @@ export const connectToPronote = async (options: {
   authenticate_response.session.instance.ent_cookies = ent_cookies;
   authenticate_response.session.instance.ent_url = options.use_ent ? options.ent_url : null;
 
-  const user_data_response = await callAPI<ApiUserData>("/user/data", {
+  const user_data_response = await callAPI<ApiUserData>("/user/data", () => ({
     session: authenticate_response.session
-  }, { // Here, we prevent the cache even if we'll cache it later.
+  }), { // Here, we prevent the cache even if we'll cache it later.
     prevent_cache : true
   });
 
@@ -445,31 +470,12 @@ export const callUserTimetableAPI = async (week: number) => {
     is_loader: true
   });
 
-  try {
-    const data = await callAPI<ApiUserTimetable>(endpoint, {
-      ressource: user.endpoints["/user/data"].donnees.ressource,
-      session: user.session
-    });
+  const data = await callAPI<ApiUserTimetable>(endpoint, () => ({
+    ressource: user.endpoints["/user/data"].donnees.ressource,
+    session: user.session
+  }));
 
-    return data.received;
-  }
-  catch (error) {
-    if (error instanceof ApiError) {
-      if (error.message === ResponseErrorMessage.NewSessionAvailable) {
-        const user_data = await endpoints.get<ApiUserData>(user.slug, "/user/data");
-        if (!user_data) throw error;
-
-        const data = await callAPI<ApiUserTimetable>(endpoint, {
-          ressource: user_data.donnees.ressource,
-          session: user.session
-        });
-
-        return data.received;
-      }
-    }
-
-    throw error;
-  }
+  return data.received;
 };
 
 export const parseTimetableLessons = (
@@ -532,29 +538,11 @@ export const callUserHomeworksAPI = async (week: number) => {
     is_loader: true
   });
 
-  try {
-    const data = await callAPI<ApiUserHomeworks>(endpoint, {
-      session: user.session
-    });
+  const data = await callAPI<ApiUserHomeworks>(endpoint, () => ({
+    session: user.session
+  }));
 
-    return data.received;
-  }
-  catch (error) {
-    if (error instanceof ApiError) {
-      if (error.message === ResponseErrorMessage.NewSessionAvailable) {
-        const user_data = await endpoints.get<ApiUserData>(user.slug, "/user/data");
-        if (!user_data) throw error;
-
-        const data = await callAPI<ApiUserHomeworks>(endpoint, {
-          session: user.session
-        });
-
-        return data.received;
-      }
-    }
-
-    throw error;
-  }
+  return data.received;
 };
 
 export const callUserRessourcesAPI = async (week: number) => {
@@ -572,29 +560,11 @@ export const callUserRessourcesAPI = async (week: number) => {
     is_loader: true
   });
 
-  try {
-    const data = await callAPI<ApiUserRessources>(endpoint, {
-      session: user.session
-    });
+  const data = await callAPI<ApiUserRessources>(endpoint, () => ({
+    session: user.session
+  }));
 
-    return data.received;
-  }
-  catch (error) {
-    if (error instanceof ApiError) {
-      if (error.message === ResponseErrorMessage.NewSessionAvailable) {
-        const user_data = await endpoints.get<ApiUserData>(user.slug, "/user/data");
-        if (!user_data) throw error;
-
-        const data = await callAPI<ApiUserRessources>(endpoint, {
-          session: user.session
-        });
-
-        return data.received;
-      }
-    }
-
-    throw error;
-  }
+  return data.received;
 };
 
 export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
@@ -638,29 +608,10 @@ export const callUserGradesAPI = async (period: ApiUserGrades["request"]["period
     is_loader: true
   });
 
-  try {
-    const data = await callAPI<ApiUserGrades>(endpoint, {
-      session: user.session,
-      period
-    });
+  const data = await callAPI<ApiUserGrades>(endpoint, () => ({
+    session: user.session,
+    period
+  }));
 
-    return data.received;
-  }
-  catch (error) {
-    if (error instanceof ApiError) {
-      if (error.message === ResponseErrorMessage.NewSessionAvailable) {
-        const user_data = await endpoints.get<ApiUserData>(user.slug, "/user/data");
-        if (!user_data) throw error;
-
-        const data = await callAPI<ApiUserGrades>(endpoint, {
-          session: user.session,
-          period
-        });
-
-        return data.received;
-      }
-    }
-
-    throw error;
-  }
+  return data.received;
 };

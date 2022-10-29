@@ -17,7 +17,6 @@ export enum ResponseErrorMessage {
   SessionExpired = "The session was expired. Restore the session and try again.",
   SessionCantRestore = "Can't restore the session, please enter your credentials again.",
   RequestPayloadBroken = "A mistake was made in the request payload.",
-  NewSessionAvailable = "A new session is available, please retry!",
   UserUnavailable = "User is not into the session.",
   MissingParameters = "Missing parameters in the body request.",
   IncorrectParameters = "Incorrect parameters in the URL or body.",
