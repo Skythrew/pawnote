@@ -16,9 +16,14 @@ import {
   ErrorBoundary
 } from "solid-start";
 
+import settings from "@/stores/settings";
+
 export default function () {
   return (
-    <Html lang="en">
+    <Html
+      lang="fr"
+      classList={{ "dark": settings.globalThemeMode() === "dark" }}
+    >
       <Head>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />

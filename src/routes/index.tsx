@@ -3,6 +3,7 @@ import type { ApiUserData } from "@/types/api";
 
 import { A } from "solid-start";
 
+import settings from "@/stores/settings";
 import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
 
@@ -38,8 +39,8 @@ const RootHomePage: Component = () => {
         <h1 class="font-bold text-3xl dark:text-brand-primary">{APP_NAME}</h1>
         <p class="text-lg text-brand-light mb-4">Client Pronote non-officiel.</p>
 
-        <button>
-          Sombre/Clair{/* {theme === "light" ? "Mode Sombre" : "Mode Clair"} */}
+        <button onClick={settings.toggleGlobalThemeMode}>
+          {settings.globalThemeMode() === "dark" ? "Mode Clair" : "Mode Sombre"}
         </button>
       </header>
 
