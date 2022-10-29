@@ -60,6 +60,8 @@ type Response = {
     latitude: number;
     longitude: number;
     postal_code: number;
+    /** Distance from the given location in meters. */
+    distance: number;
 }[]; // Note that it's an array of objects.
 ```
 
@@ -83,11 +85,45 @@ You can find more informations about the `PronoteApiInstance` typing @ `/src/typ
 
 ```typescript
 type Response = {
-  /** Response decrypted and/or uncompressed given by the function. */ 
   received: PronoteApiInstance;
 
-  pronote_url: string; // Parsed URL of the instance.
-  ent_url?: string; // URL of the ENT login page when available.
+  /** Base URL of the instance. */
+  pronote_url: string;
+  /** When available, URL redirecting to the ENT login. */
+  ent_url?: string;
+};
+```
+
+## `POST /login/ent_cookies`
+
+Used when you need to login using ENT. Gather the cookies of the ENT by logging in and send them back to you for usage with the `/login/ent_ticket` endpoint.
+
+### Request Body
+
+Here, the encryption process for `credentials` property was *inspired by Pronote developers*.
+
+To get the value of this property, you'll need to encode in Base64 the username and the password and then join the two with a `:` like this: `usernameInB64:passwordInB64`. When you have this, you'll need to encode this string in HEX then uppercase it and reverse the string.
+
+The JS implementation using `node-forge` is looking like this:
+```typescript
+const credentials = forge.util.createBuffer(`${forge.util.encode64(username)}:${forge.util.encode64(password)}`)
+  .toHex().toUpperCase().split("").reverse().join("");
+```
+
+Now that you have the credentials value, you can use it in the body request!
+
+```typescript
+type Request = {
+  ent_url: string;
+  credentials: string;
+};
+```
+
+### Response Body
+
+```typescript
+type Response = {
+  ent_cookies: string[];
 };
 ```
 
