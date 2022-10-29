@@ -26,6 +26,13 @@ const AppHome: Component = () => {
           <A href="homeworks">Vous avez {homeworks.donnees.ListeTravauxAFaire.V.length} devoirs cette semaine.</A>
         )}
       </Show>
+
+      <Show
+        fallback={<A href="ressources">Les ressources pédagogiques n'ont pas encore été récupérés.</A>}
+        when={app.current_user.slug !== null && app.current_user.endpoints[`/user/ressources/${week_number}`]}
+      >
+        <A href="ressources">Voir les ressources pédagogiques de cette semaine.</A>
+      </Show>
     </div>
   );
 };

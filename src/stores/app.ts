@@ -4,7 +4,8 @@ import {
   ApiLoginInformations,
   ApiUserData,
   ApiUserHomeworks,
-  ApiUserTimetable
+  ApiUserTimetable,
+  ApiUserRessources
 } from "@/types/api";
 
 /// This is the store used by the app when
@@ -23,6 +24,7 @@ export type CurrentUserStore =
       // Not available when not cached/fetched.
       [key: ApiUserTimetable["path"]]: ApiUserTimetable["response"]["received"] | undefined;
       [key: ApiUserHomeworks["path"]]: ApiUserHomeworks["response"]["received"] | undefined;
+      [key: ApiUserRessources["path"]]: ApiUserRessources["response"]["received"] | undefined;
     }
   }
   | {
@@ -54,6 +56,7 @@ export enum AppBannerMessage {
   RestoringSession,
   FetchingTimetable,
   FetchingHomeworks,
+  FetchingRessources,
   NeedCredentials,
   UnknownError
 }

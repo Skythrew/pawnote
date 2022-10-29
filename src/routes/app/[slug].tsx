@@ -12,7 +12,8 @@ import {
   getCurrentWeekNumber,
 
   callUserTimetableAPI,
-  callUserHomeworksAPI
+  callUserHomeworksAPI,
+  callUserRessourcesAPI
 } from "@/utils/client";
 
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
@@ -48,10 +49,12 @@ const AppLayout: Component = () => {
     const week_number = getCurrentWeekNumber();
     const user_timetable = await callUserTimetableAPI(week_number);
     const user_homeworks = await callUserHomeworksAPI(week_number);
+    const user_ressources = await callUserRessourcesAPI(week_number);
 
     batch(() => {
       app.setCurrentUser("endpoints", `/user/timetable/${week_number}`, user_timetable);
       app.setCurrentUser("endpoints", `/user/homeworks/${week_number}`, user_homeworks);
+      app.setCurrentUser("endpoints", `/user/ressources/${week_number}`, user_ressources);
 
       app.setBannerToIdle();
     });

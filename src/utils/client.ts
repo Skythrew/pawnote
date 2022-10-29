@@ -8,7 +8,8 @@ import type {
   ApiLoginEntTicket,
   ApiUserTimetable,
   ApiUserHomeworks,
-  ApiUserData
+  ApiUserData,
+  ApiUserRessources
 } from "@/types/api";
 
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
@@ -544,6 +545,46 @@ export const callUserHomeworksAPI = async (week: number) => {
         if (!user_data) throw error;
 
         const data = await callAPI<ApiUserHomeworks>(endpoint, {
+          session: user.session
+        });
+
+        return data.received;
+      }
+    }
+
+    throw error;
+  }
+};
+
+export const callUserRessourcesAPI = async (week: number) => {
+  const user = app.current_user;
+  if (!user.slug) throw new ApiError ({
+    message: ResponseErrorMessage.UserUnavailable
+  });
+
+  const endpoint: ApiUserRessources["path"] = `/user/ressources/${week}`;
+  const local_response = await endpoints.get<ApiUserRessources>(user.slug, endpoint);
+  if (local_response && local_response !== null) return local_response;
+
+  app.setBannerMessage({
+    message: AppBannerMessage.FetchingRessources,
+    is_loader: true
+  });
+
+  try {
+    const data = await callAPI<ApiUserRessources>(endpoint, {
+      session: user.session
+    });
+
+    return data.received;
+  }
+  catch (error) {
+    if (error instanceof ApiError) {
+      if (error.message === ResponseErrorMessage.NewSessionAvailable) {
+        const user_data = await endpoints.get<ApiUserData>(user.slug, "/user/data");
+        if (!user_data) throw error;
+
+        const data = await callAPI<ApiUserRessources>(endpoint, {
           session: user.session
         });
 
