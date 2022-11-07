@@ -1,13 +1,20 @@
 import type { Component, JSX } from "solid-js";
 import { ApiGeolocation, ApiInstance } from "@/types/api";
 
+import { A } from "solid-start";
+
 import {
   HeadlessDisclosureChild,
   Listbox,
   ListboxButton,
   ListboxOption,
   ListboxOptions,
-  Transition
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+  DialogOverlay
 } from "solid-headless";
 
 import {
@@ -24,20 +31,22 @@ import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
-    geolocation_data: ApiGeolocation["response"] | null;
+    info_dialog_open: boolean;
 
     pronote_url: string;
-    school_informations_commun: ApiInstance["response"] | null;
+    instance_data: ApiInstance["response"] | null;
+    geolocation_data: ApiGeolocation["response"] | null;
   }>({
-    geolocation_data: null,
+    info_dialog_open: false,
 
     pronote_url: "",
-    school_informations_commun: null
+    instance_data: null,
+    geolocation_data: null
   });
 
   /**
-   * Takes the pronote_url value and checks
-   * if a school in the geolocation_data have
+   * Takes the `pronote_url` value and checks
+   * if a school in the `geolocation_data` have
    * that URL stored.
    */
   const checkMatchPronoteUrl = () => state.geolocation_data && state.geolocation_data.find (
@@ -62,6 +71,7 @@ const LinkPronoteAccount: Component = () => {
 
       setState({
         geolocation_data: data,
+        // Automatically select the first URL.
         pronote_url: data[0].url
       });
     }
@@ -87,7 +97,7 @@ const LinkPronoteAccount: Component = () => {
       }));
 
       batch(() =>  {
-        setState("school_informations_commun", response);
+        setState("instance_data", response);
         app.setModal("needs_scratch_session", true);
       });
     }
@@ -97,18 +107,95 @@ const LinkPronoteAccount: Component = () => {
   };
 
   return (
-    <div>
-      <header>
-        <h1>Connexion à Pronote</h1>
-        <p>Selectionnez l'instance Pronote de votre établissement.</p>
+    <div class="min-h-screen bg-brand-primary">
+      <header class="w-full p-6 pb-8">
+        <A class="bg-brand-light text-brand-dark px-4 py-1 rounded" href="/">{"< Accueil"}</A>
       </header>
 
-      <main>
-        <form onSubmit={processInformations}>
+      <main class="flex flex-col max-w-md px-8 mx-auto">
+
+        <div class="text-center mb-12">
+          <h1 class="font-bold text-xl text-brand-white">
+            Connexion à Pronote
+          </h1>
+          <button
+            class="text-brand-light border-b-2 border-brand-light"
+            onClick={() => setState("info_dialog_open", true)}
+          >
+            Comment faire ?
+          </button>
+
+        </div>
+
+        <Portal>
+          <Transition
+            appear
+            show={state.info_dialog_open}
+          >
+            <Dialog
+              isOpen
+              class="fixed inset-0 z-10 overflow-y-auto"
+              onClose={() => setState("info_dialog_open", false)}
+            >
+              <div class="min-h-screen px-4 flex items-center justify-center">
+                <TransitionChild
+                  enter="ease-out duration-200"
+                  enterFrom="opacity-0 scale-80"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <DialogOverlay class="fixed inset-0 bg-brand-dark bg-opacity-50" />
+                </TransitionChild>
+
+                {/* This element is to trick the browser into centering the modal contents. */}
+                <span
+                  class="inline-block h-screen align-middle"
+                  aria-hidden="true"
+                >
+              &#8203;
+                </span>
+                <TransitionChild
+                  class="transform"
+                  enter="ease-out duration-200"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-brand-light shadow-xl rounded-lg">
+                    <DialogTitle
+                      as="h3"
+                      class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-50"
+                    >
+                      Informations sur la connexion
+                    </DialogTitle>
+                    <div class="mt-2">
+                      <p>Pour effectuer la première étape de votre connexion, vous allez devoir choisir une instance Pronote. Pour cela, vous pouvez coller l'URL de l'instance Pronote ci-dessous. <br /> Autrement, vous pouvez cliquer sur le bouton de Géolocalisation pour trouver les instances Pronote proche de votre localisation.</p>
+                    </div>
+
+                    <div class="mt-4">
+                      <button
+                        type="button"
+                        onClick={() => setState("info_dialog_open", false)}
+                      >
+                    J'ai compris !
+                      </button>
+                    </div>
+                  </DialogPanel>
+                </TransitionChild>
+              </div>
+            </Dialog>
+          </Transition>
+        </Portal>
+
+        <form class="space-y-4" onSubmit={processInformations}>
           <div class="flex">
             <Show when={state.geolocation_data !== null}>
               <Listbox defaultOpen value={state.pronote_url} onSelectChange={instanceSelectChange}>
-                <div class="relative mt-1">
+                <div class="relative w-full">
                   <ListboxButton type="button" class="relative w-full py-2 pl-3 pr-10 text-left bg-brand-white rounded-lg rounded-r-none cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-brand-primary focus-visible:ring-offset-2 focus-visible:border-brand-primary sm:text-sm">
                     <span class="block truncate">{checkMatchPronoteUrl()?.name || state.pronote_url}</span>
                     <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -130,7 +217,7 @@ const LinkPronoteAccount: Component = () => {
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                       >
-                        <ListboxOptions class="list-none p-0 absolute w-max py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                        <ListboxOptions class="list-none p-0 absolute py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                           <For each={state.geolocation_data}>
                             {instance => (
                               <ListboxOption class="focus:outline-none group" value={instance.url}>
@@ -170,30 +257,30 @@ const LinkPronoteAccount: Component = () => {
                   </HeadlessDisclosureChild>
                 </div>
               </Listbox>
-              <button class="bg-brand-light p-2 px-8 rounded-lg rounded-l-none" type="button" onClick={() => setState("geolocation_data", null)}>
-                Edit
+              <button class="bg-brand-light p-2 px-4 rounded-lg rounded-l-none" type="button" onClick={() => setState("geolocation_data", null)}>
+                Editer
               </button>
             </Show>
 
             <Show when={!state.geolocation_data}>
-              <input
+              <input class="w-full rounded-lg rounded-r-none"
                 type="url"
                 value={state.pronote_url}
                 onChange={event => setState("pronote_url", event.currentTarget.value)}
               />
 
-              <button class="bg-brand-light p-2 rounded-lg rounded-l-none" type="button" onClick={handleGeolocation}>
+              <button class="bg-brand-light py-2 px-4 rounded-lg flex items-center justify-center rounded-l-none" type="button" onClick={handleGeolocation}>
                 <IconMdiMapMarkerRadius />
               </button>
             </Show>
           </div>
 
-          <button type="submit">
-            Valider le choix
+          <button disabled={!state.pronote_url} class="disabled:opacity-40 bg-brand-light px-4 py-2 rounded-lg w-full" type="submit">
+            Etablir une connexion
           </button>
         </form>
 
-        <Show when={state.school_informations_commun} keyed>
+        <Show when={state.instance_data} keyed>
           {instance => <SessionFromScratchModal
             available_accounts={instance.received.donnees.espaces.V}
             pronote_url={instance.pronote_url}
