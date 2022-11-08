@@ -30,6 +30,9 @@ export default function () {
 
         <Link rel="icon" href="/favicon.ico" sizes="any" />
         <Link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+
+
+        <Meta name="color-scheme" content="light dark" />
         <Meta name="theme-color" content="#17AA67" />
 
         <Show when={import.meta.env.PROD}>

@@ -55,7 +55,7 @@ const RootHomePage: Component = () => {
             <Show
               when={sessions.length > 0}
               fallback={
-                <A href="/link" class="font-medium px-6 py-4 shadow-md rounded-lg dark:bg-brand-primary dark:bg-opacity-20 dark:border-2 dark:border-brand-primary bg-brand-light bg-opacity-20 border-2 border-brand-light">
+                <A href="/link" class="font-medium px-6 py-4 rounded-lg dark:bg-brand-primary dark:bg-opacity-20 dark:border-2 dark:border-brand-primary bg-brand-light bg-opacity-20 border-2 border-brand-light">
                     Cliquez pour associer un compte Pronote!
                 </A>
               }
@@ -81,7 +81,7 @@ const RootHomePage: Component = () => {
                 )}
               </For>
               <A href="/link">
-                  Ajouter un autre compte Pronote
+                Ajouter un autre compte Pronote
               </A>
             </Show>
           )}
