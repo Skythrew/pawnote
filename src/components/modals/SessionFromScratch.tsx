@@ -148,8 +148,7 @@ const SessionFromScratchModal: Component<{
   };
 
   return (
-    <>
-
+    <Portal>
       <Transition
         appear
         show={app.modal.needs_scratch_session}
@@ -168,7 +167,7 @@ const SessionFromScratchModal: Component<{
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <DialogOverlay class="fixed inset-0 bg-gray-900 bg-opacity-50" />
+              <DialogOverlay class="fixed inset-0 bg-brand-dark bg-opacity-50" />
             </TransitionChild>
 
             {/* This element is to trick the browser into centering the modal contents. */}
@@ -179,17 +178,19 @@ const SessionFromScratchModal: Component<{
               &#8203;
             </span>
             <TransitionChild
-              enter="ease-out duration-300"
+              class="transform"
+              enter="ease-out duration-200"
               enterFrom="opacity-0 scale-95"
               enterTo="opacity-100 scale-100"
               leave="ease-in duration-200"
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-50 dark:bg-gray-900 shadow-xl rounded-2xl dark:border dark:border-gray-50">
+
+              <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
                 <DialogTitle
                   as="h3"
-                  class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-50"
+                  class="text-center text-lg font-medium leading-6 text-brand-dark"
                 >
                   {app.current_user.slug
                     ? "Connexion perdue!"
@@ -198,6 +199,7 @@ const SessionFromScratchModal: Component<{
                 </DialogTitle>
                 <DialogDescription
                   as="p"
+                  class="text-sm text-brand-dark text-opacity-80"
                 >
                   {app.current_user.slug
                     ? `
@@ -207,50 +209,89 @@ const SessionFromScratchModal: Component<{
                     `
                     : `
                       Créez une nouvelle session sur cette instance en entrant vos identifiants.
-                      Souvenez vous que Pornote ne les retiendra pas et qu'il vous les redemandera plus tard
-                      si une perte de connexion a lieue.
                     `
                   }
 
                 </DialogDescription>
 
-                <form onSubmit={processUserAuthentication}>
+                <form
+                  class="flex flex-col gap-3 mt-6 w-full"
+                  onSubmit={processUserAuthentication}
+                >
                   <Show when={props.ent_url}>
-                    <input
-                      type="checkbox"
-                      checked={credentials.use_ent}
-                      onChange={event => setCredentials("use_ent", event.currentTarget.checked)}
-                    />
+                    <label
+                      class="inline mx-auto rounded-full px-3 py-1 border flex items-center justify-center gap-1 transition mb-2"
+                      classList={{
+                        "bg-brand-light border-brand-primary text-brand-primary": credentials.use_ent,
+                        "text-brand-dark border-brand-dark": !credentials.use_ent
+                      }}
+                    >
+                      <Show when={credentials.use_ent} fallback={<IconMdiClose />}><IconMdiCheck /></Show> ENT
+                      <input
+                        type="checkbox"
+                        checked={credentials.use_ent}
+                        onChange={event => setCredentials("use_ent", event.currentTarget.checked)}
+                        hidden
+                      />
+                    </label>
                   </Show>
 
                   <Show when={!credentials.use_ent && !app.current_user.slug}>
-                    <select onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}>
-                      <For each={props.available_accounts}>
-                        {espace => (
-                          <option value={espace.G}>{espace.L}</option>
-                        )}
-                      </For>
-                    </select>
+                    <label>Espace à utiliser
+                      <select
+                        class="px-2 py-1 rounded-md border border-brand-dark w-full bg-brand-dark bg-opacity-0 hover:bg-opacity-10 outline-brand-primary focus:bg-brand-light focus:bg-opacity-100"
+                        onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}
+                      >
+                        <For each={props.available_accounts}>
+                          {espace => (
+                            <option value={espace.G}>{espace.L}</option>
+                          )}
+                        </For>
+                      </select>
+                    </label>
                   </Show>
 
-                  <input
-                    type="text"
-                    value={credentials.username}
-                    onChange={event => setCredentials("username", event.currentTarget.value)}
-                  />
-                  <input
-                    type="password"
-                    value={credentials.password}
-                    onChange={event => setCredentials("password", event.currentTarget.value)}
-                  />
+                  <label>
+                    Nom d'utilisateur
+                    <input
+                      class="px-2 py-1 rounded-md border border-brand-dark w-full bg-brand-dark bg-opacity-0 hover:bg-opacity-10 outline-brand-primary focus:bg-brand-light focus:bg-opacity-100"
+                      type="text"
+                      value={credentials.username}
+                      onChange={event => setCredentials("username", event.currentTarget.value)}
+                    />
+                  </label>
+                  <label>
+                    Mot de passe
+                    <input
+                      class="px-2 py-1 rounded-md border border-brand-dark w-full bg-brand-dark bg-opacity-0 hover:bg-opacity-10 outline-brand-primary focus:bg-brand-light focus:bg-opacity-100"
+                      type="password"
+                      value={credentials.password}
+                      onChange={event => setCredentials("password", event.currentTarget.value)}
+                    />
+                  </label>
 
-                  <input
-                    type="checkbox"
-                    checked={credentials.save}
-                    onChange={(event) => setCredentials("save", event.currentTarget.checked)}
-                  />
+                  <label
+                    class="rounded-full border inline mx-auto px-3 py-1 my-2 transition"
+                    classList={{
+                      "bg-brand-light text-brand-primary border-brand-primary": credentials.save,
+                      "border-brand-dark text-brand-dark":!credentials.save
+                    }}
+                  >
+                    Se souvenir de mes identifiants
+                    <input
+                      type="checkbox"
+                      checked={credentials.save}
+                      onChange={(event) => setCredentials("save", event.currentTarget.checked)}
+                      hidden
+                    />
+                  </label>
 
-                  <button type="submit">Valider!</button>
+                  <button
+                    class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2"
+                    type="submit"
+                  >
+                    Connexion !
+                  </button>
                 </form>
               </DialogPanel>
             </TransitionChild>
@@ -281,7 +322,7 @@ const SessionFromScratchModal: Component<{
           </div>
         )}
       </Show>
-    </>
+    </Portal>
   );
 };
 

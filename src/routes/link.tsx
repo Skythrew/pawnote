@@ -170,7 +170,7 @@ const LinkPronoteAccount: Component = () => {
                   <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
                     <DialogTitle
                       as="h3"
-                      class="text-xl font-semibold text-brand-primary text-center"
+                      class="text-lg font-semibold text-brand-primary text-center"
                     >
                       Comment se connecter?
                     </DialogTitle>
