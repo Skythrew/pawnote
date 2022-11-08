@@ -3,6 +3,16 @@ import type { Component, JSX } from "solid-js";
 import type { PronoteApiAccountId } from "@/types/pronote";
 import type { ApiInstance, ApiLoginInformations, ApiUserData } from "@/types/api";
 
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+  DialogOverlay,
+  DialogDescription
+} from "solid-headless";
+
 import { connectToPronote } from "@/utils/client";
 import { objectHasProperty } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
@@ -139,69 +149,114 @@ const SessionFromScratchModal: Component<{
 
   return (
     <>
-      <Show when={app.modal.needs_scratch_session}>
-        <div>
-          <h2>
-            {app.current_user.slug
-              ? "Connexion perdue!"
-              : "Première connexion"
-            }
-          </h2>
-          <p>
-            {app.current_user.slug
-              ? `
-              Renseignez de nouveau vos identifiants pour créer
-              une nouvelle session en fonction de l'ancienne.
-              Vos données ne seront pas perdues.
-            `
-              : `
-              Créez une nouvelle session sur cette instance en entrant vos identifiants.
-              Souvenez vous que Pornote ne les retiendra pas et qu'il vous les redemandera plus tard
-              si une perte de connexion a lieue.
-            `
-            }
-          </p>
 
-          <form onSubmit={processUserAuthentication}>
-            <Show when={props.ent_url}>
-              <input
-                type="checkbox"
-                checked={credentials.use_ent}
-                onChange={event => setCredentials("use_ent", event.currentTarget.checked)}
-              />
-            </Show>
+      <Transition
+        appear
+        show={app.modal.needs_scratch_session}
+      >
+        <Dialog
+          isOpen
+          class="fixed inset-0 z-10 overflow-y-auto"
+          onClose={() => app.setModal("needs_scratch_session", false)}
+        >
+          <div class="min-h-screen px-4 flex items-center justify-center">
+            <TransitionChild
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <DialogOverlay class="fixed inset-0 bg-gray-900 bg-opacity-50" />
+            </TransitionChild>
 
-            <Show when={!credentials.use_ent && !app.current_user.slug}>
-              <select onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}>
-                <For each={props.available_accounts}>
-                  {espace => (
-                    <option value={espace.G}>{espace.L}</option>
-                  )}
-                </For>
-              </select>
-            </Show>
+            {/* This element is to trick the browser into centering the modal contents. */}
+            <span
+              class="inline-block h-screen align-middle"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+            <TransitionChild
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-50 dark:bg-gray-900 shadow-xl rounded-2xl dark:border dark:border-gray-50">
+                <DialogTitle
+                  as="h3"
+                  class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-50"
+                >
+                  {app.current_user.slug
+                    ? "Connexion perdue!"
+                    : "Première connexion"
+                  }
+                </DialogTitle>
+                <DialogDescription
+                  as="p"
+                >
+                  {app.current_user.slug
+                    ? `
+                      Renseignez de nouveau vos identifiants pour créer
+                      une nouvelle session en fonction de l'ancienne.
+                      Vos données ne seront pas perdues.
+                    `
+                    : `
+                      Créez une nouvelle session sur cette instance en entrant vos identifiants.
+                      Souvenez vous que Pornote ne les retiendra pas et qu'il vous les redemandera plus tard
+                      si une perte de connexion a lieue.
+                    `
+                  }
 
-            <input
-              type="text"
-              value={credentials.username}
-              onChange={event => setCredentials("username", event.currentTarget.value)}
-            />
-            <input
-              type="password"
-              value={credentials.password}
-              onChange={event => setCredentials("password", event.currentTarget.value)}
-            />
+                </DialogDescription>
 
-            <input
-              type="checkbox"
-              checked={credentials.save}
-              onChange={(event) => setCredentials("save", event.currentTarget.checked)}
-            />
+                <form onSubmit={processUserAuthentication}>
+                  <Show when={props.ent_url}>
+                    <input
+                      type="checkbox"
+                      checked={credentials.use_ent}
+                      onChange={event => setCredentials("use_ent", event.currentTarget.checked)}
+                    />
+                  </Show>
 
-            <button type="submit">Valider!</button>
-          </form>
-        </div>
-      </Show>
+                  <Show when={!credentials.use_ent && !app.current_user.slug}>
+                    <select onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}>
+                      <For each={props.available_accounts}>
+                        {espace => (
+                          <option value={espace.G}>{espace.L}</option>
+                        )}
+                      </For>
+                    </select>
+                  </Show>
+
+                  <input
+                    type="text"
+                    value={credentials.username}
+                    onChange={event => setCredentials("username", event.currentTarget.value)}
+                  />
+                  <input
+                    type="password"
+                    value={credentials.password}
+                    onChange={event => setCredentials("password", event.currentTarget.value)}
+                  />
+
+                  <input
+                    type="checkbox"
+                    checked={credentials.save}
+                    onChange={(event) => setCredentials("save", event.currentTarget.checked)}
+                  />
+
+                  <button type="submit">Valider!</button>
+                </form>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </Dialog>
+      </Transition>
 
       <Show keyed when={slugModalData()}>
         {data => (
