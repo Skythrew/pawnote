@@ -108,11 +108,13 @@ const LinkPronoteAccount: Component = () => {
 
   return (
     <div class="min-h-screen bg-brand-primary">
-      <header class="w-full p-6 pb-8">
-        <A class="bg-brand-light text-brand-dark px-4 py-1 rounded" href="/">{"< Accueil"}</A>
+      <header class="p-4 pb-8">
+        <A class="flex w-max text-xl p-2 text-brand-light" href="/">
+          <IconMdiArrowLeft />
+        </A>
       </header>
 
-      <main class="flex flex-col max-w-md px-8 mx-auto">
+      <main class="flex flex-col max-w-md mx-auto px-8">
 
         <div class="text-center mb-12">
           <h1 class="font-bold text-xl text-brand-white">
@@ -140,8 +142,8 @@ const LinkPronoteAccount: Component = () => {
               <div class="min-h-screen px-4 flex items-center justify-center">
                 <TransitionChild
                   enter="ease-out duration-200"
-                  enterFrom="opacity-0 scale-80"
-                  enterTo="opacity-100 scale-100"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
                   leave="ease-in duration-200"
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
@@ -165,23 +167,26 @@ const LinkPronoteAccount: Component = () => {
                   leaveFrom="opacity-100 scale-100"
                   leaveTo="opacity-0 scale-95"
                 >
-                  <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-brand-light shadow-xl rounded-lg">
+                  <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
                     <DialogTitle
                       as="h3"
-                      class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-50"
+                      class="text-xl font-semibold text-brand-primary text-center"
                     >
-                      Informations sur la connexion
+                      Comment se connecter?
                     </DialogTitle>
-                    <div class="mt-2">
-                      <p>Pour effectuer la première étape de votre connexion, vous allez devoir choisir une instance Pronote. Pour cela, vous pouvez coller l'URL de l'instance Pronote ci-dessous. <br /> Autrement, vous pouvez cliquer sur le bouton de Géolocalisation pour trouver les instances Pronote proche de votre localisation.</p>
+                    <div class="mt-2 flex flex-col gap-2">
+                      <p class="text-brand-dark font-medium">Pour effectuer la première étape de votre connexion, vous allez devoir choisir une instance Pronote.</p>
+                      <p>Pour cela, vous devez coller <b>l'URL de l'instance Pronote</b> dans la boite de texte.</p>
+                      <p>Autrement, vous pouvez cliquer sur le bouton de <b>Géolocalisation</b> pour trouver les instances Pronote proche de votre localisation et directement les utiliser.</p>
                     </div>
 
                     <div class="mt-4">
                       <button
+                        class="w-full bg-brand-primary px-2 py-1 rounded-md text-brand-light"
                         type="button"
                         onClick={() => setState("info_dialog_open", false)}
                       >
-                    J'ai compris !
+                        J'ai compris !
                       </button>
                     </div>
                   </DialogPanel>
@@ -263,13 +268,13 @@ const LinkPronoteAccount: Component = () => {
             </Show>
 
             <Show when={!state.geolocation_data}>
-              <input class="w-full rounded-lg rounded-r-none"
+              <input class="w-full rounded-lg rounded-r-none outline-none px-2 text-sm"
                 type="url"
                 value={state.pronote_url}
                 onChange={event => setState("pronote_url", event.currentTarget.value)}
               />
 
-              <button class="bg-brand-light py-2 px-4 rounded-lg flex items-center justify-center rounded-l-none" type="button" onClick={handleGeolocation}>
+              <button class="bg-brand-light py-2 px-4 rounded-lg flex items-center justify-center rounded-l-none text-brand-dark" type="button" onClick={handleGeolocation}>
                 <IconMdiMapMarkerRadius />
               </button>
             </Show>
