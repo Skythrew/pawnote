@@ -8,7 +8,7 @@
 <hr />
 
 Unofficial client for [Pronote](https://www.index-education.com/fr/logiciel-gestion-vie-scolaire.php)
-includes many features such as...
+including many features such as...
 
 - [x] Offline access thanks to `vite-plugin-pwa`.
 - [x] Multi-accounts stored under unique *slugs* locally.
