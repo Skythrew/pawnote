@@ -484,6 +484,7 @@ export const parseTimetableLessons = (
   interface ParsedTimetableLesson {
     date: dayjs.Dayjs;
     duration: number;
+    position: number;
     color: string;
 
     name?: string;
@@ -498,6 +499,9 @@ export const parseTimetableLessons = (
    */
   const parsed_lessons: ParsedTimetableLesson[][] = [...Array.from(Array(7), () => [])];
 
+  const general_data = app.current_user.endpoints?.["/login/informations"].donnees.General;
+  if (!general_data) return parsed_lessons;
+
   for (const lesson of lessons) {
     const date = dayjs(lesson.DateDuCours.V, "DD-MM-YYYY HH:mm:ss");
     const dayOfWeek = date.day();
@@ -505,7 +509,10 @@ export const parseTimetableLessons = (
     const parsed_lesson: ParsedTimetableLesson = {
       date,
       duration: lesson.duree,
-      color: lesson.CouleurFond
+      color: lesson.CouleurFond,
+      // Since dayOfWeek starts from Sunday, we remove 1
+      // to start from Monday.
+      position: lesson.place - (general_data.PlacesParJour * (dayOfWeek - 1))
     };
 
     for (const content of lesson.ListeContenus.V) {
@@ -526,7 +533,7 @@ export const parseTimetableLessons = (
     parsed_lessons[dayOfWeek].push(parsed_lesson);
   }
 
-  return parsed_lessons;
+  return parsed_lessons.map(days => days.sort((a, b) => a.position - b.position));
 };
 
 export const callUserHomeworksAPI = async (week: number) => {

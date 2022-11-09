@@ -152,7 +152,7 @@ const AppHome: Component = () => {
                     class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
                   >
                     <h5 class="font-medium">{lesson.name}</h5>
-                    <span>{lesson.room}</span>
+                    <span>{lesson.position}</span>
                   </div>
                 )}
               </For>
@@ -160,8 +160,6 @@ const AppHome: Component = () => {
           </div>
         )}
       </Show>
-
-
 
       {/*
       <Show
