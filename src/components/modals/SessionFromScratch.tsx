@@ -299,29 +299,83 @@ const SessionFromScratchModal: Component<{
         </Dialog>
       </Transition>
 
-      <Show keyed when={slugModalData()}>
-        {data => (
-          <div>
-            <h4>Connexion établie!</h4>
-            <p>Choissisez un nom d'utilisateur local pour facilement retrouver le compte (depuis l'URL par exemple)</p>
-            <span>Vous êtes connecté en tant que {data.endpoints["/user/data"].donnees.ressource.L} à l'instance {data.endpoints["/user/data"].donnees.ressource.Etablissement.V.L}</span>
+      <Transition
+        appear
+        show={slugModalData() !== null}
+      >
+        <Dialog
+          isOpen
+          class="fixed inset-0 z-10 overflow-y-auto"
+          onClose={() => setSlugModalData(null)}
+        >
+          <div class="min-h-screen px-4 flex items-center justify-center">
+            <TransitionChild
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <DialogOverlay class="fixed inset-0 bg-brand-dark bg-opacity-50" />
+            </TransitionChild>
 
-            <form onSubmit={processSlugSave}>
-              <input
-                type="text"
-                value={credentials.slug}
-                onInput={event => {
-                  const cleanedValue = event.currentTarget.value
-                  // Clean-up the value to make sure it's a slug.
-                    .toLowerCase().replace(/[^a-z0-9-]+/g, "-");
-                  return setCredentials("slug", cleanedValue);
-                }}
-              />
-              <button type="submit">Sauvegarder la session!</button>
-            </form>
+            {/* This element is to trick the browser into centering the modal contents. */}
+            <span
+              class="inline-block h-screen align-middle"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+            <TransitionChild
+              class="transform"
+              enter="ease-out duration-200"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+
+              <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
+                <DialogTitle
+                  as="h3"
+                  class="text-center text-lg font-medium leading-6 text-brand-dark"
+                >
+                  Connexion établie !
+                </DialogTitle>
+                <DialogDescription
+                  as="p"
+                  class="text-sm text-brand-dark text-opacity-80"
+                >
+                  Vous êtes connecté en tant que {slugModalData()?.endpoints["/user/data"].donnees.ressource.L} à l'instance {slugModalData()?.endpoints["/user/data"].donnees.ressource.Etablissement.V.L}.
+                </DialogDescription>
+
+                <p class="my-4">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
+
+                <form onSubmit={processSlugSave}>
+                  <input
+                    type="text"
+                    class="px-2 py-1 rounded-md border border-brand-dark w-full bg-brand-dark bg-opacity-0 hover:bg-opacity-10 outline-brand-primary focus:bg-brand-light focus:bg-opacity-100"
+                    value={credentials.slug}
+                    onInput={event => {
+                      const cleanedValue = event.currentTarget.value
+                      // Clean-up the value to make sure it's a slug.
+                        .toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+                      return setCredentials("slug", cleanedValue);
+                    }}
+                  />
+                  <button type="submit"
+                    class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2"
+                  >
+                    Sauvegarder la session
+                  </button>
+                </form>
+              </DialogPanel>
+            </TransitionChild>
           </div>
-        )}
-      </Show>
+        </Dialog>
+      </Transition>
     </Portal>
   );
 };
