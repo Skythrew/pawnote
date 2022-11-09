@@ -16,10 +16,10 @@ import type {
   ApiUserGrades
 } from "@/types/api";
 
-import { aes, credentials as credentials_utility } from "@/utils/globals";
+import { aes, capitalizeFirstLetter, credentials as credentials_utility } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
-import { PronoteApiAccountId, PronoteApiOnglets, PronoteApiUserTimetableContentType } from "@/types/pronote";
+import { PronoteApiAccountId, PronoteApiOnglets, PronoteApiUserHomeworks, PronoteApiUserTimetableContentType } from "@/types/pronote";
 import { ResponseErrorMessage } from "@/types/api";
 
 import app, { AppBannerMessage } from "@/stores/app";
@@ -545,6 +545,31 @@ export const callUserHomeworksAPI = async (week: number) => {
   return data.received;
 };
 
+/**
+  * Sort the homeworks by the day they need to be done.
+  * Returned object keys is from 0 to 6 (where 0 is Sunday and 6 is Saturday
+  * Each item is an array containing the homeworks for that day.
+  */
+export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["donnees"]) => {
+  const parsed_homeworks: { [key: number]: {
+    subject_name: string;
+    description: string;
+  }[] } = {};
+
+  for (const homework of homeworks.ListeTravauxAFaire.V) {
+    const day = dayjs(homework.PourLe.V, "DD-MM-YYYY").day();
+
+    if (!parsed_homeworks[day]) parsed_homeworks[day] = [];
+
+    parsed_homeworks[day].push({
+      description: homework.descriptif.V,
+      subject_name: homework.Matiere.V.L
+    });
+  }
+
+  return parsed_homeworks;
+};
+
 export const callUserRessourcesAPI = async (week: number) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
@@ -615,3 +640,17 @@ export const callUserGradesAPI = async (period: ApiUserGrades["request"]["period
 
   return data.received;
 };
+
+export const getDayNameFromDayNumber = (day_number: string | number) => {
+  if (typeof day_number === "string") day_number = parseInt(day_number);
+
+  const day_name_lowercase = dayjs()
+    .day(day_number)
+    .toDate()
+    .toLocaleDateString("fr-FR", { weekday: "long" })
+    .toLowerCase();
+
+  const day_name = capitalizeFirstLetter(day_name_lowercase);
+  return day_name;
+};
+

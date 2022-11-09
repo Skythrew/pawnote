@@ -6,15 +6,23 @@ import { A } from "@solidjs/router";
 
 import {
   getCurrentWeekNumber,
-  getDefaultPeriodOnglet
+  getDayNameFromDayNumber,
+  getDefaultPeriodOnglet,
+
+  parseHomeworks
 } from "@/utils/client";
 
 const AppHome: Component = () => {
   const week_number = getCurrentWeekNumber();
   const period_grades = getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
 
+  const homeworks_endpoint = () => app.current_user.endpoints?.[`/user/homeworks/${week_number}`];
+  const homeworks = () => homeworks_endpoint()
+    ? parseHomeworks(homeworks_endpoint()!.donnees)
+    : null;
+
   return (
-    <div>
+    <div class="flex flex-col gap-4 px-4">
       <Show keyed
         fallback={<A href="timetable">L'emploi du temps n'a pas encore été récupéré.</A>}
         when={app.current_user.slug !== null && app.current_user.endpoints[`/user/timetable/${week_number}`]}
@@ -26,10 +34,17 @@ const AppHome: Component = () => {
 
       <Show keyed
         fallback={<A href="homeworks">Les devoirs n'ont pas encore été récupérés.</A>}
-        when={app.current_user.slug !== null && app.current_user.endpoints[`/user/homeworks/${week_number}`]}
+        when={app.current_user.slug !== null && homeworks()}
       >
         {homeworks => (
-          <A href="homeworks">Vous avez {homeworks.donnees.ListeTravauxAFaire.V.length} devoirs cette semaine.</A>
+          <>
+            <A href="homeworks">Voir les devoirs de cette semaine.</A>
+            <For each={Object.keys(homeworks)}>
+              {day_number => (
+                <h4>{getDayNameFromDayNumber(day_number)}</h4>
+              )}
+            </For>
+          </>
         )}
       </Show>
 
