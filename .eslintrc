@@ -38,6 +38,10 @@
     
     "no-return-await": "error",
     "no-trailing-spaces": "error",
-    "solid/jsx-no-undef": "off"
+
+    "solid/jsx-no-undef": "off",
+    "solid/no-innerhtml": "off",
+
+    "@typescript-eslint/no-non-null-assertion": "off"
   }
 }

@@ -483,6 +483,8 @@ export const parseTimetableLessons = (
 ) => {
   interface ParsedTimetableLesson {
     date: dayjs.Dayjs;
+    duration: number;
+    color: string;
 
     name?: string;
     room?: string;
@@ -492,7 +494,7 @@ export const parseTimetableLessons = (
   /**
    * Lessons are stored in an array for each day.
    * So the structure is basically `dayOfWeek[lesson[]]`,
-   * where `dayOfWeek` is a number and starts from 0 for Monday.
+   * where `dayOfWeek` is a number and starts from 0 for Sunday.
    */
   const parsed_lessons: ParsedTimetableLesson[][] = [...Array.from(Array(7), () => [])];
 
@@ -500,7 +502,11 @@ export const parseTimetableLessons = (
     const date = dayjs(lesson.DateDuCours.V, "DD-MM-YYYY HH:mm:ss");
     const dayOfWeek = date.day();
 
-    const parsed_lesson: ParsedTimetableLesson = { date };
+    const parsed_lesson: ParsedTimetableLesson = {
+      date,
+      duration: lesson.duree,
+      color: lesson.CouleurFond
+    };
 
     for (const content of lesson.ListeContenus.V) {
       switch (content.G) {
@@ -554,6 +560,7 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
   const parsed_homeworks: { [key: number]: {
     subject_name: string;
     description: string;
+    done: boolean;
   }[] } = {};
 
   for (const homework of homeworks.ListeTravauxAFaire.V) {
@@ -563,7 +570,8 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
 
     parsed_homeworks[day].push({
       description: homework.descriptif.V,
-      subject_name: homework.Matiere.V.L
+      subject_name: homework.Matiere.V.L,
+      done: homework.TAFFait
     });
   }
 
