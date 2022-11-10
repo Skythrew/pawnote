@@ -41,12 +41,12 @@ const AppHome: Component = () => {
     : null;
 
   return (
-    <div class="flex flex-col gap-4 px-4 pb-8">
+    <div class="flex flex-col items-center md:flex-row-reverse md:justify-end md:items-start gap-4 px-4 pb-8">
       <Show
         fallback={<A href="homeworks">Les devoirs n'ont pas encore été récupérés.</A>}
         when={app.current_user.slug !== null && homeworks() !== null}
       >
-        <div class="flex flex-col shadow rounded-md bg-brand-primary py-2">
+        <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary py-2">
           <div class="flex gap-1 justify-between items-center px-6 py-2">
             <div class="flex flex-col">
               <A href="homeworks">
@@ -107,7 +107,7 @@ const AppHome: Component = () => {
         when={app.current_user.slug !== null && timetable_lessons()}
       >
         {lessons => (
-          <div class="flex flex-col shadow rounded-md bg-brand-primary py-2">
+          <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary py-2">
             <div class="flex gap-1 justify-between items-center px-6 py-2">
               <div class="flex flex-col">
                 <A href="timetable">
@@ -143,17 +143,21 @@ const AppHome: Component = () => {
                   <p>Aucun cours de la journée!</p>
                 </div>
               }>
-                {lesson => (
-                  <div
-                    style={{
-                      "border-color": lesson.color,
-                      "height": (32 * lesson.duration) + "px"
-                    }}
-                    class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
-                  >
-                    <h5 class="font-medium">{lesson.name}</h5>
-                    <span>{lesson.position}</span>
-                  </div>
+                {lesson_raw => (
+                  <Show keyed when={lesson_raw}>
+                    {lesson => (
+                      <div
+                        style={{
+                          "border-color": lesson.color,
+                          "height": (32 * lesson.duration) + "px"
+                        }}
+                        class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
+                      >
+                        <h5 class="font-medium text-lg">{lesson.name}</h5>
+                        <span class="block text-sm">{lesson.room} - {lesson.teacher}</span>
+                      </div>
+                    )}
+                  </Show>
                 )}
               </For>
             </div>

@@ -19,7 +19,7 @@ import type {
 import { aes, capitalizeFirstLetter, credentials as credentials_utility } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
-import { PronoteApiAccountId, PronoteApiOnglets, PronoteApiUserHomeworks, PronoteApiUserTimetableContentType } from "@/types/pronote";
+import { PronoteApiAccountId, PronoteApiOnglets, PronoteApiUserHomeworks, PronoteApiUserTimetable, PronoteApiUserTimetableContentType } from "@/types/pronote";
 import { ResponseErrorMessage } from "@/types/api";
 
 import app, { AppBannerMessage } from "@/stores/app";
@@ -479,7 +479,7 @@ export const callUserTimetableAPI = async (week: number) => {
 };
 
 export const parseTimetableLessons = (
-  lessons: ApiUserTimetable["response"]["received"]["donnees"]["ListeCours"]
+  lessons: PronoteApiUserTimetable["response"]["donnees"]["ListeCours"]
 ) => {
   interface ParsedTimetableLesson {
     date: dayjs.Dayjs;
@@ -492,27 +492,30 @@ export const parseTimetableLessons = (
     teacher?: string;
   }
 
+  const general_data = app.current_user.endpoints?.["/login/informations"].donnees.General;
+  if (!general_data) return [] as ParsedTimetableLesson[][];
+
   /**
    * Lessons are stored in an array for each day.
    * So the structure is basically `dayOfWeek[lesson[]]`,
    * where `dayOfWeek` is a number and starts from 0 for Sunday.
    */
-  const parsed_lessons: ParsedTimetableLesson[][] = [...Array.from(Array(7), () => [])];
-
-  const general_data = app.current_user.endpoints?.["/login/informations"].donnees.General;
-  if (!general_data) return parsed_lessons;
+  const parsed_lessons: (ParsedTimetableLesson | null)[][] = [...Array.from(Array(7), () => [
+    ...Array.from(Array(general_data.PlacesParJour), () => null)
+  ])];
 
   for (const lesson of lessons) {
     const date = dayjs(lesson.DateDuCours.V, "DD-MM-YYYY HH:mm:ss");
     const dayOfWeek = date.day();
 
+    // Since dayOfWeek starts from Sunday, we remove 1
+    // to start from Monday.
+    const position = lesson.place - (general_data.PlacesParJour * (dayOfWeek - 1));
     const parsed_lesson: ParsedTimetableLesson = {
       date,
+      position,
       duration: lesson.duree,
-      color: lesson.CouleurFond,
-      // Since dayOfWeek starts from Sunday, we remove 1
-      // to start from Monday.
-      position: lesson.place - (general_data.PlacesParJour * (dayOfWeek - 1))
+      color: lesson.CouleurFond
     };
 
     for (const content of lesson.ListeContenus.V) {
@@ -530,10 +533,18 @@ export const parseTimetableLessons = (
     }
 
     // Add the lesson to that day.
-    parsed_lessons[dayOfWeek].push(parsed_lesson);
+    parsed_lessons[dayOfWeek][position] = parsed_lesson;
+
+    for (let i = 0; i < lesson.duree - 1; i++) {
+      if (parsed_lessons[dayOfWeek][position] === null) {
+        parsed_lessons[dayOfWeek] = parsed_lessons[dayOfWeek].slice(position + i, 1);
+      }
+    }
   }
 
-  return parsed_lessons.map(days => days.sort((a, b) => a.position - b.position));
+  return parsed_lessons;
+
+  // return parsed_lessons.map(days => days.sort((a, b) => a.position - b.position));
 };
 
 export const callUserHomeworksAPI = async (week: number) => {
