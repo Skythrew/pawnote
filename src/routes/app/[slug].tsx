@@ -34,10 +34,10 @@ const AppLayout: Component = () => {
     const session = await sessions.get(slug());
     if (session === null) return navigate("/link");
 
-    const user_data = await endpoints.get<ApiUserData>(slug(), "/user/data");
+    const user_data = await endpoints.get<ApiUserData>(slug(), "/user/data", { force: true });
     if (!user_data) return navigate("/link");
 
-    const login_informations = await endpoints.get<ApiLoginInformations>(slug(), "/login/informations");
+    const login_informations = await endpoints.get<ApiLoginInformations>(slug(), "/login/informations", { force: true });
     if (!login_informations) return navigate("/link");
 
     app.setCurrentUser({
@@ -50,7 +50,7 @@ const AppLayout: Component = () => {
     });
 
     const week_number = getCurrentWeekNumber();
-    const grades_period = getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
+    const grades_period = () => getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
 
     const user_timetable = await callUserTimetableAPI(week_number);
     const user_homeworks = await callUserHomeworksAPI(week_number);

@@ -8,7 +8,8 @@ const database = (slug: string) => localforage.createInstance({
 });
 
 const get = async <Api extends { path: string, response: { received: unknown } }>(
-  slug: string, endpoint: Api["path"]
+  slug: string, endpoint: Api["path"],
+  options = { force: false }
 ): Promise<Api["response"]["received"] | null> => {
   const user = app.current_user;
   if (user.slug && user.slug === slug) {
@@ -26,9 +27,9 @@ const get = async <Api extends { path: string, response: { received: unknown } }
 
   // Endpoints should be renewed every 4h
   // (TODO: Make it so the user can choose)
-  const expiration = 4 * (1000 * 60 * 60);
+  const expiration = 10_000; // 4 * (1000 * 60 * 60);
   const is_expired = Date.now() - data.date >= expiration;
-  if (is_expired) return null;
+  if (is_expired && !options.force) return null;
 
   if (user.slug && user.slug === slug) {
     app.setCurrentUser("endpoints", {
@@ -63,4 +64,14 @@ const upsert = async <Api extends { path: string, response: { received: unknown 
   }
 };
 
-export default { get, upsert };
+/** Removes every entry starting with the "match" string. */
+const removeAllStartingWith = async (slug: string, match: string) => {
+  const keys = await database(slug).keys();
+  for (const key of keys) {
+    if (key.startsWith(match)) {
+      await database(slug).removeItem(key);
+    }
+  }
+};
+
+export default { get, upsert, removeAllStartingWith };

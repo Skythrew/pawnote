@@ -19,8 +19,13 @@ import dayjs from "dayjs";
 
 const AppHome: Component = () => {
   const day_number = dayjs().day();
-  const week_number = getCurrentWeekNumber();
+  const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
   const period_grades = getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
+
+  const sanitizeWeekNumber = (number: number) => {
+    if (number < 0) return 0;
+    return number;
+  };
 
   const sanitizeDayNumber = (number: number) => {
     if (number < 0) return 6;
@@ -29,7 +34,7 @@ const AppHome: Component = () => {
   };
 
   const [homeworksDayNumber, setHomeworksDayNumber] = createSignal(day_number);
-  const homeworks_endpoint = () => app.current_user.endpoints?.[`/user/homeworks/${week_number}`];
+  const homeworks_endpoint = () => app.current_user.endpoints?.[`/user/homeworks/${weekNumber()}`];
   const homeworks = () => homeworks_endpoint()
     ? parseHomeworks(homeworks_endpoint()!.donnees)[homeworksDayNumber()]
       // Only show not done homework.
@@ -37,7 +42,7 @@ const AppHome: Component = () => {
     : null;
 
   const [timetableDayNumber, setTimetableDayNumber] = createSignal(day_number);
-  const timetable_endpoint = () => app.current_user.endpoints?.[`/user/timetable/${week_number}`];
+  const timetable_endpoint = () => app.current_user.endpoints?.[`/user/timetable/${weekNumber()}`];
   const timetable_lessons_full = createMemo(() => timetable_endpoint()
     ? parseTimetableLessons(timetable_endpoint()!.donnees.ListeCours)
     : null
@@ -47,9 +52,19 @@ const AppHome: Component = () => {
   return (
     <>
       <nav class="flex justify-center items-center gap-2 mt mb-8">
-        <button class="flex"><IconMdiArrowLeft /></button>
-        <h2 class="text-lg font-medium">Semaine {week_number}</h2>
-        <button class="flex"><IconMdiArrowRight /></button>
+        <button
+          class="flex"
+          onClick={() => setWeekNumber(prev => sanitizeWeekNumber(--prev))}
+        >
+          <IconMdiArrowLeft />
+        </button>
+        <h2 class="text-lg font-medium">Semaine {weekNumber()}</h2>
+        <button
+          class="flex"
+          onClick={() => setWeekNumber(prev => sanitizeWeekNumber(++prev))}
+        >
+          <IconMdiArrowRight />
+        </button>
       </nav>
 
       <div class="flex flex-col items-center md:flex-row-reverse md:justify-end md:items-start gap-4 px-4 pb-8">

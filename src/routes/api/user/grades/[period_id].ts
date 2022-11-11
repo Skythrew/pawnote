@@ -14,13 +14,18 @@ import Session from "@/utils/session";
 
 export const POST = handleServerRequest<ApiUserGrades["response"]>(async (req, res) => {
   const body = await req.json() as ApiUserGrades["request"];
-  const period_id = parseInt(new URL(req.url).pathname.split("/").pop() as string);
+  const period_id = new URL(req.url).pathname.split("/").pop() as string;
 
   if (!objectHasProperty(body, "session") || !objectHasProperty(body, "period") || !period_id)
     return res.error({
       message: ResponseErrorMessage.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
+
+  if (period_id !== body.period.N) return res.error({
+    message: ResponseErrorMessage.IncorrectParameters,
+    debug: { url: period_id, body: body.period.N }
+  });
 
   try {
     const session = Session.importFromObject(body.session);

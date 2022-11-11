@@ -55,14 +55,19 @@ export const callAPI = async <Api extends {
   request: unknown;
   response: unknown;
 }>(
-  path: Api["path"],
+  path_raw: Api["path"] | Accessor<Api["path"]>,
   body: Accessor<Api["request"]>,
   options = {
     /** Prevents the response from being saved in the localForage. */
     prevent_cache: false
   }
 ): Promise<Api["response"]> => {
-  const request = await fetch("/api" + path, {
+  const path = () => typeof path_raw === "function"
+    ? (path_raw as Accessor<Api["path"]>)()
+    : path_raw as Api["path"];
+
+  const url = () => "/api" + path();
+  const request = await fetch(url(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body())
@@ -132,6 +137,11 @@ export const callAPI = async <Api extends {
           }
 
           const is_saved = await sessions.upsert(user.slug, data.session);
+
+          // Endpoints with some session defined ID
+          // can't be saved because these IDs are renewed.
+          await endpoints.removeAllStartingWith(user.slug, "/user/grades/");
+
           if (is_saved) {
             await endpoints.upsert<ApiUserData>(
               user.slug, "/user/data", data.endpoints["/user/data"]
@@ -183,7 +193,7 @@ export const callAPI = async <Api extends {
     };
 
     typed_response.session && await sessions.upsert(user.slug, typed_response.session);
-    typed_response.received && await endpoints.upsert(user.slug, path, typed_response.received);
+    typed_response.received && await endpoints.upsert(user.slug, path(), typed_response.received);
   }
 
   app.setBannerToIdle();
@@ -726,14 +736,14 @@ export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
   return period;
 };
 
-export const callUserGradesAPI = async (period: ApiUserGrades["request"]["period"]) => {
+export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"]["period"]>) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
     message: ResponseErrorMessage.UserUnavailable
   });
 
-  const endpoint: ApiUserGrades["path"] = `/user/grades/${period.N}`;
-  const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint);
+  const endpoint = (): ApiUserGrades["path"] => `/user/grades/${period().N}`;
+  const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint());
   if (local_response && local_response !== null) return local_response;
 
   app.setBannerMessage({
@@ -743,7 +753,7 @@ export const callUserGradesAPI = async (period: ApiUserGrades["request"]["period
 
   const data = await callAPI<ApiUserGrades>(endpoint, () => ({
     session: user.session,
-    period
+    period: period()
   }));
 
   return data.received;

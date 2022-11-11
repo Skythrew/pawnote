@@ -20,8 +20,10 @@ const RootHomePage: Component = () => {
     const available_sessions: AvailableSession[] = [];
 
     const slugs = await sessions.keys();
+    console.log(slugs);
     for (const slug of slugs) {
-      const user_data = await endpoints.get<ApiUserData>(slug, "/user/data");
+      const user_data = await endpoints.get<ApiUserData>(slug, "/user/data", { force: true });
+      console.log(user_data);
       if (!user_data) continue;
 
       const user_name = user_data.donnees.ressource.L;
@@ -29,6 +31,8 @@ const RootHomePage: Component = () => {
 
       available_sessions.push({ slug, user_name, instance_name });
     }
+
+    console.log(available_sessions);
 
     setAvailableSessions([...available_sessions]);
   });
