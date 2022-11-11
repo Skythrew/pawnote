@@ -1,5 +1,5 @@
 import type { Component } from "solid-js";
-import type { TimetableLesson, TimetableBreak } from "@/utils/client";
+import { TimetableLesson, TimetableBreak, getTimeFormattedDiff } from "@/utils/client";
 import { PronoteApiOnglets } from "@/types/pronote";
 
 import app from "@/stores/app";
@@ -38,9 +38,11 @@ const AppHome: Component = () => {
 
   const [timetableDayNumber, setTimetableDayNumber] = createSignal(day_number);
   const timetable_endpoint = () => app.current_user.endpoints?.[`/user/timetable/${week_number}`];
-  const timetable_lessons = () => timetable_endpoint()
-    ? parseTimetableLessons(timetable_endpoint()!.donnees.ListeCours)[timetableDayNumber()]
-    : null;
+  const timetable_lessons_full = createMemo(() => timetable_endpoint()
+    ? parseTimetableLessons(timetable_endpoint()!.donnees.ListeCours)
+    : null
+  );
+  const timetable_lessons = () => timetable_lessons_full()?.[timetableDayNumber()];
 
   return (
     <>
@@ -145,7 +147,7 @@ const AppHome: Component = () => {
               </div>
 
 
-              <div class="flex flex-col gap-2 py-2 px-4">
+              <div class="flex flex-col gap-3 py-2 px-4">
                 <For each={lessons} fallback={
                   <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
                     <IconMdiCheck />
@@ -157,8 +159,19 @@ const AppHome: Component = () => {
                       <Switch>
                         <Match keyed when={lesson_raw.type === "break" && lesson_raw}>
                           {lesson => (
-                            <div style={{"height":"32px"}} class="bg-brand-white">
-                              Pause de {getLabelOfPosition(lesson.from)} à {getLabelOfPosition(lesson.to)}
+                            <div style={{
+                              "height": (32 * (lesson.to - lesson.from)) + "px"
+                            }}
+                            class="bg-brand-white bg-opacity-20 border-2 border-brand-white flex items-center justify-center rounded m-2"
+                            >
+                              <p class="text-brand-white text-sm">Pause de {getLabelOfPosition(lesson.from)} à {getLabelOfPosition(lesson.to)} ({
+                                getTimeFormattedDiff(
+                                  { value: getLabelOfPosition(lesson.from) as string, format: "HH[h]mm" },
+                                  { value: getLabelOfPosition(lesson.to) as string, format: "HH[h]mm" },
+                                  "HH[h]mm"
+                                )
+                              })
+                              </p>
                             </div>
                           )}
                         </Match>

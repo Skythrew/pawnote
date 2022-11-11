@@ -30,9 +30,11 @@ import sessions from "@/stores/sessions";
 import forge from "node-forge";
 import dayjs from "dayjs";
 
+import dayjsCustomDuration from "dayjs/plugin/duration";
 import dayjsCustomParse from "dayjs/plugin/customParseFormat";
 import {unwrap} from "solid-js/store";
 dayjs.extend(dayjsCustomParse);
+dayjs.extend(dayjsCustomDuration);
 
 /** Helper class for easier error handling. */
 export class ApiError extends Error {
@@ -502,6 +504,7 @@ export interface TimetableBreak {
 export const parseTimetableLessons = (
   lessons_raw: PronoteApiUserTimetable["response"]["donnees"]["ListeCours"]
 ) => {
+  console.info("[debug]: running timetable parsing.");
 
   const general_data = app.current_user.endpoints?.["/login/informations"].donnees.General;
   if (!general_data) return [] as TimetableLesson[][];
@@ -604,6 +607,26 @@ export const getLabelOfPosition = (position: number) => {
   return app.current_user.endpoints?.["/login/informations"].donnees.General.ListeHeures.V.find(
     item => item.G === position
   )?.L;
+};
+
+export const getTimeFormattedDiff = (
+  a: {
+    value: string,
+    format: string
+  },
+  b: {
+    value: string,
+    format: string
+  },
+  format: string
+) => {
+  const date_a = dayjs(a.value, a.format);
+  const date_b = dayjs(b.value, b.format);
+
+  const diff = date_b.diff(date_a);
+  const duration = dayjs.duration(diff);
+
+  return duration.format(format);
 };
 
 export const callUserHomeworksAPI = async (week: number) => {

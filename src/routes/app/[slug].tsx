@@ -73,7 +73,7 @@ const AppLayout: Component = () => {
       <Show when={app.current_user.slug} fallback={
         <p>Récupération des données sauvegardés dans la base de données locale.</p>
       }>
-        <header class="fixed top-0 right-0 left-0 flex flex-col shadow">
+        <header class="fixed z-20 top-0 right-0 left-0 flex flex-col shadow-md">
           <nav class="flex justify-between items-center px-4 h-18 bg-brand-primary">
             <A href={`/app/${app.current_user.slug}`}>
               <div class="flex flex-col">
