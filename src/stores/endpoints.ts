@@ -7,14 +7,23 @@ const database = (slug: string) => localforage.createInstance({
   storeName: slug
 });
 
-const get = async <Api extends { path: string, response: { received: unknown } }>(
-  slug: string, endpoint: Api["path"],
-  options = { force: false }
-): Promise<Api["response"]["received"] | null> => {
+const get = async <Api extends {
+  path: string,
+  response: { received: unknown }
+}>(
+  slug: string,
+  endpoint: Api["path"]
+): Promise<{
+  expired: boolean,
+  data: Api["response"]["received"]
+} | null> => {
   const user = app.current_user;
   if (user.slug && user.slug === slug) {
     const cached_data = user.endpoints[endpoint as keyof (typeof user.endpoints)];
-    if (cached_data) return cached_data;
+    if (cached_data) return {
+      expired: false,
+      data: cached_data
+    };
   }
 
   const data = await database(slug).getItem<{
@@ -29,7 +38,6 @@ const get = async <Api extends { path: string, response: { received: unknown } }
   // (TODO: Make it so the user can choose)
   const expiration = 10_000; // 4 * (1000 * 60 * 60);
   const is_expired = Date.now() - data.date >= expiration;
-  if (is_expired && !options.force) return null;
 
   if (user.slug && user.slug === slug) {
     app.setCurrentUser("endpoints", {
@@ -37,7 +45,10 @@ const get = async <Api extends { path: string, response: { received: unknown } }
     });
   }
 
-  return data.received;
+  return {
+    expired: is_expired,
+    data: data.received
+  };
 };
 
 const upsert = async <Api extends { path: string, response: { received: unknown } }>(

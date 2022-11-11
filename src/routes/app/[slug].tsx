@@ -34,44 +34,38 @@ const AppLayout: Component = () => {
     const session = await sessions.get(slug());
     if (session === null) return navigate("/link");
 
-    const user_data = await endpoints.get<ApiUserData>(slug(), "/user/data", { force: true });
+    const user_data = await endpoints.get<ApiUserData>(slug(), "/user/data");
     if (!user_data) return navigate("/link");
 
-    const login_informations = await endpoints.get<ApiLoginInformations>(slug(), "/login/informations", { force: true });
+    const login_informations = await endpoints.get<ApiLoginInformations>(slug(), "/login/informations");
     if (!login_informations) return navigate("/link");
 
     app.setCurrentUser({
       slug: slug(),
       session,
       endpoints: {
-        "/login/informations": login_informations,
-        "/user/data": user_data
+        "/login/informations": login_informations.data,
+        "/user/data": user_data.data
       }
     });
 
     const week_number = getCurrentWeekNumber();
     const grades_period = () => getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
 
-    const user_timetable = await callUserTimetableAPI(week_number);
-    const user_homeworks = await callUserHomeworksAPI(week_number);
-    const user_ressources = await callUserRessourcesAPI(week_number);
-    const user_grades = await callUserGradesAPI(grades_period);
+    // Just calling them will save into global store.
+    await callUserTimetableAPI(week_number);
+    await callUserHomeworksAPI(week_number);
+    await callUserRessourcesAPI(week_number);
+    await callUserGradesAPI(grades_period);
 
-    batch(() => {
-      app.setCurrentUser("endpoints", `/user/timetable/${week_number}`, user_timetable);
-      app.setCurrentUser("endpoints", `/user/homeworks/${week_number}`, user_homeworks);
-      app.setCurrentUser("endpoints", `/user/ressources/${week_number}`, user_ressources);
-      app.setCurrentUser("endpoints", `/user/grades/${grades_period}`, user_grades);
-
-      app.setBannerToIdle();
-    });
+    app.setBannerToIdle();
   });
 
   return (
     <>
       <Title>{slug()} - Pornote</Title>
       <Show when={app.current_user.slug} fallback={
-        <p>Récupération des données sauvegardés dans la base de données locale.</p>
+        <p>Récupération des données, veuillez patienter.</p>
       }>
         <header class="fixed z-20 top-0 right-0 left-0 flex flex-col shadow-md">
           <nav class="flex justify-between items-center px-4 h-18 bg-brand-primary">

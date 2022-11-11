@@ -476,7 +476,9 @@ export const callUserTimetableAPI = async (week: number) => {
 
   const endpoint: ApiUserTimetable["path"] = `/user/timetable/${week}`;
   const local_response = await endpoints.get<ApiUserTimetable>(user.slug, endpoint);
-  if (local_response && local_response !== null) return local_response;
+  if (local_response && !local_response.expired) return local_response;
+
+  console.info("[debug:timetable] renew");
 
   app.setBannerMessage({
     message: AppBannerMessage.FetchingTimetable,
@@ -647,7 +649,9 @@ export const callUserHomeworksAPI = async (week: number) => {
 
   const endpoint: ApiUserHomeworks["path"] = `/user/homeworks/${week}`;
   const local_response = await endpoints.get<ApiUserHomeworks>(user.slug, endpoint);
-  if (local_response && local_response !== null) return local_response;
+  if (local_response && !local_response.expired) return local_response;
+
+  console.info("[debug:homeworks] renew");
 
   app.setBannerMessage({
     message: AppBannerMessage.FetchingTimetable,
@@ -696,7 +700,9 @@ export const callUserRessourcesAPI = async (week: number) => {
 
   const endpoint: ApiUserRessources["path"] = `/user/ressources/${week}`;
   const local_response = await endpoints.get<ApiUserRessources>(user.slug, endpoint);
-  if (local_response && local_response !== null) return local_response;
+  if (local_response && !local_response.expired) return local_response;
+
+  console.info("[debug:ressources] renew");
 
   app.setBannerMessage({
     message: AppBannerMessage.FetchingRessources,
@@ -716,17 +722,17 @@ export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
     message: ResponseErrorMessage.UserUnavailable
   });
 
-  const user_data = user.endpoints["/user/data"];
-  const onglet = user_data.donnees.ressource.listeOngletsPourPeriodes.V.find(
+  const user_data = () => user.endpoints["/user/data"];
+  const onglet = () => user_data().donnees.ressource.listeOngletsPourPeriodes.V.find(
     onglet => onglet.G === onglet_id
   );
 
-  if (!onglet) throw new ApiError ({
+  if (!onglet()) throw new ApiError ({
     message: ResponseErrorMessage.OngletUnauthorized
   });
 
-  const period = onglet.listePeriodes.V.find(
-    period => period.N === onglet.periodeParDefaut.V.N
+  const period = onglet()?.listePeriodes.V.find(
+    period => period.N === onglet()?.periodeParDefaut.V.N
   );
 
   if (!period) throw new ApiError ({
@@ -744,7 +750,9 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
 
   const endpoint = (): ApiUserGrades["path"] => `/user/grades/${period().N}`;
   const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint());
-  if (local_response && local_response !== null) return local_response;
+  if (local_response && !local_response.expired) return local_response;
+
+  console.info("[debug:grades] renew");
 
   app.setBannerMessage({
     message: AppBannerMessage.FetchingGrades,
