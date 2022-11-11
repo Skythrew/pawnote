@@ -43,9 +43,16 @@ export default defineConfig ({
     pwa ({
       base: "/",
       includeAssets: [
+        "robots.txt",
         "favicon.ico",
-        "robots.txt"
+        "apple-touch-icon.png"
       ],
+
+      workbox: {
+        globPatterns: [
+          "**/*.{js,css,html,svg,png,woff,woff2}"
+        ]
+      },
 
       manifest: {
         name: "Pornote",
