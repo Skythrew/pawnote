@@ -450,7 +450,7 @@ export const getCurrentWeekNumber = (): number => {
   const first_date_raw = user.endpoints["/login/informations"].donnees.General.PremierLundi.V;
   const first_date = dayjs(first_date_raw, "DD-MM-YYYY");
   const days_since_first = dayjs().diff(first_date, "days");
-  const week_number = 1 + Math.round(days_since_first / 7);
+  const week_number = 1 + Math.floor(days_since_first / 7);
 
   return week_number;
 };
