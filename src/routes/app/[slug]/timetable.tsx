@@ -3,6 +3,7 @@ import type { Component } from "solid-js";
 import {
   callUserTimetableAPI,
   getCurrentWeekNumber,
+  TimetableLesson,
   parseTimetableLessons
 } from "@/utils/client";
 
@@ -42,21 +43,30 @@ const AppTimetable: Component = () => {
                 {days => (
                   <div class="flex flex-col">
                     <Index each={days}>
-                      {lesson => (
-                        <div class="mb-2">
-                          à {lesson().date.hour()}h
+                      {(lesson_raw, pos) => (
+                        <Switch>
+                          <Match when={lesson_raw() === null}>
+                            <p>Trou à {pos}</p>
+                          </Match>
+                          <Match keyed when={typeof lesson_raw() !== "number" && lesson_raw() as TimetableLesson}>
+                            { lesson => (
+                              <div class="mb-2">
+                                à {lesson.date.format("HH[h]mm")}
 
-                          <Show when={lesson().name}>
-                            <p>{lesson().name}</p>
-                          </Show>
-                          <Show when={lesson().teacher}>
-                            <p>{lesson().teacher}</p>
-                          </Show>
-                          <Show when={lesson().room}>
-                            <p>{lesson().room}</p>
-                          </Show>
+                                <Show when={lesson.name}>
+                                  <p>{lesson.name}</p>
+                                </Show>
+                                <Show when={lesson.teacher}>
+                                  <p>{lesson.teacher}</p>
+                                </Show>
+                                <Show when={lesson.room}>
+                                  <p>{lesson.room}</p>
+                                </Show>
 
-                        </div>
+                              </div>
+                            )}
+                          </Match>
+                        </Switch>
                       )}
                     </Index>
                   </div>

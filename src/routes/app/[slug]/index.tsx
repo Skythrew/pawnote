@@ -1,4 +1,5 @@
 import type { Component } from "solid-js";
+import type { TimetableLesson, TimetableBreak } from "@/utils/client";
 import { PronoteApiOnglets } from "@/types/pronote";
 
 import app from "@/stores/app";
@@ -8,6 +9,7 @@ import {
   getCurrentWeekNumber,
   getDayNameFromDayNumber,
   getDefaultPeriodOnglet,
+  getLabelOfPosition,
 
   parseHomeworks,
   parseTimetableLessons
@@ -41,131 +43,152 @@ const AppHome: Component = () => {
     : null;
 
   return (
-    <div class="flex flex-col items-center md:flex-row-reverse md:justify-end md:items-start gap-4 px-4 pb-8">
-      <Show
-        fallback={<A href="homeworks">Les devoirs n'ont pas encore été récupérés.</A>}
-        when={app.current_user.slug !== null && homeworks() !== null}
-      >
-        <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary py-2">
-          <div class="flex gap-1 justify-between items-center px-6 py-2">
-            <div class="flex flex-col">
-              <A href="homeworks">
-                <h4 class="font-medium text-xl text-brand-white">Devoirs non faits</h4>
-              </A>
+    <>
+      <nav class="flex justify-center items-center gap-2 mt mb-8">
+        <button class="flex"><IconMdiArrowLeft /></button>
+        <h2 class="text-lg font-medium">Semaine {week_number}</h2>
+        <button class="flex"><IconMdiArrowRight /></button>
+      </nav>
 
-              <span class="text-sm text-brand-light">
-                {getDayNameFromDayNumber(homeworksDayNumber())}
-              </span>
-            </div>
-
-            <div class="flex gap-1.5">
-              <button
-                onClick={() => setHomeworksDayNumber(prev => sanitizeDayNumber(--prev))}
-                class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
-              >
-                <IconMdiArrowLeft />
-              </button>
-              <button
-                onClick={() => setHomeworksDayNumber(prev => sanitizeDayNumber(++prev))}
-                class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
-              >
-                <IconMdiArrowRight />
-              </button>
-            </div>
-
-          </div>
-
-          <div class="flex flex-col gap-2 py-2 px-4">
-            <Show keyed when={homeworks()} fallback={
-              <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
-                <IconMdiCheck />
-                <p>Aucun devoir pour ce jour!</p>
-              </div>
-            }>
-
-              <For each={homeworks()} fallback={
-                <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
-                  <IconMdiCheck />
-                  <p>Tous les devoirs ont été faits!</p>
-                </div>
-              }>
-                {homework => (
-                  <div class="bg-brand-white rounded py-2 px-4">
-                    <h5 class="font-medium">{homework.subject_name}</h5>
-                    <div innerHTML={homework.description} />
-                  </div>
-                )}
-              </For>
-            </Show>
-          </div>
-
-        </div>
-      </Show>
-
-      <Show keyed
-        fallback={<A href="timetable">L'emploi du temps n'a pas encore été récupéré.</A>}
-        when={app.current_user.slug !== null && timetable_lessons()}
-      >
-        {lessons => (
+      <div class="flex flex-col items-center md:flex-row-reverse md:justify-end md:items-start gap-4 px-4 pb-8">
+        <Show
+          fallback={<A href="homeworks">Les devoirs n'ont pas encore été récupérés.</A>}
+          when={app.current_user.slug !== null && homeworks() !== null}
+        >
           <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary py-2">
             <div class="flex gap-1 justify-between items-center px-6 py-2">
               <div class="flex flex-col">
-                <A href="timetable">
-                  <h4 class="font-medium text-xl text-brand-white">EDT</h4>
+                <A href="homeworks">
+                  <h4 class="font-medium text-xl text-brand-white">Devoirs non faits</h4>
                 </A>
 
                 <span class="text-sm text-brand-light">
-                  {getDayNameFromDayNumber(timetableDayNumber())}
+                  {getDayNameFromDayNumber(homeworksDayNumber())}
                 </span>
               </div>
 
               <div class="flex gap-1.5">
                 <button
-                  onClick={() => setTimetableDayNumber(prev => sanitizeDayNumber(--prev))}
+                  onClick={() => setHomeworksDayNumber(prev => sanitizeDayNumber(--prev))}
                   class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
                 >
                   <IconMdiArrowLeft />
                 </button>
                 <button
-                  onClick={() => setTimetableDayNumber(prev => sanitizeDayNumber(++prev))}
+                  onClick={() => setHomeworksDayNumber(prev => sanitizeDayNumber(++prev))}
                   class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
                 >
                   <IconMdiArrowRight />
                 </button>
               </div>
-            </div>
 
+            </div>
 
             <div class="flex flex-col gap-2 py-2 px-4">
-              <For each={lessons} fallback={
+              <Show keyed when={homeworks()} fallback={
                 <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
                   <IconMdiCheck />
-                  <p>Aucun cours de la journée!</p>
+                  <p>Aucun devoir pour ce jour!</p>
                 </div>
               }>
-                {lesson_raw => (
-                  <Show keyed when={lesson_raw}>
-                    {lesson => (
-                      <div
-                        style={{
-                          "border-color": lesson.color,
-                          "height": (32 * lesson.duration) + "px"
-                        }}
-                        class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
-                      >
-                        <h5 class="font-medium text-lg">{lesson.name}</h5>
-                        <span class="block text-sm">{lesson.room} - {lesson.teacher}</span>
-                      </div>
-                    )}
-                  </Show>
-                )}
-              </For>
-            </div>
-          </div>
-        )}
-      </Show>
 
-      {/*
+                <For each={homeworks()} fallback={
+                  <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
+                    <IconMdiCheck />
+                    <p>Tous les devoirs ont été faits!</p>
+                  </div>
+                }>
+                  {homework => (
+                    <div class="bg-brand-white rounded py-2 px-4">
+                      <h5 class="font-medium">{homework.subject_name}</h5>
+                      <div innerHTML={homework.description} />
+                    </div>
+                  )}
+                </For>
+              </Show>
+            </div>
+
+          </div>
+        </Show>
+
+        <Show keyed
+          fallback={<A href="timetable">L'emploi du temps n'a pas encore été récupéré.</A>}
+          when={app.current_user.slug !== null && timetable_lessons()}
+        >
+          {lessons => (
+            <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary py-2">
+              <div class="flex gap-1 justify-between items-center px-6 py-2">
+                <div class="flex flex-col">
+                  <A href="timetable">
+                    <h4 class="font-medium text-xl text-brand-white">EDT</h4>
+                  </A>
+
+                  <span class="text-sm text-brand-light">
+                    {getDayNameFromDayNumber(timetableDayNumber())}
+                  </span>
+                </div>
+
+                <div class="flex gap-1.5">
+                  <button
+                    onClick={() => setTimetableDayNumber(prev => sanitizeDayNumber(--prev))}
+                    class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
+                  >
+                    <IconMdiArrowLeft />
+                  </button>
+                  <button
+                    onClick={() => setTimetableDayNumber(prev => sanitizeDayNumber(++prev))}
+                    class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
+                  >
+                    <IconMdiArrowRight />
+                  </button>
+                </div>
+              </div>
+
+
+              <div class="flex flex-col gap-2 py-2 px-4">
+                <For each={lessons} fallback={
+                  <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
+                    <IconMdiCheck />
+                    <p>Aucun cours de la journée!</p>
+                  </div>
+                }>
+                  {lesson_raw => (
+                    <div class="relative">
+                      <Switch>
+                        <Match keyed when={lesson_raw.type === "break" && lesson_raw}>
+                          {lesson => (
+                            <div style={{"height":"32px"}} class="bg-brand-white">
+                              Pause de {getLabelOfPosition(lesson.from)} à {getLabelOfPosition(lesson.to)}
+                            </div>
+                          )}
+                        </Match>
+                        <Match keyed when={lesson_raw.type === "lesson" && lesson_raw as TimetableLesson}>
+                          {lesson => (
+                            <>
+                              <span class="absolute -top-2 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position)}</span>
+                              <div
+                                style={{
+                                  "border-color": lesson.color,
+                                  "height": (32 * lesson.duration) + "px"
+                                }}
+                                class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
+                              >
+                                <h5 class="font-medium text-lg">{lesson.name}</h5>
+                                <span class="block text-sm">{lesson.room} - {lesson.teacher}</span>
+                              </div>
+                            </>
+                          )}
+                        </Match>
+                      </Switch>
+                    </div>
+                  )}
+                </For>
+              </div>
+            </div>
+          )}
+        </Show>
+
+        {/*
       <Show
         fallback={<A href="ressources">Les ressources pédagogiques n'ont pas encore été récupérées.</A>}
         when={app.current_user.slug !== null && app.current_user.endpoints[`/user/ressources/${week_number}`]}
@@ -179,7 +202,8 @@ const AppHome: Component = () => {
       >
         <A href="grades">Voir les notes du {period_grades.L}.</A>
       </Show>*/}
-    </div>
+      </div>
+    </>
   );
 };
 
