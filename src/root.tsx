@@ -18,12 +18,9 @@ import {
 
 import settings from "@/stores/settings";
 
-export default function () {
+export default function Root () {
   return (
-    <Html
-      lang="fr"
-      classList={{ "dark": settings.globalThemeMode() === "dark" }}
-    >
+    <Html lang="fr">
       <Head>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
@@ -31,13 +28,8 @@ export default function () {
         <Link rel="icon" href="/favicon.ico" sizes="any" />
         <Link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 
-
         <Meta name="color-scheme" content="light dark" />
         <Meta name="theme-color" content="#17AA67" />
-
-        <Show when={import.meta.env.PROD}>
-          <Link rel="manifest" href="/manifest.webmanifest" />
-        </Show>
 
         <Title>{APP_NAME}</Title>
         <Meta name="title" content={APP_NAME} />
@@ -56,7 +48,9 @@ export default function () {
         <Meta property="twitter:description" content={APP_DESCRIPTION} />
         {/* <Meta property="twitter:image" content="/banner.png" /> */}
       </Head>
-      <Body>
+      <Body
+        classList={{ "dark": settings.globalThemeMode() === "dark" }}
+      >
         <Suspense>
           <ErrorBoundary>
             <Routes>
