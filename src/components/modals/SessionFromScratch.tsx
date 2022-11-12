@@ -258,6 +258,7 @@ const SessionFromScratchModal: Component<{
                       type="text"
                       value={credentials.username}
                       onChange={event => setCredentials("username", event.currentTarget.value)}
+                      autocomplete="username"
                     />
                   </label>
                   <label>
@@ -267,6 +268,7 @@ const SessionFromScratchModal: Component<{
                       type="password"
                       value={credentials.password}
                       onChange={event => setCredentials("password", event.currentTarget.value)}
+                      autocomplete="current-password"
                     />
                   </label>
 
