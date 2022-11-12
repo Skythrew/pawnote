@@ -71,6 +71,11 @@ export const callAPI = async <Api extends {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body())
+  }).catch(() => {
+    console.error("couldn't fetch for data");
+    throw new ApiError({
+      message: ResponseErrorMessage.NetworkFail
+    });
   });
 
   const user = app.current_user;
@@ -478,19 +483,24 @@ export const callUserTimetableAPI = async (week: number) => {
   const local_response = await endpoints.get<ApiUserTimetable>(user.slug, endpoint);
   if (local_response && !local_response.expired) return local_response;
 
-  console.info("[debug:timetable] renew");
+  try {
+    console.info("[debug:timetable] renew");
 
-  app.setBannerMessage({
-    message: AppBannerMessage.FetchingTimetable,
-    is_loader: true
-  });
+    app.setBannerMessage({
+      message: AppBannerMessage.FetchingTimetable,
+      is_loader: true
+    });
 
-  const data = await callAPI<ApiUserTimetable>(endpoint, () => ({
-    ressource: user.endpoints["/user/data"].donnees.ressource,
-    session: user.session
-  }));
+    const data = await callAPI<ApiUserTimetable>(endpoint, () => ({
+      ressource: user.endpoints["/user/data"].donnees.ressource,
+      session: user.session
+    }));
 
-  return data.received;
+    return data.received;
+  }
+  catch {
+    return local_response?.data;
+  }
 };
 
 export interface TimetableLesson {
@@ -651,18 +661,23 @@ export const callUserHomeworksAPI = async (week: number) => {
   const local_response = await endpoints.get<ApiUserHomeworks>(user.slug, endpoint);
   if (local_response && !local_response.expired) return local_response;
 
-  console.info("[debug:homeworks] renew");
+  try {
+    console.info("[debug:homeworks] renew");
 
-  app.setBannerMessage({
-    message: AppBannerMessage.FetchingTimetable,
-    is_loader: true
-  });
+    app.setBannerMessage({
+      message: AppBannerMessage.FetchingTimetable,
+      is_loader: true
+    });
 
-  const data = await callAPI<ApiUserHomeworks>(endpoint, () => ({
-    session: user.session
-  }));
+    const data = await callAPI<ApiUserHomeworks>(endpoint, () => ({
+      session: user.session
+    }));
 
-  return data.received;
+    return data.received;
+  }
+  catch {
+    return local_response?.data;
+  }
 };
 
 /**
@@ -702,18 +717,23 @@ export const callUserRessourcesAPI = async (week: number) => {
   const local_response = await endpoints.get<ApiUserRessources>(user.slug, endpoint);
   if (local_response && !local_response.expired) return local_response;
 
-  console.info("[debug:ressources] renew");
+  try {
+    console.info("[debug:ressources] renew");
 
-  app.setBannerMessage({
-    message: AppBannerMessage.FetchingRessources,
-    is_loader: true
-  });
+    app.setBannerMessage({
+      message: AppBannerMessage.FetchingRessources,
+      is_loader: true
+    });
 
-  const data = await callAPI<ApiUserRessources>(endpoint, () => ({
-    session: user.session
-  }));
+    const data = await callAPI<ApiUserRessources>(endpoint, () => ({
+      session: user.session
+    }));
 
-  return data.received;
+    return data.received;
+  }
+  catch {
+    return local_response?.data;
+  }
 };
 
 export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
@@ -752,19 +772,24 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
   const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint());
   if (local_response && !local_response.expired) return local_response;
 
-  console.info("[debug:grades] renew");
+  try {
+    console.info("[debug:grades] renew");
 
-  app.setBannerMessage({
-    message: AppBannerMessage.FetchingGrades,
-    is_loader: true
-  });
+    app.setBannerMessage({
+      message: AppBannerMessage.FetchingGrades,
+      is_loader: true
+    });
 
-  const data = await callAPI<ApiUserGrades>(endpoint, () => ({
-    session: user.session,
-    period: period()
-  }));
+    const data = await callAPI<ApiUserGrades>(endpoint, () => ({
+      session: user.session,
+      period: period()
+    }));
 
-  return data.received;
+    return data.received;
+  }
+  catch {
+    return local_response?.data;
+  }
 };
 
 export const getDayNameFromDayNumber = (day_number: string | number) => {
