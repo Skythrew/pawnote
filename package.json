@@ -1,8 +1,8 @@
 {
   "name": "pornote",
-  "description": "Re-design de l'application web Pronote. Celle-ci est complètement personnalisable et inclut de nouvelles fonctionnalités.",
-  "homepage": "https://pornote.vercel.app",
-  "version": "0.1.1",
+  "description": "Client web non-officiel Pronote.",
+  "homepage": "https://www.pornote.ml",
+  "version": "0.0.0",
   "type": "module",
   "license": "MIT",
   "private": true,
