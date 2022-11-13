@@ -11,6 +11,9 @@ import {
   getDefaultPeriodOnglet,
   getLabelOfPosition,
 
+  callUserHomeworksAPI,
+  callUserTimetableAPI,
+
   parseHomeworks,
   parseTimetableLessons
 } from "@/utils/client";
@@ -48,6 +51,13 @@ const AppHome: Component = () => {
     : null
   );
   const timetable_lessons = () => timetable_lessons_full()?.[timetableDayNumber()];
+
+  // Call to renew the APIs when the week has changed.
+  createEffect(on(weekNumber, async (week) => {
+    console.info("[+effect]: weekNumber()");
+    await callUserHomeworksAPI(week);
+    await callUserTimetableAPI(week);
+  }));
 
   return (
     <>

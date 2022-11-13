@@ -8,18 +8,7 @@ import app, { AppBannerMessage } from "@/stores/app";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
 
-import {
-  getCurrentWeekNumber,
-  getDefaultPeriodOnglet,
-
-  callUserTimetableAPI,
-  callUserHomeworksAPI,
-  callUserRessourcesAPI,
-  callUserGradesAPI
-} from "@/utils/client";
-
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
-import { PronoteApiOnglets } from "@/types/pronote";
 
 const AppLayout: Component = () => {
   const navigate = useNavigate();
@@ -28,18 +17,31 @@ const AppLayout: Component = () => {
   const slug = () => params.slug;
 
   createEffect(async () => {
-    onCleanup(() => app.cleanCurrentUser());
-    app.setBannerMessage({ message: AppBannerMessage.RestoringSession, is_loader: true });
+    console.info("[[slug.tsx][+effect]: " + slug());
+
+    onCleanup(() => {
+      console.info("[[slug].tsx][-effect]: " + slug());
+      app.cleanCurrentUser();
+    });
+
+    app.setBannerMessage({
+      message: AppBannerMessage.RestoringSession,
+      is_loader: true
+    });
 
     const session = await sessions.get(slug());
     if (session === null) return navigate("/link");
+    console.info("[[slug.tsx]: got session from cache");
 
     const user_data = await endpoints.get<ApiUserData>(slug(), "/user/data");
     if (!user_data) return navigate("/link");
+    console.info("[[slug.tsx]: got '/user/data' from cache");
 
     const login_informations = await endpoints.get<ApiLoginInformations>(slug(), "/login/informations");
     if (!login_informations) return navigate("/link");
+    console.info("[[slug.tsx]: got '/login/informations' from cache");
 
+    console.info("[[slug].tsx]: define app.current_user");
     app.setCurrentUser({
       slug: slug(),
       session,
@@ -48,38 +50,30 @@ const AppLayout: Component = () => {
         "/user/data": user_data.data
       }
     });
-
-    const week_number = getCurrentWeekNumber();
-    const grades_period = () => getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
-
-    // Just calling them will save into global store.
-    await callUserTimetableAPI(week_number);
-    await callUserHomeworksAPI(week_number);
-    await callUserRessourcesAPI(week_number);
-    await callUserGradesAPI(grades_period);
-
-    app.setBannerToIdle();
   });
+
+  // Short-hand.
+  const user = () => app.current_user;
 
   return (
     <>
       <Title>{slug()} - Pornote</Title>
-      <Show when={app.current_user.slug} fallback={
+      <Show when={user().slug} fallback={
         <p>Récupération des données, veuillez patienter.</p>
       }>
         <header class="fixed z-20 top-0 right-0 left-0 flex flex-col shadow-md">
           <nav class="flex justify-between items-center px-4 h-18 bg-brand-primary">
-            <A href={`/app/${app.current_user.slug}`}>
+            <A href={`/app/${user().slug}`}>
               <div class="flex flex-col">
                 <h1 class="font-semibold text-lg text-brand-white">
-                  {app.current_user.endpoints?.["/user/data"].donnees.ressource.L}
+                  {user().endpoints?.["/user/data"].donnees.ressource.L}
                 </h1>
                 <div class="flex items-center gap-2">
                   <span class="text-brand-light text-md font-medium">
-                    {app.current_user.endpoints?.["/user/data"].donnees.ressource.Etablissement.V.L}
+                    {user().endpoints?.["/user/data"].donnees.ressource.Etablissement.V.L}
                   </span>
                   <span class="text-brand-light text-xs">
-                    {app.current_user.endpoints?.["/user/data"].donnees.ressource.classeDEleve.L}
+                    {user().endpoints?.["/user/data"].donnees.ressource.classeDEleve.L}
                   </span>
                 </div>
               </div>
@@ -87,8 +81,8 @@ const AppLayout: Component = () => {
 
           </nav>
           <Show when={app.banner_message.message !== AppBannerMessage.Idle}>
-            <div class="flex items-center justify-center px-2 h-8">
-              <p class="text-center">{appBannerMessageToString(app.banner_message.message)}</p>
+            <div class="flex items-center justify-center px-2 h-8 bg-brand-white">
+              <p class="text-center text-sm">{appBannerMessageToString(app.banner_message.message)}</p>
             </div>
           </Show>
         </header>
@@ -98,8 +92,8 @@ const AppLayout: Component = () => {
         </main>
 
         <SessionFromScratchModal
-          pronote_url={app.current_user.session?.instance.pronote_url as string}
-          ent_url={app.current_user.session?.instance.ent_url ?? undefined}
+          pronote_url={user().session?.instance.pronote_url as string}
+          ent_url={user().session?.instance.ent_url ?? undefined}
         />
       </Show>
     </>
