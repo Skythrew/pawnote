@@ -1,5 +1,4 @@
 import { defineConfig } from "vite";
-import pkg from "./package.json";
 import crypto from "crypto";
 import path from "path";
 import fs from "fs";
@@ -21,6 +20,11 @@ const indexHtmlRevision = () => {
   hash.update(file_buffer);
   return hash.digest("hex");
 };
+
+const pkg = JSON.parse(fs.readFileSync(
+  path.resolve(__dirname, "package.json"),
+  { encoding: "utf-8" }
+));
 
 export default defineConfig ({
   plugins: [

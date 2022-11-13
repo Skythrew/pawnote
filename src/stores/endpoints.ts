@@ -1,5 +1,4 @@
 import localforage from "localforage";
-
 import app from "@/stores/app";
 
 const database = (slug: string) => localforage.createInstance({
@@ -40,8 +39,12 @@ const get = async <Api extends {
   const is_expired = Date.now() - data.date >= expiration;
 
   if (user.slug && user.slug === slug) {
-    app.setCurrentUser("endpoints", {
-      [endpoint as keyof (typeof user.endpoints)]: data.received
+
+    batch(() => {
+      app.setCurrentUser("endpoints", {
+        [endpoint as keyof (typeof user.endpoints)]: data.received
+      });
+      console.info(`[debug][endpoints.get]: cached '${endpoint}'`);
     });
   }
 
@@ -60,17 +63,22 @@ const upsert = async <Api extends { path: string, response: { received: unknown 
       date: Date.now()
     });
 
+    console.info(`[debug][endpoints.upsert]: stored locally '${endpoint}'`);
+
     const user = app.current_user;
     if (user.slug && user.slug === slug) {
-      app.setCurrentUser("endpoints", {
-        [endpoint as keyof (typeof user.endpoints)]: data
+      batch(() => {
+        app.setCurrentUser("endpoints", {
+          [endpoint as keyof (typeof user.endpoints)]: data
+        });
+        console.info(`[debug][endpoints.upsert]: cached '${endpoint}'`);
       });
     }
 
     return true;
   }
   catch (error) {
-    console.error(`[stores:endpoints:${slug}:upsert:${endpoint}]`, error);
+    console.error(`[debug][endpoints.upsert][${endpoint}]:`, error);
     return false;
   }
 };
@@ -81,6 +89,7 @@ const removeAllStartingWith = async (slug: string, match: string) => {
   for (const key of keys) {
     if (key.startsWith(match)) {
       await database(slug).removeItem(key);
+      console.info(`[debug][endpoints] removed '${key}'`);
     }
   }
 };

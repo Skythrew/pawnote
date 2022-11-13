@@ -1,23 +1,31 @@
 import type { Component } from "solid-js";
-import type { ApiUserHomeworks } from "@/types/api";
 
 import {
   callUserHomeworksAPI,
-  getCurrentWeekNumber
+  getCurrentWeekNumber,
+
+  parseHomeworks
 } from "@/utils/client";
 
-const AppHomeworks: Component = () => {
-  const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
-  const [weekHomeworks, setWeekHomeworks] = createSignal<ApiUserHomeworks["response"]["received"] | null>(null);
+import app from "@/stores/app";
 
-  /**
-   * Reload the homeworks depending
-   * on the week number.
-   */
-  createEffect(on(weekNumber, async (week_number) => {
-    const data = await callUserHomeworksAPI(week_number);
-    setWeekHomeworks(data);
+const AppHomeworks: Component = () => {
+  onMount(() => console.groupCollapsed("homeworks"));
+  onCleanup(() => console.groupEnd());
+
+  const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
+
+  const endpoint = () => app.current_user.endpoints?.[`/user/homeworks/${weekNumber()}`];
+
+  /** Renew the homeworks when needed. */
+  createEffect(on(weekNumber, async (week) => {
+    console.groupCollapsed(`Week ${week}`);
+    onCleanup(() => console.groupEnd());
+
+    await callUserHomeworksAPI(week);
   }));
+
+  const homeworks = () => endpoint() ? parseHomeworks(endpoint()!.donnees) : null;
 
   return (
     <div>
@@ -26,9 +34,9 @@ const AppHomeworks: Component = () => {
       <button onClick={() => setWeekNumber(prev => prev - 1)}>Avant</button>
       <button onClick={() => setWeekNumber(prev => prev + 1)}>Après</button>
 
-      <Show keyed when={weekHomeworks()}>
+      <Show keyed when={homeworks()}>
         {homeworks => (
-          <pre>{JSON.stringify(homeworks.donnees.ListeTravauxAFaire.V, null, 2)}</pre>
+          <pre>{JSON.stringify(homeworks)}</pre>
         )}
       </Show>
     </div>
@@ -36,3 +44,4 @@ const AppHomeworks: Component = () => {
 };
 
 export default AppHomeworks;
+

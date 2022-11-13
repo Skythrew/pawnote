@@ -17,12 +17,18 @@ const AppLayout: Component = () => {
   const slug = () => params.slug;
 
   createEffect(async () => {
-    console.info("[[slug.tsx][+effect]: " + slug());
+    console.group(`=> ${slug()}`);
 
     onCleanup(() => {
-      console.info("[[slug].tsx][-effect]: " + slug());
+      console.groupCollapsed("cleanup");
       app.cleanCurrentUser();
+      console.info("[debug]: cleaned 'app.current_user'");
+      console.groupEnd();
+
+      console.groupEnd(); // Closes '=> {slug}'.
     });
+
+    console.groupCollapsed("initialization");
 
     app.setBannerMessage({
       message: AppBannerMessage.RestoringSession,
@@ -30,25 +36,43 @@ const AppLayout: Component = () => {
     });
 
     const session = await sessions.get(slug());
-    if (session === null) return navigate("/link");
-    console.info("[[slug.tsx]: got session from cache");
+    if (session === null) {
+      console.error("[debug] no session found");
+      console.groupEnd();
+      return navigate("/link");
+    }
+    console.info("[debug]: got session");
 
     const user_data = await endpoints.get<ApiUserData>(slug(), "/user/data");
-    if (!user_data) return navigate("/link");
-    console.info("[[slug.tsx]: got '/user/data' from cache");
+    if (!user_data) {
+      console.error("[debug] no endpoint '/user/data' found");
+      console.groupEnd();
+      return navigate("/link");
+    }
+    console.info("[debug]: got '/user/data'");
 
     const login_informations = await endpoints.get<ApiLoginInformations>(slug(), "/login/informations");
-    if (!login_informations) return navigate("/link");
-    console.info("[[slug.tsx]: got '/login/informations' from cache");
+    if (!login_informations) {
+      console.error("[debug] no endpoint '/login/informations' found");
+      console.groupEnd();
+      return navigate("/link");
+    }
+    console.info("[debug]: got '/login/informations'");
 
-    console.info("[[slug].tsx]: define app.current_user");
-    app.setCurrentUser({
-      slug: slug(),
-      session,
-      endpoints: {
-        "/login/informations": login_informations.data,
-        "/user/data": user_data.data
-      }
+    batch(() => {
+      app.setCurrentUser({
+        slug: slug(),
+        session,
+        endpoints: {
+          "/login/informations": login_informations.data,
+          "/user/data": user_data.data
+        }
+      });
+
+      app.setBannerToIdle();
+
+      console.info("[debug]: defined `app.current_user`");
+      console.groupEnd();
     });
   });
 
@@ -101,3 +125,4 @@ const AppLayout: Component = () => {
 };
 
 export default AppLayout;
+

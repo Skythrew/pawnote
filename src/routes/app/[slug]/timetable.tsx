@@ -1,26 +1,32 @@
 import type { Component } from "solid-js";
 
 import {
+  type TimetableLesson,
+
   callUserTimetableAPI,
   getCurrentWeekNumber,
-  TimetableLesson,
   parseTimetableLessons
 } from "@/utils/client";
 
-import { ApiUserTimetable } from "@/types/api";
+import app from "@/stores/app";
 
 const AppTimetable: Component = () => {
-  const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
-  const [weekTimetable, setWeekTimetable] = createSignal<ApiUserTimetable["response"]["received"] | null>(null);
+  onMount(() => console.groupCollapsed("timetable"));
+  onCleanup(() => console.groupEnd());
 
-  /**
-   * Reload the timetable depending
-   * on the week number.
-   */
-  createEffect(on(weekNumber, async (week_number) => {
-    const data = await callUserTimetableAPI(week_number);
-    setWeekTimetable(data);
+  const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
+
+  const endpoint = () => app.current_user.endpoints?.[`/user/timetable/${weekNumber()}`];
+
+  /** Renew the timetable data when needed. */
+  createEffect(on(weekNumber, async (week) => {
+    console.groupCollapsed(`Week ${week}`);
+    onCleanup(() => console.groupEnd());
+
+    await callUserTimetableAPI(week);
   }));
+
+  const timetable = () => endpoint() ? parseTimetableLessons(endpoint()!.donnees.ListeCours) : null;
 
   return (
     <div>
@@ -29,17 +35,15 @@ const AppTimetable: Component = () => {
       <button onClick={() => setWeekNumber(prev => prev - 1)}>Avant</button>
       <button onClick={() => setWeekNumber(prev => prev + 1)}>Après</button>
 
-      <Show keyed when={weekTimetable()}
+      <Show keyed when={timetable()}
         fallback={
           <span>Récupération de l'emploi du temps...</span>
         }
       >
-        {timetable => (
+        {timetable_entries => (
           <div>
-            <p>Vous avez {timetable.donnees.ListeCours.length} cours cette semaine.</p>
-
             <div class="flex">
-              <For each={parseTimetableLessons(timetable.donnees.ListeCours)}>
+              <For each={timetable_entries}>
                 {days => (
                   <div class="flex flex-col">
                     <Index each={days}>
@@ -81,3 +85,4 @@ const AppTimetable: Component = () => {
 };
 
 export default AppTimetable;
+

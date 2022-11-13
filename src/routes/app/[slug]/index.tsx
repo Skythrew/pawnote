@@ -21,6 +21,9 @@ import {
 import dayjs from "dayjs";
 
 const AppHome: Component = () => {
+  onMount(() => console.groupCollapsed("dashboard"));
+  onCleanup(() => console.groupEnd());
+
   const day_number = dayjs().day();
   const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
   const period_grades = getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
@@ -38,11 +41,13 @@ const AppHome: Component = () => {
 
   const [homeworksDayNumber, setHomeworksDayNumber] = createSignal(day_number);
   const homeworks_endpoint = () => app.current_user.endpoints?.[`/user/homeworks/${weekNumber()}`];
-  const homeworks = () => homeworks_endpoint()
-    ? parseHomeworks(homeworks_endpoint()!.donnees)[homeworksDayNumber()]
-      // Only show not done homework.
-      ?.filter(homework => !homework.done)
-    : null;
+  const homeworks_full = createMemo(() => homeworks_endpoint()
+    ? parseHomeworks(homeworks_endpoint()!.donnees)
+    : null
+  );
+  const homeworks = () => homeworks_full()?.[homeworksDayNumber()]
+    // Only show not done homework.
+    ?.filter(homework => !homework.done);
 
   const [timetableDayNumber, setTimetableDayNumber] = createSignal(day_number);
   const timetable_endpoint = () => app.current_user.endpoints?.[`/user/timetable/${weekNumber()}`];
@@ -54,9 +59,10 @@ const AppHome: Component = () => {
 
   // Call to renew the APIs when the week has changed.
   createEffect(on(weekNumber, async (week) => {
-    console.info("[+effect]: weekNumber()");
+    console.groupCollapsed(`Week ${week}`);
     await callUserHomeworksAPI(week);
     await callUserTimetableAPI(week);
+    console.groupEnd();
   }));
 
   return (

@@ -484,7 +484,7 @@ export const callUserTimetableAPI = async (week: number) => {
   if (local_response && !local_response.expired) return local_response;
 
   try {
-    console.info("[debug:timetable] renew");
+    console.info("[debug][timetable] renew");
 
     app.setBannerMessage({
       message: AppBannerMessage.FetchingTimetable,
@@ -526,7 +526,7 @@ export interface TimetableBreak {
 export const parseTimetableLessons = (
   lessons_raw: PronoteApiUserTimetable["response"]["donnees"]["ListeCours"]
 ) => {
-  console.info("[debug]: running timetable parsing.");
+  console.info("[debug][timetable]: parse");
 
   const general_data = app.current_user.endpoints?.["/login/informations"].donnees.General;
   if (!general_data) return [] as TimetableLesson[][];
@@ -662,7 +662,7 @@ export const callUserHomeworksAPI = async (week: number) => {
   if (local_response && !local_response.expired) return local_response;
 
   try {
-    console.info("[debug:homeworks] renew");
+    console.info("[debug][homeworks] renew");
 
     app.setBannerMessage({
       message: AppBannerMessage.FetchingTimetable,
@@ -686,7 +686,9 @@ export const callUserHomeworksAPI = async (week: number) => {
   * Each item is an array containing the homeworks for that day.
   */
 export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["donnees"]) => {
-  const parsed_homeworks: { [key: number]: {
+  console.info("[debug][homeworks]: parse");
+
+  const output: { [key: number]: {
     subject_name: string;
     description: string;
     done: boolean;
@@ -695,16 +697,17 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
   for (const homework of homeworks.ListeTravauxAFaire.V) {
     const day = dayjs(homework.PourLe.V, "DD-MM-YYYY").day();
 
-    if (!parsed_homeworks[day]) parsed_homeworks[day] = [];
+    // Initialize the array for the day if doesn't exist.
+    if (!output[day]) output[day] = [];
 
-    parsed_homeworks[day].push({
+    output[day].push({
       description: homework.descriptif.V,
       subject_name: homework.Matiere.V.L,
       done: homework.TAFFait
     });
   }
 
-  return parsed_homeworks;
+  return output;
 };
 
 export const callUserRessourcesAPI = async (week: number) => {
@@ -718,7 +721,7 @@ export const callUserRessourcesAPI = async (week: number) => {
   if (local_response && !local_response.expired) return local_response;
 
   try {
-    console.info("[debug:ressources] renew");
+    console.info("[debug][ressources]: renew");
 
     app.setBannerMessage({
       message: AppBannerMessage.FetchingRessources,
@@ -773,7 +776,7 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
   if (local_response && !local_response.expired) return local_response;
 
   try {
-    console.info("[debug:grades] renew");
+    console.info("[debug][grades]: renew");
 
     app.setBannerMessage({
       message: AppBannerMessage.FetchingGrades,
