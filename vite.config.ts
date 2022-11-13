@@ -15,10 +15,6 @@ import auto from "unplugin-auto-import/vite";
 import icons_resolver from "unplugin-icons/resolver";
 
 const indexHtmlRevision = () => {
-  // Environment variable set only when building the client.
-  // See <https://github.com/solidjs/solid-start/blob/df5d22be3db0f76e4ab5d815c1892855ec43b1f2/packages/start/bin.cjs#L398>.
-  if (!process.env.START_SPA_CLIENT) return "";
-
   const index_path = path.resolve(__dirname, ".solid/index.html");
   const file_buffer = fs.readFileSync(index_path);
   const hash = crypto.createHash("md5");
@@ -63,12 +59,12 @@ export default defineConfig ({
       ],
 
       workbox: {
-        additionalManifestEntries: [
-          {
-            url: "index.html",
-            revision: indexHtmlRevision()
-          }
-        ],
+        // Environment variable set only when building the client.
+        // See <https://github.com/solidjs/solid-start/blob/df5d22be3db0f76e4ab5d815c1892855ec43b1f2/packages/start/bin.cjs#L398>.
+        additionalManifestEntries: process.env.START_SPA_CLIENT ? [{
+          url: "index.html",
+          revision: indexHtmlRevision()
+        }] : undefined,
 
         globPatterns: [
           "**/*.{js,css,html,svg,png,woff,woff2}"
