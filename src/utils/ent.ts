@@ -10,7 +10,8 @@ interface AvailableENT {
 
 const OpenENT: AvailableENT = {
   hostnames: [
-    "mon.lyceeconnecte.fr"
+    "mon.lyceeconnecte.fr",
+    "ent.l-educdenormandie.fr"
   ],
 
   methods: (url) => ({
@@ -72,9 +73,12 @@ export const findENT = (raw_url: string) => {
   let url = new URL(raw_url);
 
   // Workarounds for some URLs.
-  if (url.hostname === "jeunes.nouvelle-aquitaine.fr") {
+  switch (url.hostname) {
+  case "jeunes.nouvelle-aquitaine.fr":
+  case "connexion.l-educdenormandie.fr": {
     const callback = url.searchParams.get("callback") as string;
     url = new URL(callback);
+  }
   }
 
   for (const service of Object.values(available_ents)) {

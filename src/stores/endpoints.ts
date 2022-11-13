@@ -36,7 +36,7 @@ const get = async <Api extends {
 
   // Endpoints should be renewed every 4h
   // (TODO: Make it so the user can choose)
-  const expiration = 10_000; // 4 * (1000 * 60 * 60);
+  const expiration = 4 * (1000 * 60 * 60);
   const is_expired = Date.now() - data.date >= expiration;
 
   if (user.slug && user.slug === slug) {
