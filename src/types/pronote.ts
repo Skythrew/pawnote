@@ -952,9 +952,12 @@ export interface PronoteApiUserTimetable {
         }[];
       }
 
-      ListeCours: {
+      ListeCours: ({
         place: number;
         duree: number;
+
+        /** Whether the lesson is canceled or not. */
+        estAnnule: boolean;
 
         DateDuCours: {
           _T: 7;
@@ -984,7 +987,10 @@ export interface PronoteApiUserTimetable {
         G: number;
 
         AvecTafPublie: boolean;
-      }[];
+      } & (
+        | { estAnnule: undefined }
+        | { estAnnule: true, Statut: string }
+      ))[];
     }
   }
 }

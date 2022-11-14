@@ -526,7 +526,7 @@ export interface TimetableBreak {
 export const parseTimetableLessons = (
   lessons_raw: PronoteApiUserTimetable["response"]["donnees"]["ListeCours"]
 ) => {
-  console.info("[debug][timetable]: parse");
+  console.info("[timetable]: started parsing");
 
   const general_data = app.current_user.endpoints?.["/login/informations"].donnees.General;
   if (!general_data) return [] as TimetableLesson[][];
@@ -544,6 +544,9 @@ export const parseTimetableLessons = (
 
   for (let lesson_index = 0; lesson_index < lessons.length; lesson_index++) {
     const lesson = lessons[lesson_index];
+
+    // Skip the lesson when it's canceled.
+    if (lesson.estAnnule) continue;
 
     const getDate = (item: typeof lesson) => {
       return dayjs(item.DateDuCours.V, "DD-MM-YYYY HH:mm:ss");
@@ -622,6 +625,7 @@ export const parseTimetableLessons = (
     raw_output[dayOfWeek].push(parsed_lesson);
   }
 
+  console.info("[timetable]: parsing done");
   return raw_output;
 };
 
