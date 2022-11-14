@@ -526,7 +526,7 @@ export interface TimetableBreak {
 export const parseTimetableLessons = (
   lessons_raw: PronoteApiUserTimetable["response"]["donnees"]["ListeCours"]
 ) => {
-  console.info("[timetable]: started parsing");
+  console.info("[timetable]: start parsing");
 
   const general_data = app.current_user.endpoints?.["/login/informations"].donnees.General;
   if (!general_data) return [] as TimetableLesson[][];
@@ -541,7 +541,6 @@ export const parseTimetableLessons = (
    * where `dayOfWeek` is a number and starts from 0 for Sunday.
    */
   const raw_output: (TimetableLesson | TimetableBreak)[][] = [...Array.from(Array(7), () => [])];
-  console.log(lessons);
   for (let lesson_index = 0; lesson_index < lessons.length; lesson_index++) {
     const lesson = lessons[lesson_index];
 
@@ -622,7 +621,7 @@ export const parseTimetableLessons = (
     raw_output[dayOfWeek].push(parsed_lesson);
   }
 
-  console.info("[timetable]: parsing done");
+  console.info("[timetable]: done");
   return raw_output;
 };
 

@@ -17,8 +17,9 @@ import app from "@/stores/app";
 import dayjs from "dayjs";
 
 const AppTimetable: Component = () => {
-  const [windowHeight, setWindowHeight] = createSignal(window.innerHeight);
-  const windowResizeHandler = () => setWindowHeight(window.innerHeight);
+  const NAVBAR_SIZE = 72;
+  const [windowHeight, setWindowHeight] = createSignal(window.innerHeight - NAVBAR_SIZE);
+  const windowResizeHandler = () => setWindowHeight(window.innerHeight - NAVBAR_SIZE);
 
   onMount(() => {
     console.groupCollapsed("timetable");
@@ -77,17 +78,17 @@ const AppTimetable: Component = () => {
                     }}
                     class="flex flex-col pb-6 bg-brand-primary rounded-md"
                   >
-                    <div class="flex justify-center items-center gap-4 py-4">
+                    <div class="px-4 flex justify-between items-center gap-4 py-4">
                       <button
                         onClick={() => setDayNumber(prev => sanitizeDayNumber(--prev))}
-                        class="md:hidden flex px-2 py-1 rounded-full"
+                        class="md:hidden flex px-2 py-1 rounded-full text-brand-light"
                       >
                         <IconMdiArrowLeft />
                       </button>
                       <h3 class="font-medium text-xl text-brand-light">{getDayNameFromDayNumber(day_index())}</h3>
                       <button
                         onClick={() => setDayNumber(prev => sanitizeDayNumber(++prev))}
-                        class="md:hidden flex px-2 py-1 rounded-full"
+                        class="md:hidden flex px-2 py-1 rounded-full text-brand-light"
                       >
                         <IconMdiArrowRight />
                       </button>
@@ -103,7 +104,7 @@ const AppTimetable: Component = () => {
                               <Match keyed when={lesson_raw().type === "break" && lesson_raw() as TimetableBreak}>
                                 {lesson => (
                                   <div
-                                    class="bg-brand-white bg-opacity-20 border-2 border-brand-white flex items-center justify-center"
+                                    class="bg-brand-white bg-opacity-20 flex items-center justify-center"
                                     style={{
                                       "height": item_height() * (lesson.to - lesson.from) + "px"
                                     }}
@@ -122,19 +123,19 @@ const AppTimetable: Component = () => {
                               <Match keyed when={lesson_raw().type === "lesson" && lesson_raw() as TimetableLesson}>
                                 {lesson => (
                                   <>
-                                    <span class="absolute -top-3.5 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position)}</span>
+                                    <span class="absolute z-10 -top-2.5 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position)}</span>
                                     <div
                                       style={{
-                                        "border-color": lesson.color,
+                                        "border-left-color": lesson.color,
                                         "height": item_height() * lesson.duration + "px"
                                       }}
                                       class="border-l-4 border-l-brand-primary bg-brand-white px-4 py-2.5"
                                     >
-                                      <h5 class="font-medium text-lg md:text-base">{lesson.name}</h5>
+                                      <h5 class="font-medium">{lesson.name}</h5>
                                       <span class="block text-sm">{lesson.room} - {lesson.teacher}</span>
                                     </div>
                                     <Show when={lesson_index === lessons.length - 1}>
-                                      <span class="absolute -bottom-3.5 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position + lesson.duration)}</span>
+                                      <span class="absolute -bottom-2.5 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position + lesson.duration)}</span>
                                     </Show>
                                   </>
                                 )}
