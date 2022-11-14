@@ -531,9 +531,9 @@ export const parseTimetableLessons = (
   const general_data = app.current_user.endpoints?.["/login/informations"].donnees.General;
   if (!general_data) return [] as TimetableLesson[][];
 
-  const lessons = unwrap(lessons_raw).sort(
-    (a, b) => a.place - b.place
-  );
+  const lessons = unwrap(lessons_raw)
+    .sort((a, b) => a.place - b.place)
+    .filter(lesson => !lesson.estAnnule);
 
   /**
    * Lessons are stored in an array for each day.
@@ -541,12 +541,9 @@ export const parseTimetableLessons = (
    * where `dayOfWeek` is a number and starts from 0 for Sunday.
    */
   const raw_output: (TimetableLesson | TimetableBreak)[][] = [...Array.from(Array(7), () => [])];
-
+  console.log(lessons);
   for (let lesson_index = 0; lesson_index < lessons.length; lesson_index++) {
     const lesson = lessons[lesson_index];
-
-    // Skip the lesson when it's canceled.
-    if (lesson.estAnnule) continue;
 
     const getDate = (item: typeof lesson) => {
       return dayjs(item.DateDuCours.V, "DD-MM-YYYY HH:mm:ss");
