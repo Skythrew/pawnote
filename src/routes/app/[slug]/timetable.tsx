@@ -19,7 +19,12 @@ import dayjs from "dayjs";
 const AppTimetable: Component = () => {
   const NAVBAR_SIZE = 72;
   const [windowHeight, setWindowHeight] = createSignal(window.innerHeight - NAVBAR_SIZE);
-  const windowResizeHandler = () => setWindowHeight(window.innerHeight - NAVBAR_SIZE);
+  const [windowWidth, setWindowWidth] = createSignal(window.innerWidth);
+
+  const windowResizeHandler = () => batch(() => {
+    setWindowHeight(window.innerHeight - NAVBAR_SIZE);
+    setWindowWidth(window.innerWidth);
+  });
 
   onMount(() => {
     console.groupCollapsed("timetable");
@@ -52,7 +57,11 @@ const AppTimetable: Component = () => {
 
   const timetable = () => endpoint() ? parseTimetableLessons(endpoint()!.donnees.ListeCours) : null;
 
-  const item_height = () => windowHeight() / ((app.current_user.endpoints?.["/login/informations"].donnees.General.ListeHeures.V.length ?? 0) - 1);
+  const item_height = () => (windowWidth() >= 768
+    ? /* Screen height on wider screens */ windowHeight()
+    : /* Mobile view */ 768
+  ) / ((app.current_user.endpoints?.["/login/informations"].donnees.General.ListeHeures.V.length ?? 0) - 1);
+  const item_width = () => windowWidth() / (timetable() ?? []).filter(entries => entries.length > 0).length - 28;
 
   return (
     <div>
@@ -104,19 +113,21 @@ const AppTimetable: Component = () => {
                               <Match keyed when={lesson_raw().type === "break" && lesson_raw() as TimetableBreak}>
                                 {lesson => (
                                   <div
-                                    class="bg-brand-white bg-opacity-20 flex items-center justify-center"
+                                    class="bg-brand-white bg-opacity-20 flex flex-col items-center justify-center"
                                     style={{
-                                      "height": item_height() * (lesson.to - lesson.from) + "px"
+                                      "height": item_height() * (lesson.to - lesson.from) + "px",
+                                      "width": windowWidth() >= 768 ? item_width() + "px" : "100%"
                                     }}
                                   >
-                                    <p class="text-brand-white text-sm text-center">Pause de {getLabelOfPosition(lesson.from)} à {getLabelOfPosition(lesson.to)} ({
+                                    <p class="text-brand-white text-sm text-center">Pause de {getLabelOfPosition(lesson.from)} à {getLabelOfPosition(lesson.to)}
+                                    </p>
+                                    <span classList={{ "hidden": (item_height() * (lesson.to - lesson.from)) <= 60 }} class="text-brand-white text-opacity-80 text-xs">(Durée: {
                                       getTimeFormattedDiff(
                                         { value: getLabelOfPosition(lesson.from) as string, format: "HH[h]mm" },
                                         { value: getLabelOfPosition(lesson.to) as string, format: "HH[h]mm" },
                                         "HH[h]mm"
                                       )
-                                    })
-                                    </p>
+                                    })</span>
                                   </div>
                                 )}
                               </Match>
@@ -127,12 +138,15 @@ const AppTimetable: Component = () => {
                                     <div
                                       style={{
                                         "border-left-color": lesson.color,
-                                        "height": item_height() * lesson.duration + "px"
+                                        "height": item_height() * lesson.duration + "px",
+                                        "width": windowWidth() >= 768 ? item_width() + "px" : "100%"
                                       }}
                                       class="border-l-4 border-l-brand-primary bg-brand-white px-4 py-2.5"
                                     >
-                                      <h5 class="font-medium">{lesson.name}</h5>
-                                      <span class="block text-sm">{lesson.room} - {lesson.teacher}</span>
+                                      <h5 classList={{ "truncate": (item_height() * lesson.duration) <= 60 }} class="overflow-hidden text-clip font-medium">{lesson.name}</h5>
+                                      <span
+                                        classList={{ "hidden": (item_height() * lesson.duration) <= 60 }}
+                                        class="truncate block text-sm">{[lesson.room, lesson.teacher].filter(Boolean).join(" - ")}</span>
                                     </div>
                                     <Show when={lesson_index === lessons.length - 1}>
                                       <span class="absolute -bottom-2.5 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position + lesson.duration)}</span>
