@@ -228,6 +228,7 @@ export const callPronoteAPI = async <T>(
     return { payload, cookies };
   }
   catch (error) {
+    console.error(`[${function_name}]:`, error);
     return null;
   }
 };

@@ -484,7 +484,7 @@ export const callUserTimetableAPI = async (week: number) => {
   if (local_response && !local_response.expired) return local_response;
 
   try {
-    console.info("[debug][timetable] renew");
+    console.info("[timetable] renew");
 
     app.setBannerMessage({
       message: AppBannerMessage.FetchingTimetable,
@@ -662,10 +662,10 @@ export const callUserHomeworksAPI = async (week: number) => {
   if (local_response && !local_response.expired) return local_response;
 
   try {
-    console.info("[debug][homeworks] renew");
+    console.info("[homeworks] renew");
 
     app.setBannerMessage({
-      message: AppBannerMessage.FetchingTimetable,
+      message: AppBannerMessage.FetchingHomeworks,
       is_loader: true
     });
 
