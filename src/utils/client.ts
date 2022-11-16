@@ -514,6 +514,7 @@ export interface TimetableLesson {
   name?: string;
   room?: string;
   teacher?: string;
+  status?: string;
 }
 
 export interface TimetableBreak {
@@ -600,7 +601,8 @@ export const parseTimetableLessons = (
       date: getDate(lesson),
       position,
       duration: lesson.duree,
-      color: lesson.CouleurFond
+      color: lesson.CouleurFond,
+      status: lesson.Statut
     };
 
     for (const content of lesson.ListeContenus.V) {

@@ -85,7 +85,7 @@ const AppLayout: Component = () => {
       <Show when={user().slug} fallback={
         <p>Récupération des données, veuillez patienter.</p>
       }>
-        <header class="fixed z-20 top-0 right-0 left-0 flex flex-col shadow-md">
+        <header class="fixed z-50 top-0 right-0 left-0 flex flex-col shadow-md">
           <nav class="flex justify-between items-center px-4 h-18 bg-brand-primary">
             <A href={`/app/${user().slug}`}>
               <div class="flex flex-col">
