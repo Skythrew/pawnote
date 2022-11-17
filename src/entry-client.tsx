@@ -1,3 +1,7 @@
-import { mount, StartClient } from "solid-start/entry-client";
+import { StartClient } from "solid-start/entry-client";
+import { render } from "solid-js/web";
 
-mount(() => <StartClient />, document);
+window.onload = () => {
+  render(() => <StartClient />, document.body);
+};
+
