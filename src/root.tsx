@@ -35,7 +35,7 @@ export default function Root () {
         <Link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 
         <Meta name="color-scheme" content="light dark" />
-        <Meta name="theme-color" content="#17AA67" />
+        <Meta name="theme-color" content={settings.globalThemeMode() === "dark" ? "#222222" : "#17AA67"} />
 
         <Title>{APP_NAME}</Title>
         <Meta name="title" content={APP_NAME} />

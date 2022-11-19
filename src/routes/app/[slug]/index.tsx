@@ -210,6 +210,9 @@ const AppHome: Component = () => {
                           {lesson => (
                             <>
                               <span class="absolute -top-2 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position)}</span>
+                              <Show when={lesson?.status}>
+                                <span class="absolute py-1 z-10 -top-2.5 border border-brand-light bg-brand-light font-medium px-2 -left-1 rounded text-xs w-max leading-none mr-auto">{lesson.status}</span>
+                              </Show>
                               <div
                                 style={{
                                   "border-color": lesson.color,
@@ -217,7 +220,7 @@ const AppHome: Component = () => {
                                 }}
                                 class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
                               >
-                                <h5 class="font-medium text-lg">{lesson.name}</h5>
+                                <h5 class="truncate font-medium text-lg">{lesson.name}</h5>
                                 <span class="block text-sm">{lesson.room} - {lesson.teacher}</span>
                               </div>
                             </>

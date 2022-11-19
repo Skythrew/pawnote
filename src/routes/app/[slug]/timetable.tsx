@@ -62,7 +62,9 @@ const AppTimetable: Component = () => {
     : /* Mobile view */ 768
   ) / ((app.current_user.endpoints?.["/login/informations"].donnees.General.ListeHeures.V.length ?? 0) - 1);
 
-  const item_width = () => windowWidth() / (timetable() ?? []).filter(entries => entries.length > 0).length - 20;
+  const item_width = () => windowWidth() / (timetable() ?? []).filter(entries => entries.length > 0).length
+  // 20px is for the gap and the 8px is for the margins,
+  - 28;
 
   return (
     <div class="flex flex-col gap-2 justify-center items-center">
@@ -90,13 +92,24 @@ const AppTimetable: Component = () => {
       >
         {timetable_entries => (
           <div class="pt-4 pb-8 w-full flex flex-col justify-center items-center">
-            <div class="flex gap-4">
+            {/**
+              100% - 20px because we remove 10px at left and right.
+              Then we add 20px of gap so it fits.
+             */}
+            <div
+              style={{
+                "width": windowWidth() >= 768 ? windowWidth() - 20 + "px" : "100%"
+              }}
+              class="max-w-md px-4 md:max-w-none md:px-0 flex gap-[20px] justify-center">
               <For each={timetable_entries}>
                 {(lessons, day_index) => (
                   <div
                     classList={{
                       "hidden md:flex": day_index() !== dayNumber(),
                       "md:hidden": lessons.length === 0
+                    }}
+                    style={{
+                      "width": windowWidth() >= 768 ? item_width() + "px" : "100%"
                     }}
                     class="flex flex-col pb-6 bg-brand-primary rounded-md"
                   >
@@ -118,24 +131,23 @@ const AppTimetable: Component = () => {
 
                     <Show when={lessons.length > 0}
                       fallback={
-                        <div class="bg-brand-white p-4">
-                          <span class="font-medium">
-                            Aucun cours.
+                        <div class="w-full bg-brand-white p-2">
+                          <span class="block text-center font-medium">
+                            Aucun cours
                           </span>
                         </div>
                       }
                     >
                       <Index each={lessons}>
                         {(lesson_raw, lesson_index) => (
-                          <div class="relative w-full">
+                          <div class="relative">
                             <Switch>
                               <Match keyed when={lesson_raw().type === "break" && lesson_raw() as TimetableBreak}>
                                 {lesson => (
                                   <div
-                                    class="w-full bg-brand-white bg-opacity-20 flex flex-col items-center justify-center"
+                                    class="bg-brand-white bg-opacity-20 flex flex-col items-center justify-center"
                                     style={{
-                                      "height": item_height() * (lesson.to - lesson.from) + "px",
-                                      "width": windowWidth() >= 768 ? item_width() + "px" : "100%"
+                                      "height": item_height() * (lesson.to - lesson.from) + "px"
                                     }}
                                   >
                                     <p class="text-brand-white text-sm text-center">
@@ -165,13 +177,12 @@ const AppTimetable: Component = () => {
                                     <div
                                       style={{
                                         "border-left-color": lesson.color,
-                                        "height": item_height() * lesson.duration + "px",
-                                        "width": windowWidth() >= 768 ? item_width() + "px" : "100%"
+                                        "height": item_height() * lesson.duration + "px"
                                       }}
                                       class="border-l-4 border-l-brand-primary bg-brand-white px-4 py-3"
                                     >
                                       <Show when={lesson?.status}>
-                                        <span class="absolute py-1 z-10 -top-2.5 border border-brand-light bg-brand-light font-medium bg-opacity-20 backdrop-filter backdrop-blur px-2 -left-1 rounded text-xs w-max leading-none mr-auto">{lesson.status}</span>
+                                        <span class="absolute py-1 z-10 -top-2.5 border border-brand-light bg-brand-light font-medium px-2 -left-1 rounded text-xs w-max leading-none mr-auto">{lesson.status}</span>
                                       </Show>
                                       <h5
                                         class="whitespace-nowrap truncate font-medium"

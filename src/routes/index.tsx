@@ -34,13 +34,13 @@ const RootHomePage: Component = () => {
   });
 
   return (
-    <div class="min-h-screen py-4 px-6 flex flex-col justify-between bg-brand-primary dark:bg-brand-dark text-brand-white">
+    <div class="min-h-screen py-4 px-6 flex flex-col justify-between gap-12 bg-brand-primary dark:bg-brand-dark text-brand-white">
       <header class="w-full flex flex-col items-center justify-start md:justify-between md:flex-row">
         <div class="flex flex-col items-center md:items-start">
           <h1 class="font-bold text-3xl dark:text-brand-primary">{APP_NAME}</h1>
           <p class="text-lg text-brand-light mb-4">Client Pronote non-officiel.</p>
         </div>
-        <button class="shadow-lg rounded-md py-2 px-4 flex bg-brand-dark dark:bg-brand-primary items-center gap-2" onClick={settings.toggleGlobalThemeMode}>
+        <button class="rounded-md py-1 px-3 flex border-2 bg-brand-dark border-brand-dark dark:border-brand-white dark:bg-brand-dark dark:hover:border-brand-primary dark:hover:bg-brand-primary dark:text-brand-white items-center gap-2 transition-colors" onClick={settings.toggleGlobalThemeMode}>
           {settings.globalThemeMode() === "dark"
             ? <><IconRiMoonClearLine /> Sombre</>
             : <><IconRiSunLine /> Clair</>
@@ -54,29 +54,25 @@ const RootHomePage: Component = () => {
             <p class="bg-brand-white text-brand-primary rounded-full px-4 py-1 dark:bg-brand-primary dark:text-brand-light">Chargement des comptes...</p>
           }
         >
-          { sessions => (
+          {sessions => (
             <Show
               when={sessions.length > 0}
               fallback={
                 <A href="/link" class="text-center font-medium px-4 py-2 rounded-full dark:bg-brand-primary dark:bg-opacity-20 dark:border-2 dark:border-brand-primary bg-brand-light text-brand-primary dark:text-brand-light border-2 border-brand-primary">
-                    Associer un compte Pronote !
+                  Associer un compte Pronote !
                 </A>
               }
             >
               <For each={sessions}>
                 {session => (
-                  <A href={`/app/${session.slug}`}>
+                  <A class="w-full" href={`/app/${session.slug}`}>
                     <div
-                      class="
-                          bg-brand-white rounded-xl text-brand-primary
-                          p-4 cursor-pointer hover:bg-opacity-80 transition-colors
-                          hover:shadow-sm
-                        "
+                      class="bg-brand-white rounded-full py-4 px-8 cursor-pointer hover:bg-opacity-80 dark:bg-brand-primary transition-colors hover:shadow-sm"
                     >
-                      <h2 class="font-semibold">
+                      <h2 class="font-semibold text-md text-brand-primary dark:text-brand-white">
                         {session.user_name}
                       </h2>
-                      <p class="text-opacity-60">
+                      <p class="text-sm text-brand-dark dark:text-brand-light">
                         {session.instance_name}
                       </p>
                     </div>
