@@ -1,7 +1,7 @@
 <h1 align="center"><a href="https://www.pornote.ml">Pornote</a></h1>
 
 <p align="center">
-  <b align="center">IN ACTIVE DEVELOPMENT</b> - <a href="https://github.com/users/Vexcited/projects/5">ROADMAP</a> <br />
+  <a href="https://discord.gg/qwJu57chBE">DISCORD</a> - <a href="https://github.com/users/Vexcited/projects/5">ROADMAP</a> <br />
   <kbd>SolidJS</kbd> - <kbd>WindiCSS</kbd> - <kbd>TypeScript</kbd> - <kbd>Vercel</kbd> <br />
 </p>
 
@@ -21,6 +21,7 @@ including many features such as...
      <summary><b>OpenENT</b></summary>
      <ul>
       <li><a href="https://mon.lyceeconnecte.fr/auth/login">mon.lyceeconnecte.fr</a></li>
+      <li><a href="https://ent.l-educdenormandie.fr/auth/login">ent.l-educdenormandie.fr</a></li>
      </ul>
     </details>
   </details>
