@@ -62,7 +62,7 @@ export default function Root () {
           </div>
         }>
           <ErrorBoundary fallback={(error, reset) => (
-            <div class="w-screen h-screen flex justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">
+            <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">
               <h2 class="font-medium text-xl text-brand-white">Une erreur critique est survenue!</h2>
               <button class="rounded-full px-4 py-1 bg-brand-light" onClick={reset}>
                   Redémarrer

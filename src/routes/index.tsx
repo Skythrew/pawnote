@@ -38,9 +38,11 @@ const RootHomePage: Component = () => {
       <header class="w-full flex flex-col items-center justify-start">
         <h1 class="font-bold text-3xl dark:text-brand-primary">{APP_NAME}</h1>
         <p class="text-lg text-brand-light mb-4">Client Pronote non-officiel.</p>
-
-        <button class="shadow-lg rounded-md px-2 py-1 bg-brand-dark dark:bg-brand-primary" onClick={settings.toggleGlobalThemeMode}>
-          {settings.globalThemeMode() === "dark" ? "Mode Clair" : "Mode Sombre"}
+        <button class="shadow-lg rounded-md py-2 px-4 flex bg-brand-dark dark:bg-brand-primary items-center gap-2" onClick={settings.toggleGlobalThemeMode}>
+          {settings.globalThemeMode() === "dark"
+            ? <><IconRiMoonClearLine /> Sombre</>
+            : <><IconRiSunLine /> Clair</>
+          }
         </button>
       </header>
 
@@ -48,15 +50,15 @@ const RootHomePage: Component = () => {
         <Show keyed
           when={availableSessions()}
           fallback={
-            <p>Chargement des comptes...</p>
+            <p class="bg-brand-white text-brand-primary rounded-full px-4 py-1 dark:bg-brand-primary dark:text-brand-light">Chargement des comptes...</p>
           }
         >
           { sessions => (
             <Show
               when={sessions.length > 0}
               fallback={
-                <A href="/link" class="font-medium px-6 py-4 rounded-lg dark:bg-brand-primary dark:bg-opacity-20 dark:border-2 dark:border-brand-primary bg-brand-light bg-opacity-20 border-2 border-brand-light">
-                    Cliquez pour associer un compte Pronote!
+                <A href="/link" class="text-center font-medium px-4 py-2 rounded-full dark:bg-brand-primary dark:bg-opacity-20 dark:border-2 dark:border-brand-primary bg-brand-light text-brand-primary dark:text-brand-light border-2 border-brand-primary">
+                    Associer un compte Pronote !
                 </A>
               }
             >
@@ -88,15 +90,26 @@ const RootHomePage: Component = () => {
         </Show>
       </section>
 
-      <footer class="w-full flex flex-col items-center justify-center">
-        <a
-          class="font-medium text-brand-light dark:text-brand-white dark:text-opacity-40 hover:text-opacity-60 transition-colors"
-          href="https://github.com/Vexcited/pornote"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          GitHub
-        </a>
+      <footer class="w-full flex text-sm items-center justify-between">
+        <span class="block opacity-40">Pornote v{APP_VERSION} (BETA)</span>
+        <div class="flex gap-4">
+          <a
+            class="font-medium text-brand-light dark:text-brand-white text-opacity-60 hover:text-opacity-80 dark:text-opacity-40 dark:hover:text-opacity-60 transition-colors"
+            href="https://discord.gg/qwJu57chBE"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Discord
+          </a>
+          <a
+            class="font-medium text-brand-light dark:text-brand-white text-opacity-60 hover:text-opacity-80 dark:text-opacity-40 dark:hover:text-opacity-60 transition-colors"
+            href="https://github.com/Vexcited/pornote"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            GitHub
+          </a>
+        </div>
       </footer>
     </div>
   );
