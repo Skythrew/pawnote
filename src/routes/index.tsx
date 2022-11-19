@@ -35,9 +35,11 @@ const RootHomePage: Component = () => {
 
   return (
     <div class="min-h-screen py-4 px-6 flex flex-col justify-between bg-brand-primary dark:bg-brand-dark text-brand-white">
-      <header class="w-full flex flex-col items-center justify-start">
-        <h1 class="font-bold text-3xl dark:text-brand-primary">{APP_NAME}</h1>
-        <p class="text-lg text-brand-light mb-4">Client Pronote non-officiel.</p>
+      <header class="w-full flex flex-col items-center justify-start md:justify-between md:flex-row">
+        <div class="flex flex-col items-center md:items-start">
+          <h1 class="font-bold text-3xl dark:text-brand-primary">{APP_NAME}</h1>
+          <p class="text-lg text-brand-light mb-4">Client Pronote non-officiel.</p>
+        </div>
         <button class="shadow-lg rounded-md py-2 px-4 flex bg-brand-dark dark:bg-brand-primary items-center gap-2" onClick={settings.toggleGlobalThemeMode}>
           {settings.globalThemeMode() === "dark"
             ? <><IconRiMoonClearLine /> Sombre</>
@@ -45,7 +47,6 @@ const RootHomePage: Component = () => {
           }
         </button>
       </header>
-
       <section class="w-full flex flex-col gap-4 items-center justify-center px-4">
         <Show keyed
           when={availableSessions()}
