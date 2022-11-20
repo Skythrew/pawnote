@@ -28,14 +28,24 @@ const AppHome: Component = () => {
   const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
   const period_grades = getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
 
+  /** Prevent the week number to go under the limit given by the API. */
   const sanitizeWeekNumber = (number: number) => {
-    if (number < 0) return 0;
+    const first_week = app.current_user.endpoints?.["/login/informations"].donnees.General?.numeroPremiereSemaine;
+    if (typeof first_week !== "number") {
+      if (number < 0) return 0;
+      return number;
+    }
+
+    if (number < first_week) return first_week;
     return number;
   };
 
   const sanitizeDayNumber = (number: number) => {
-    if (number < 0) return 6;
-    if (number > 6) return 0;
+    if (number > 6) {
+      setWeekNumber(prev => ++prev);
+      return 0;
+    }
+
     return number;
   };
 

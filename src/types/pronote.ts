@@ -357,6 +357,7 @@ export interface PronoteApiLoginInformations {
         GestionParcoursExcellence: boolean;
         joursOuvresParCycle: number;
         premierJourSemaine: number;
+        numeroPremiereSemaine: number;
         grillesEDTEnCycle: number;
 
         setOfJoursCycleOuvre: {
