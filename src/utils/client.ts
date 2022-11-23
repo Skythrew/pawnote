@@ -89,9 +89,17 @@ export const callAPI = async <Api extends {
 }>(
   path_raw: Api["path"] | Accessor<Api["path"]>,
   body: Accessor<Api["request"]>,
-  options = {
+  options: {
     /** Prevents the response from being saved in the localForage. */
-    prevent_cache: false
+    prevent_cache?: boolean;
+    /**
+      * When we receive an SessionExpired error,
+    * we restore a new session but don't run a new call.
+      */
+    prevent_catch_rerun?: boolean;
+  } = {
+    prevent_cache: false,
+    prevent_catch_rerun: false
   }
 ): Promise<Api["response"]> => {
   const path = () => typeof path_raw === "function"
@@ -99,6 +107,7 @@ export const callAPI = async <Api extends {
     : path_raw as Api["path"];
 
   const url = () => "/api" + path();
+
   const request = await fetch(url(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -182,6 +191,8 @@ export const callAPI = async <Api extends {
               user.slug, "/login/informations", data.endpoints["/login/informations"]
             );
           }
+
+          if (options.prevent_catch_rerun) throw new ApiError(response);
 
           return callAPI<Api>(path, body, options);
         }
@@ -801,7 +812,7 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
     await callAPI<ApiUserGrades>(endpoint, () => ({
       session: user.session,
       period: period()
-    }));
+    }), { prevent_catch_rerun: true });
   });
 
   return local_response?.data;

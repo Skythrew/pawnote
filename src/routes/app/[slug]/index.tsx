@@ -10,7 +10,6 @@ import {
   callUserGradesAPI
 } from "@/utils/client";
 
-
 import { PronoteApiOnglets } from "@/types/pronote";
 
 import app from "@/stores/app";

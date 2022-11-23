@@ -67,9 +67,9 @@ const [current_state, setCurrentState] = createStore<{
 });
 
 const fetch_queue: {
-  resolve: (value: unknown) => void,
-  reject: (error: unknown) => unknown,
-  action: () => unknown
+  resolve: (value: unknown) => void;
+  reject: (error: unknown) => unknown;
+  action: () => unknown;
 }[] = [];
 
 const enqueue_fetch = (code: AppBannerMessage, action: () => unknown) => {
@@ -121,3 +121,4 @@ export default {
   current_state, setCurrentState, setStateToIdle,
   fetch_queue, enqueue_fetch
 };
+
