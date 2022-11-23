@@ -2,11 +2,11 @@ import type { PronoteApiSession, PronoteApiFunctionPayload } from "@/types/prono
 import type { SessionInstance, SessionEncryption, SessionExported } from "@/types/session";
 
 import { PronoteApiAccountId } from "@/types/pronote";
-import { aes } from "@/utils/globals";
+import { ResponseErrorCode } from "@/types/errors";
 
+import { aes } from "@/utils/globals";
 import forge from "node-forge";
 import pako from "pako";
-import { ResponseErrorMessage } from "@/types/api";
 
 class Session {
   public instance: SessionInstance;
@@ -161,10 +161,10 @@ class Session {
    * Returns an object when the request was successful
    * and `string` if an error has been found.
    */
-  readPronoteFunctionPayload <Res>(response_body: string): Res | ResponseErrorMessage {
+  readPronoteFunctionPayload <Res>(response_body: string): Res | ResponseErrorCode.SessionExpired | ResponseErrorCode.NotMatchingOrders {
     if (response_body.includes("La page a expir")) {
       this.instance.order--; // Prevent broken response to take the order.
-      return ResponseErrorMessage.SessionExpired;
+      return ResponseErrorCode.SessionExpired;
     }
 
     this.instance.order++;
@@ -177,7 +177,7 @@ class Session {
     });
 
     if (this.instance.order !== parseInt(decrypted_order))
-      return ResponseErrorMessage.NotMatchingOrders;
+      return ResponseErrorCode.NotMatchingOrders;
 
     let final_data = response.donneesSec;
 

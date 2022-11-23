@@ -1,4 +1,9 @@
 import { AppBannerMessage } from "@/stores/app";
+//import { ResponseErrorCode, ClientErrorCode } from "@/types/errors";
+
+export const languages = {
+  "en-US": () => import("./en-US")
+};
 
 export const appBannerMessageToString = (message: AppBannerMessage) => {
   switch (message) {
@@ -19,4 +24,11 @@ export const appBannerMessageToString = (message: AppBannerMessage) => {
   case AppBannerMessage.NeedCredentials:
     return "Session expirée, entrez vos identifiants.";
   }
+};
+
+export const translateErrorCode = async (code: number) => {
+  const lang = "en-US"; // TODO: Make it configurable.
+  const local = await languages[lang]();
+
+  return local.ERRORS[code] ?? "UnknownError";
 };

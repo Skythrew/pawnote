@@ -1,5 +1,5 @@
 import type { ApiLoginEntCookies } from "@/types/api";
-import { ResponseErrorMessage } from "@/types/api";
+import { ResponseErrorCode } from "@/types/errors";
 
 import { handleServerRequest } from "@/utils/server";
 import { objectHasProperty, credentials } from "@/utils/globals";
@@ -10,7 +10,7 @@ export const POST = handleServerRequest<ApiLoginEntCookies["response"]>(async (r
 
   if (!objectHasProperty(body, "ent_url") || !objectHasProperty(body, "credentials"))
     return res.error({
-      message: ResponseErrorMessage.MissingParameters,
+      code: ResponseErrorCode.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -19,13 +19,13 @@ export const POST = handleServerRequest<ApiLoginEntCookies["response"]>(async (r
 
     const service = findENT(body.ent_url);
     if (!service) return res.error({
-      message: ResponseErrorMessage.NotFoundENT
+      code: ResponseErrorCode.NotFoundENT
     }, { status: 404 });
 
     const cookies = await service.authenticate({ username, password });
 
     if (cookies === null) return res.error({
-      message: ResponseErrorMessage.ENTCookiesFetch
+      code: ResponseErrorCode.ENTCookiesFetch
     }, { status: 400 });
 
     return res.success({ ent_cookies: cookies });
@@ -33,7 +33,7 @@ export const POST = handleServerRequest<ApiLoginEntCookies["response"]>(async (r
   catch (error) {
     console.error("[/api/login/ent_cookies]", error);
     return res.error({
-      message: ResponseErrorMessage.ENTCookiesFetch,
+      code: ResponseErrorCode.ENTCookiesFetch,
       debug: { trace: error, body }
     });
   }

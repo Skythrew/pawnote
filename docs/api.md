@@ -2,8 +2,7 @@
 
 > API used by Pornote to gather informations from Pronote.
 
-- This API is also used for the Pornote Discord bot that is currently under paused development.
-- Pornote API base endpoint is located at `https://pornote.vercel.app/api`.
+- Pornote API base endpoint is located at `https://www.pornote.ml/api`.
 
 ## Responses Helpers
 
@@ -26,16 +25,15 @@ When a request failed to execute, it always - except on currently unhandled erro
 ```typescript
 interface ResponseError {
   success: false;
-  message: string;
+  code: ResponseErrorCode;
   debug?: unknown;
 }
 ```
 
-The `message` property is a `string` explaining why the request failed.
+The `code` property is a `number` referencing to an error code explaining why the request failed - needs to be documented, one day.
 
 The `debug` property is optional so not always present in the response.
-When there's a `debug` property, most of the time, it's a simple object with data that
-have been processed server-side.
+When there's a `debug` property, most of the time, it's a simple object with data that have been processed server-side.
 
 ## Session Typings
 

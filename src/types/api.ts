@@ -12,34 +12,12 @@ import type {
 } from "@/types/pronote";
 
 import type { SessionExported } from "@/types/session";
-
-export enum ResponseErrorMessage {
-  SessionExpired = "The session was expired. Restore the session and try again.",
-  SessionCantRestore = "Can't restore the session, please enter your credentials again.",
-  RequestPayloadBroken = "A mistake was made in the request payload.",
-  UserUnavailable = "User is not into the session.",
-  MissingParameters = "Missing parameters in the body request.",
-  IncorrectParameters = "Incorrect parameters in the URL or body.",
-  ServerSideError = "Something went wrong when calling Pronote API.",
-  PronotePageDownload = "Something went wrong when downloading the Pronote page.",
-  ENTAvailableCheck = "Something went wrong when checking if ENT was available.",
-  PronoteBannedIP = "Your IP address has been temporary banned.",
-  PronoteClosedInstance = "This Pronote instance is closed.",
-  SessionReadData = "Error while parsing session data.",
-  NetworkFail = "A network error happened, please retry.",
-  NotMatchingOrders = "Received and local orders aren't matching.",
-  NoIVForAESCreated = "IV for the AES encryption wasn't created.",
-  NotFoundENT = "ENT not available. If you're a developer, please contribute to make a support for your ENT!",
-  PronoteTicketFetch = "Error while fetching the Pronote URL ticket. Please, try again.",
-  ENTCookiesFetch = "Error while fetching the ENT cookies. Maybe bad credentials, please try again.",
-  IncorrectCredentials = "Incorrect username and/or password.",
-  OngletUnauthorized = "User is not authorized to access this onglet."
-}
+import type { ResponseErrorCode } from "@/types/errors";
 
 /** Helper type for error responses. */
 export interface ResponseError {
   success: false;
-  message: ResponseErrorMessage;
+  code: ResponseErrorCode;
   debug?: unknown;
 }
 
@@ -250,3 +228,4 @@ export interface ApiUserGrades {
 
   path: ApiUserGradesPath;
 }
+

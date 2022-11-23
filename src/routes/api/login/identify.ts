@@ -2,7 +2,7 @@ import type { PronoteApiLoginIdentify } from "@/types/pronote";
 import type { ApiLoginIdentify } from "@/types/api";
 
 import { PronoteApiFunctions } from "@/types/pronote";
-import { ResponseErrorMessage } from "@/types/api";
+import { ResponseErrorCode } from "@/types/errors";
 
 import {
   handleServerRequest,
@@ -17,7 +17,7 @@ export const POST = handleServerRequest<ApiLoginIdentify["response"]>(async (req
 
   if (!objectHasProperty(body, "session") || !objectHasProperty(body, "pronote_username"))
     return res.error({
-      message: ResponseErrorMessage.MissingParameters,
+      code: ResponseErrorCode.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -46,12 +46,12 @@ export const POST = handleServerRequest<ApiLoginIdentify["response"]>(async (req
     });
 
     if (response === null) return res.error({
-      message: ResponseErrorMessage.NetworkFail
+      code: ResponseErrorCode.NetworkFail
     }, { status: 500 });
 
     const received = session.readPronoteFunctionPayload<PronoteApiLoginIdentify["response"]>(response.payload);
-    if (typeof received === "string") return res.error({
-      message: received,
+    if (typeof received === "number") return res.error({
+      code: received,
       debug: {
         response,
         request_payload,
@@ -67,7 +67,7 @@ export const POST = handleServerRequest<ApiLoginIdentify["response"]>(async (req
   catch (error) {
     console.error("[/api/login/identify]", error);
     return res.error({
-      message: ResponseErrorMessage.ServerSideError,
+      code: ResponseErrorCode.ServerSideError,
       debug: { trace: error }
     });
   }

@@ -2,7 +2,7 @@ import type { PronoteApiUserGrades } from "@/types/pronote";
 import type { ApiUserGrades } from "@/types/api";
 
 import { PronoteApiFunctions, PronoteApiOnglets } from "@/types/pronote";
-import { ResponseErrorMessage } from "@/types/api";
+import { ResponseErrorCode } from "@/types/errors";
 
 import {
   handleServerRequest,
@@ -18,12 +18,12 @@ export const POST = handleServerRequest<ApiUserGrades["response"]>(async (req, r
 
   if (!objectHasProperty(body, "session") || !objectHasProperty(body, "period") || !period_id)
     return res.error({
-      message: ResponseErrorMessage.MissingParameters,
+      code: ResponseErrorCode.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
   if (period_id !== body.period.N) return res.error({
-    message: ResponseErrorMessage.IncorrectParameters,
+    code: ResponseErrorCode.IncorrectParameters,
     debug: { url: period_id, body: body.period.N }
   });
 
@@ -43,12 +43,12 @@ export const POST = handleServerRequest<ApiUserGrades["response"]>(async (req, r
     });
 
     if (response === null) return res.error({
-      message: ResponseErrorMessage.NetworkFail
+      code: ResponseErrorCode.NetworkFail
     }, { status: 500 });
 
     const received = session.readPronoteFunctionPayload<PronoteApiUserGrades["response"]>(response.payload);
-    if (typeof received === "string") return res.error({
-      message: received,
+    if (typeof received === "number") return res.error({
+      code: received,
       debug: {
         response,
         request_payload
@@ -63,7 +63,7 @@ export const POST = handleServerRequest<ApiUserGrades["response"]>(async (req, r
   catch (error) {
     console.error("[/api/user/homeworks]", error);
     return res.error({
-      message: ResponseErrorMessage.ServerSideError,
+      code: ResponseErrorCode.ServerSideError,
       debug: { trace: error }
     });
   }

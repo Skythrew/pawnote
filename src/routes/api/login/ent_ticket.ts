@@ -1,5 +1,5 @@
 import type { ApiLoginEntTicket } from "@/types/api";
-import { ResponseErrorMessage } from "@/types/api";
+import { ResponseErrorCode } from "@/types/errors";
 
 import { handleServerRequest } from "@/utils/server";
 import { objectHasProperty } from "@/utils/globals";
@@ -10,14 +10,14 @@ export const POST = handleServerRequest<ApiLoginEntTicket["response"]>(async (re
 
   if (!objectHasProperty(body, "ent_url") || !objectHasProperty(body, "ent_cookies"))
     return res.error({
-      message: ResponseErrorMessage.MissingParameters,
+      code: ResponseErrorCode.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
   try {
     const service = findENT(body.ent_url);
     if (!service) return res.error({
-      message: ResponseErrorMessage.NotFoundENT
+      code: ResponseErrorCode.NotFoundENT
     }, { status: 404 });
 
     const pronote_url = await service.process_ticket({
@@ -25,7 +25,7 @@ export const POST = handleServerRequest<ApiLoginEntTicket["response"]>(async (re
     });
 
     if (pronote_url === null) return res.error({
-      message: ResponseErrorMessage.PronoteTicketFetch
+      code: ResponseErrorCode.PronoteTicketFetch
     });
 
     return res.success({ pronote_url });
@@ -33,7 +33,7 @@ export const POST = handleServerRequest<ApiLoginEntTicket["response"]>(async (re
   catch (error) {
     console.error("[/api/login/ent_ticket]", error);
     return res.error({
-      message: ResponseErrorMessage.PronoteTicketFetch,
+      code: ResponseErrorCode.PronoteTicketFetch,
       debug: { trace: error, body }
     });
   }

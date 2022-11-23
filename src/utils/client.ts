@@ -19,34 +19,55 @@ import type {
 import { aes, capitalizeFirstLetter, credentials as credentials_utility } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
-import { PronoteApiAccountId, PronoteApiOnglets, PronoteApiUserHomeworks, PronoteApiUserTimetable, PronoteApiUserTimetableContentType } from "@/types/pronote";
-import { ResponseErrorMessage } from "@/types/api";
+import { PronoteApiAccountId, PronoteApiOnglets, PronoteApiUserData, PronoteApiUserHomeworks, PronoteApiUserTimetable, PronoteApiUserTimetableContentType } from "@/types/pronote";
+
+import {
+  ResponseErrorCode,
+  ClientErrorCode
+} from "@/types/errors";
 
 import app, { AppBannerMessage } from "@/stores/app";
 import credentials from "@/stores/credentials";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
 
+import { unwrap } from "solid-js/store";
 import forge from "node-forge";
 import dayjs from "dayjs";
 
 import dayjsCustomDuration from "dayjs/plugin/duration";
 import dayjsCustomParse from "dayjs/plugin/customParseFormat";
-import {unwrap} from "solid-js/store";
 dayjs.extend(dayjsCustomParse);
 dayjs.extend(dayjsCustomDuration);
 
 /** Helper class for easier error handling. */
 export class ApiError extends Error {
   public debug?: ResponseError["debug"];
-  public message: ResponseErrorMessage;
+  public message: string;
 
   constructor (response: Omit<ResponseError, "success">) {
-    super(response.message);
+    const message = `ResponseErrorCode[#${response.code}]`;
+    super(message);
 
     this.name = "ApiError";
     this.debug = response.debug;
-    this.message = response.message;
+    this.message = message;
+  }
+}
+
+
+/** Helper class for easier error handling. */
+export class ClientError extends Error {
+  public debug?: ResponseError["debug"];
+  public message: string;
+
+  constructor (response: { code: number, debug?: unknown }) {
+    const message = `ClientErrorCode[#${response.code}]`;
+    super(message);
+
+    this.name = "ClientError";
+    this.debug = response.debug;
+    this.message = message;
   }
 }
 
@@ -72,9 +93,8 @@ export const callAPI = async <Api extends {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body())
   }).catch(() => {
-    console.error("couldn't fetch for data");
-    throw new ApiError({
-      message: ResponseErrorMessage.NetworkFail
+    throw new ClientError({
+      code: ClientErrorCode.NetworkFail
     });
   });
 
@@ -82,7 +102,7 @@ export const callAPI = async <Api extends {
   const response = await request.json() as Response<Api["response"]>;
 
   if (!response.success) {
-    if (response.message === ResponseErrorMessage.SessionExpired) {
+    if (response.code === ResponseErrorCode.SessionExpired) {
       if (user.slug) {
         const old_session = user.session;
 
@@ -136,8 +156,8 @@ export const callAPI = async <Api extends {
           }
 
           if (!data) {
-            throw new ApiError({
-              message: ResponseErrorMessage.SessionCantRestore
+            throw new ClientError({
+              code: ClientErrorCode.SessionCantRestore
             });
           }
 
@@ -176,7 +196,7 @@ export const callAPI = async <Api extends {
       // Should be a first-time login.
       else {
         throw new ApiError({
-          message: ResponseErrorMessage.RequestPayloadBroken
+          code: ResponseErrorCode.RequestPayloadBroken
         });
       }
     }
@@ -342,8 +362,8 @@ export const connectToPronote = async (options: {
     pronote_password = informations_response.setup.password;
   }
 
-  if (!pronote_username || !pronote_password) throw new ApiError({
-    message: ResponseErrorMessage.SessionCantRestore
+  if (!pronote_username || !pronote_password) throw new ClientError({
+    code: ClientErrorCode.SessionCantRestore
   });
 
   const identify_response = await callAPI<ApiLoginIdentify>("/login/identify", () => ({
@@ -476,7 +496,7 @@ export const getCurrentWeekNumber = (): number => {
 export const callUserTimetableAPI = async (week: number) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
-    message: ResponseErrorMessage.UserUnavailable
+    code: ResponseErrorCode.UserUnavailable
   });
 
   const endpoint: ApiUserTimetable["path"] = `/user/timetable/${week}`;
@@ -656,7 +676,7 @@ export const getTimeFormattedDiff = (
 export const callUserHomeworksAPI = async (week: number) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
-    message: ResponseErrorMessage.UserUnavailable
+    code: ResponseErrorCode.UserUnavailable
   });
 
   const endpoint: ApiUserHomeworks["path"] = `/user/homeworks/${week}`;
@@ -715,7 +735,7 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
 export const callUserRessourcesAPI = async (week: number) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
-    message: ResponseErrorMessage.UserUnavailable
+    code: ResponseErrorCode.UserUnavailable
   });
 
   const endpoint: ApiUserRessources["path"] = `/user/ressources/${week}`;
@@ -723,7 +743,7 @@ export const callUserRessourcesAPI = async (week: number) => {
   if (local_response && !local_response.expired) return local_response;
 
   try {
-    console.info("[debug][ressources]: renew");
+    console.info("[ressources]: renew");
 
     app.setBannerMessage({
       message: AppBannerMessage.FetchingRessources,
@@ -744,7 +764,7 @@ export const callUserRessourcesAPI = async (week: number) => {
 export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
-    message: ResponseErrorMessage.UserUnavailable
+    code: ResponseErrorCode.UserUnavailable
   });
 
   const user_data = () => user.endpoints["/user/data"];
@@ -753,7 +773,7 @@ export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
   );
 
   if (!onglet()) throw new ApiError ({
-    message: ResponseErrorMessage.OngletUnauthorized
+    code: ResponseErrorCode.OngletUnauthorized
   });
 
   const period = onglet()?.listePeriodes.V.find(
@@ -761,16 +781,44 @@ export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
   );
 
   if (!period) throw new ApiError ({
-    message: ResponseErrorMessage.OngletUnauthorized
+    code: ResponseErrorCode.OngletUnauthorized
   });
 
   return period;
 };
 
+export const getCurrentPeriod = (periods: PronoteApiUserData["response"]["donnees"]["ressource"]["listeOngletsPourPeriodes"]["V"][number]["listePeriodes"]["V"]) => {
+  const user = app.current_user;
+  if (!user.slug) throw new ApiError ({
+    code: ResponseErrorCode.UserUnavailable
+  });
+
+  const login_informations = () => user.endpoints["/login/informations"];
+  const periods_info = login_informations().donnees.General.ListePeriodes.filter(
+    period_info => periods.find(
+      period => period.N === period_info.N
+    )
+  )
+    .map(
+      period => ({
+        ...period,
+        dateDebut: dayjs(period.dateDebut.V, "DD-MM-YYYY"),
+        dateFin: dayjs(period.dateFin.V, "DD-MM-YYYY")
+      })
+    );
+
+  const today = dayjs();
+  const current_period = periods_info.find(
+    period => today.isBefore(period.dateFin) && today.isAfter(period.dateDebut)
+  );
+
+  return current_period;
+};
+
 export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"]["period"]>) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
-    message: ResponseErrorMessage.UserUnavailable
+    code: ResponseErrorCode.UserUnavailable
   });
 
   const endpoint = (): ApiUserGrades["path"] => `/user/grades/${period().N}`;

@@ -1,5 +1,6 @@
-import type { Component } from "solid-js";
-import { TimetableLesson, TimetableBreak, getTimeFormattedDiff } from "@/utils/client";
+import type { Component, Accessor } from "solid-js";
+import { type TimetableLesson, getTimeFormattedDiff, callUserGradesAPI, getCurrentPeriod } from "@/utils/client";
+import type { ApiUserGrades } from "@/types/api";
 import { PronoteApiOnglets } from "@/types/pronote";
 
 import app from "@/stores/app";
@@ -8,7 +9,6 @@ import { A } from "@solidjs/router";
 import {
   getCurrentWeekNumber,
   getDayNameFromDayNumber,
-  getDefaultPeriodOnglet,
   getLabelOfPosition,
 
   callUserHomeworksAPI,
@@ -19,6 +19,8 @@ import {
 } from "@/utils/client";
 
 import dayjs from "dayjs";
+import dayjsCustomParse from "dayjs/plugin/customParseFormat";
+dayjs.extend(dayjsCustomParse);
 
 const AppHome: Component = () => {
   onMount(() => console.groupCollapsed("dashboard"));
@@ -26,7 +28,6 @@ const AppHome: Component = () => {
 
   const day_number = dayjs().day();
   const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
-  const period_grades = getDefaultPeriodOnglet(PronoteApiOnglets.Grades);
 
   /** Prevent the week number to go under the limit given by the API. */
   const sanitizeWeekNumber = (number: number) => {
@@ -41,10 +42,8 @@ const AppHome: Component = () => {
   };
 
   const sanitizeDayNumber = (number: number) => {
-    if (number > 6) {
-      setWeekNumber(prev => ++prev);
-      return 0;
-    }
+    if (number > 6) return 0;
+    if (number < 0) return 6;
 
     return number;
   };
@@ -69,10 +68,28 @@ const AppHome: Component = () => {
 
   // Call to renew the APIs when the week has changed.
   createEffect(on(weekNumber, async (week) => {
-    console.groupCollapsed(`Week ${week}`);
+    console.info(`-> Week: ${week}`);
     await callUserHomeworksAPI(week);
     await callUserTimetableAPI(week);
-    console.groupEnd();
+  }));
+
+  // TODO: Fix typings safety (mostly ! on gradesCurrentPeriod)
+  const gradesPeriods = () => app.current_user.endpoints?.["/user/data"].donnees.ressource.listeOngletsPourPeriodes.V.find(
+    onglet => onglet.G === PronoteApiOnglets.Grades
+  )?.listePeriodes.V;
+  const gradesCurrentPeriod = () => getCurrentPeriod(gradesPeriods()!);
+
+  const grades_endpoint = () => app.current_user.endpoints?.[`/user/grades/${gradesCurrentPeriod()?.N}`];
+  const grades = () => grades_endpoint()
+    ? grades_endpoint()!.donnees
+    : null;
+
+  // Call to renew the API when the user data has changed.
+  createEffect(on(gradesCurrentPeriod, async (period) => {
+    if (!period) return;
+
+    console.info(`-> Grades Period: ${period.N}`);
+    await callUserGradesAPI(() => period as unknown as ApiUserGrades["request"]["period"]);
   }));
 
   return (
@@ -124,7 +141,6 @@ const AppHome: Component = () => {
                   <IconMdiArrowRight />
                 </button>
               </div>
-
             </div>
 
             <div class="flex flex-col gap-2 py-2 px-4">
@@ -187,7 +203,6 @@ const AppHome: Component = () => {
                 </div>
               </div>
 
-
               <div class="flex flex-col gap-3 py-2 px-4">
                 <For each={lessons} fallback={
                   <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
@@ -245,6 +260,54 @@ const AppHome: Component = () => {
           )}
         </Show>
 
+        <Show
+          fallback={<A href="grades">Les notes n'ont pas encore été récupérées.</A>}
+          when={app.current_user.slug !== null && grades()}
+        >
+          <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary py-2">
+            <div class="flex gap-1 justify-between items-center px-6 py-2">
+              <div class="flex flex-col">
+                <A href="grades">
+                  <h4 class="font-medium text-xl text-brand-white">Dernières notes</h4>
+                </A>
+
+                <span class="text-sm text-brand-light">
+                  {gradesCurrentPeriod()?.L}
+                </span>
+              </div>
+
+              <div class="flex flex-col m-0 ml-auto">
+                <h4 class="text-right font-medium text-xl text-brand-white">
+                  {grades()?.moyGenerale.V}
+                </h4>
+                <span class="text-right text-sm text-brand-light">
+                Classe: {grades()?.moyGeneraleClasse.V}
+                </span>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2 py-2 px-4">
+              <Show when={grades() && grades()!.listeDevoirs.V.length > 0} fallback={
+
+                <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
+                  <IconMdiCheck />
+                  <p>Aucune note!</p>
+                </div>
+              }>
+                <For each={grades()!.listeDevoirs.V.sort(
+                  (a, b) => (dayjs(a.date.V, "DD-MM-YYYY").isAfter(dayjs(b.date.V, "DD-MM-YYYY")) ? 1 : -1)
+                )}>
+                  {grade => (
+                    <div class="bg-brand-white rounded py-2 px-4">
+                      <h5 class="font-medium">{grade.note.V}/{grade.bareme.V}</h5>
+                      {grade.date.V}
+                    </div>
+                  )}
+                </For>
+              </Show>
+            </div>
+          </div>
+        </Show>
         {/*
       <Show
         fallback={<A href="ressources">Les ressources pédagogiques n'ont pas encore été récupérées.</A>}

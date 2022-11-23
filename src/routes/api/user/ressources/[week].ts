@@ -2,7 +2,7 @@ import type { PronoteApiUserRessources } from "@/types/pronote";
 import type { ApiUserRessources } from "@/types/api";
 
 import { PronoteApiFunctions, PronoteApiOnglets } from "@/types/pronote";
-import { ResponseErrorMessage } from "@/types/api";
+import { ResponseErrorCode } from "@/types/errors";
 
 import {
   handleServerRequest,
@@ -17,13 +17,13 @@ export const POST = handleServerRequest<ApiUserRessources["response"]>(async (re
   const week_number = parseInt(new URL(req.url).pathname.split("/").pop() as string);
 
   if (Number.isNaN(week_number)) return res.error({
-    message: ResponseErrorMessage.IncorrectParameters,
-    debug: { url: req.url }
+    code: ResponseErrorCode.IncorrectParameters,
+    debug: { url: req.url, week_number }
   });
 
   if (!objectHasProperty(body, "session"))
     return res.error({
-      message: ResponseErrorMessage.MissingParameters,
+      code: ResponseErrorCode.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -46,12 +46,12 @@ export const POST = handleServerRequest<ApiUserRessources["response"]>(async (re
     });
 
     if (response === null) return res.error({
-      message: ResponseErrorMessage.NetworkFail
+      code: ResponseErrorCode.NetworkFail
     }, { status: 500 });
 
     const received = session.readPronoteFunctionPayload<PronoteApiUserRessources["response"]>(response.payload);
-    if (typeof received === "string") return res.error({
-      message: received,
+    if (typeof received === "number") return res.error({
+      code: received,
       debug: {
         response,
         request_payload
@@ -66,7 +66,7 @@ export const POST = handleServerRequest<ApiUserRessources["response"]>(async (re
   catch (error) {
     console.error("[/api/user/ressources]", error);
     return res.error({
-      message: ResponseErrorMessage.ServerSideError,
+      code: ResponseErrorCode.ServerSideError,
       debug: { trace: error }
     });
   }

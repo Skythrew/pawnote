@@ -8,7 +8,7 @@ import type { FetchEvent } from "solid-start/server";
 import { json } from "solid-start/server";
 import set_cookie from "set-cookie-parser";
 
-import { ResponseErrorMessage } from "@/types/api";
+import { ResponseErrorCode } from "@/types/errors";
 import { HEADERS_PRONOTE } from "@/utils/constants";
 
 export const handleServerRequest = <T>(callback: (
@@ -25,7 +25,7 @@ export const handleServerRequest = <T>(callback: (
         options = { status: 500 }
       ) => json({
         success: false,
-        message: params.message,
+        code: params.code,
         debug: params.debug
       }, options),
       success: (
@@ -155,15 +155,15 @@ export const checkAvailableENT = async (url: string): Promise<(
  */
 export const extractPronoteSessionFromBody = (body: string): (
   | PronoteApiSession // Actual session.
-  | ResponseErrorMessage // Error message.
+  | ResponseErrorCode // Error message.
   | null // Nothing returned.
 ) => {
   if (body.includes("Votre adresse IP est provisoirement suspendue")) {
-    return ResponseErrorMessage.PronoteBannedIP;
+    return ResponseErrorCode.PronoteBannedIP;
   }
 
   if (body.includes("Le site n'est pas disponible")) {
-    return ResponseErrorMessage.PronoteClosedInstance;
+    return ResponseErrorCode.PronoteClosedInstance;
   }
 
   try {
@@ -227,8 +227,8 @@ export const callPronoteAPI = async <T>(
 
     return { payload, cookies };
   }
-  catch (error) {
-    console.error(`[${function_name}]:`, error);
+  catch {
+    // This is most of the time caused by a network error.
     return null;
   }
 };

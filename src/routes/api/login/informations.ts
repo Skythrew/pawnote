@@ -2,7 +2,7 @@ import type { PronoteApiLoginInformations } from "@/types/pronote";
 import type { ApiLoginInformations } from "@/types/api";
 
 import { PronoteApiFunctions } from "@/types/pronote";
-import { ResponseErrorMessage } from "@/types/api";
+import { ResponseErrorCode } from "@/types/errors";
 
 import {
   extractPronoteSessionFromBody,
@@ -23,7 +23,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
 
   if (!objectHasProperty(body, "pronote_url") || !objectHasProperty(body, "account_type"))
     return res.error({
-      message: ResponseErrorMessage.MissingParameters,
+      code: ResponseErrorCode.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -40,7 +40,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
 
     // Check if the Pronote page has been correctly downloaded.
     if (pronote_page === null) return res.error({
-      message: ResponseErrorMessage.PronotePageDownload,
+      code: ResponseErrorCode.PronotePageDownload,
       debug: {
         pronote_page_url,
         pronote_page
@@ -49,8 +49,8 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
 
     // We extract session from the downloaded Pronote page.
     const session_data = extractPronoteSessionFromBody(pronote_page.body);
-    if (typeof session_data === "string") return res.error({
-      message: session_data,
+    if (typeof session_data === "number") return res.error({
+      code: session_data,
       debug: {
         pronote_page_url,
         pronote_page
@@ -58,7 +58,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
     });
 
     if (session_data === null) return res.error({
-      message: ResponseErrorMessage.SessionReadData,
+      code: ResponseErrorCode.SessionReadData,
       debug: {
         pronote_page_url,
         pronote_page
@@ -81,7 +81,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
 
     const aes_iv = session.encryption.aes.iv;
     if (!aes_iv) return res.error({
-      message: ResponseErrorMessage.NoIVForAESCreated,
+      code: ResponseErrorCode.NoIVForAESCreated,
       debug: {
         pronote_page,
         pronote_page_url,
@@ -112,12 +112,12 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
     });
 
     if (response === null) return res.error({
-      message: ResponseErrorMessage.ServerSideError
+      code: ResponseErrorCode.ServerSideError
     }, { status: 500 });
 
     const received = session.readPronoteFunctionPayload<PronoteApiLoginInformations["response"]>(response.payload);
-    if (typeof received === "string") return res.error({
-      message: received,
+    if (typeof received === "number") return res.error({
+      code: received,
       debug: {
         cookies,
         response,
@@ -139,7 +139,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
   catch (error) {
     console.error("[/api/login/informations]", error);
     return res.error({
-      message: ResponseErrorMessage.ServerSideError,
+      code: ResponseErrorCode.ServerSideError,
       debug: { trace: error }
     });
   }

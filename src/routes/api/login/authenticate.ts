@@ -2,7 +2,7 @@ import type { PronoteApiLoginAuthenticate } from "@/types/pronote";
 import type { ApiLoginAuthenticate } from "@/types/api";
 
 import { PronoteApiFunctions } from "@/types/pronote";
-import { ResponseErrorMessage } from "@/types/api";
+import { ResponseErrorCode } from "@/types/errors";
 
 import {
   handleServerRequest,
@@ -17,7 +17,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
 
   if (!objectHasProperty(body, "session") || !objectHasProperty(body, "solved_challenge"))
     return res.error({
-      message: ResponseErrorMessage.MissingParameters,
+      code: ResponseErrorCode.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -39,12 +39,12 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
     });
 
     if (response === null) return res.error({
-      message: ResponseErrorMessage.NetworkFail
+      code: ResponseErrorCode.NetworkFail
     }, { status: 500 });
 
     const received = session.readPronoteFunctionPayload<PronoteApiLoginAuthenticate["response"]>(response.payload);
-    if (typeof received === "string") return res.error({
-      message: received,
+    if (typeof received === "number") return res.error({
+      code: received,
       debug: {
         response,
         request_payload,
@@ -53,7 +53,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
     }, { status: 400 });
 
     if (!received.donnees.cle) return res.error({
-      message: ResponseErrorMessage.IncorrectCredentials,
+      code: ResponseErrorCode.IncorrectCredentials,
       debug: {
         received,
         request_payload,
@@ -69,7 +69,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
   catch (error) {
     console.error("[/api/login/authenticate]", error);
     return res.error({
-      message: ResponseErrorMessage.ServerSideError,
+      code: ResponseErrorCode.ServerSideError,
       debug: { trace: error }
     });
   }

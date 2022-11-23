@@ -2,7 +2,7 @@ import type { PronoteApiGeolocation } from "@/types/pronote";
 import type { ApiGeolocation } from "@/types/api";
 
 import { GEOLOCATION_API_URL, HEADERS_PRONOTE } from "@/utils/constants";
-import { ResponseErrorMessage } from "@/types/api";
+import { ResponseErrorCode } from "@/types/errors";
 
 import { handleServerRequest } from "@/utils/server";
 import { objectHasProperty } from "@/utils/globals";
@@ -15,7 +15,7 @@ export const POST = handleServerRequest<ApiGeolocation["response"]>(async (req, 
 
   if (!objectHasProperty(body, "latitude") || !objectHasProperty(body, "longitude"))
     return res.error({
-      message: ResponseErrorMessage.MissingParameters,
+      code: ResponseErrorCode.MissingParameters,
       debug: { received_body: body }
     }, { status: 400 });
 
@@ -72,10 +72,9 @@ export const POST = handleServerRequest<ApiGeolocation["response"]>(async (req, 
 
     return res.success(results);
   }
-  catch (error) {
+  catch {
     return res.error({
-      message: ResponseErrorMessage.ServerSideError,
-      debug: { trace: error }
+      code: ResponseErrorCode.NetworkFail
     });
   }
 });
