@@ -22,6 +22,8 @@ import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
 import credentials_store from "@/stores/credentials";
 
+const [visibility, setModalVisibility] = createSignal(false);
+
 const SessionFromScratchModal: Component<{
   pronote_url: string,
   ent_url?: string,
@@ -93,7 +95,7 @@ const SessionFromScratchModal: Component<{
         )
       });
 
-      app.setModal("needs_scratch_session", false);
+      setModalVisibility(false);
 
       if (app.current_user.slug) {
         await saveIntoSlug(app.current_user.slug, data);
@@ -151,12 +153,12 @@ const SessionFromScratchModal: Component<{
     <Portal>
       <Transition
         appear
-        show={app.modal.needs_scratch_session}
+        show={visibility()}
       >
         <Dialog
           isOpen
           class="fixed inset-0 z-10 overflow-y-auto"
-          onClose={() => app.setModal("needs_scratch_session", false)}
+          onClose={() => setModalVisibility(false)}
         >
           <div class="min-h-screen px-4 flex items-center justify-center">
             <TransitionChild
@@ -382,4 +384,7 @@ const SessionFromScratchModal: Component<{
   );
 };
 
-export default SessionFromScratchModal;
+export default {
+  show: () => setModalVisibility(true),
+  Component: SessionFromScratchModal
+};

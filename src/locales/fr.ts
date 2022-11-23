@@ -27,6 +27,26 @@ export const CLIENT_ERRORS = {
   [ClientErrorCode.NetworkFail]: "Une erreur reseau est survenue."
 };
 
+// export const APP_BANNER = {
+//   case AppBannerMessage.Idle:
+//     return "Données à jour.";
+//   case AppBannerMessage.FetchingTimetable:
+//     return "Récupération de l'emploi du temps...";
+//   case AppBannerMessage.FetchingHomeworks:
+//     return "Récupération des devoirs...";
+//   case AppBannerMessage.RestoringSession:
+//     return "Récupération de la session...";
+//   case AppBannerMessage.FetchingRessources:
+//     return "Récupération des ressources pédagogiques...";
+//   case AppBannerMessage.FetchingGrades:
+//     return "Récupération des notes...";
+//   case AppBannerMessage.UnknownError:
+//     return "Une erreur inconnue est survenue.";
+//   case AppBannerMessage.NeedCredentials:
+//     return "Session expirée, entrez vos identifiants.";
+//   }
+// }
+
 export default {
   API_ERRORS,
   CLIENT_ERRORS

@@ -2,7 +2,6 @@ import type { Component } from "solid-js";
 import type { ApiLoginInformations, ApiUserData } from "@/types/api";
 
 import { A } from "solid-start";
-import { appBannerMessageToString } from "@/i18n";
 
 import app, { AppBannerMessage } from "@/stores/app";
 import endpoints from "@/stores/endpoints";
@@ -30,9 +29,9 @@ const AppLayout: Component = () => {
 
     console.groupCollapsed("initialization");
 
-    app.setBannerMessage({
-      message: AppBannerMessage.RestoringSession,
-      is_loader: true
+    app.setCurrentState({
+      code: AppBannerMessage.RestoringSession,
+      fetching: true
     });
 
     const session = await sessions.get(slug());
@@ -69,7 +68,7 @@ const AppLayout: Component = () => {
         }
       });
 
-      app.setBannerToIdle();
+      app.setStateToIdle();
 
       console.info("[debug]: defined `app.current_user`");
       console.groupEnd();
@@ -104,18 +103,16 @@ const AppLayout: Component = () => {
             </A>
 
           </nav>
-          <Show when={app.banner_message.message !== AppBannerMessage.Idle}>
-            <div class="flex items-center justify-center px-2 h-8 bg-brand-white">
-              <p class="text-center text-sm">{appBannerMessageToString(app.banner_message.message)}</p>
-            </div>
-          </Show>
+          <div class="flex items-center justify-center px-2 h-8 bg-brand-white">
+            <p class="text-center text-sm">{app.current_state.code}</p>
+          </div>
         </header>
 
         <main class="mt-26 pt-4">
           <Outlet />
         </main>
 
-        <SessionFromScratchModal
+        <SessionFromScratchModal.Component
           pronote_url={user().session?.instance.pronote_url as string}
           ent_url={user().session?.instance.ent_url ?? undefined}
         />
@@ -125,4 +122,3 @@ const AppLayout: Component = () => {
 };
 
 export default AppLayout;
-

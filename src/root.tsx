@@ -17,6 +17,7 @@ import {
 } from "solid-start";
 
 import settings from "@/stores/settings";
+import { Provider as LocalesProvider } from "@/locales";
 
 export default function Root () {
   createEffect(() => {
@@ -55,26 +56,30 @@ export default function Root () {
         {/* <Meta property="twitter:image" content="/banner.png" /> */}
       </Head>
       <Body>
-        <Suspense fallback={
-          <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">
-            <h2 class="font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white">Chargement de Pornote...</h2>
-            <span class="text-brand-light text-sm font-medium">v{APP_VERSION} - BETA</span>
-          </div>
-        }>
-          <ErrorBoundary fallback={(error, reset) => (
+        <LocalesProvider>
+
+          <Suspense fallback={
             <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">
-              <h2 class="font-medium text-xl text-brand-white">Une erreur critique est survenue!</h2>
-              <button class="rounded-full px-4 py-1 bg-brand-light" onClick={reset}>
-                  Redémarrer
-              </button>
-              <pre class="text-sm opacity-60">{error}</pre>
+              <h2 class="font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white">Chargement de Pornote...</h2>
+              <span class="text-brand-light text-sm font-medium">v{APP_VERSION} - BETA</span>
             </div>
-          )}>
-            <Routes>
-              <FileRoutes />
-            </Routes>
-          </ErrorBoundary>
-        </Suspense>
+          }>
+            <ErrorBoundary fallback={(error, reset) => (
+              <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">
+                <h2 class="font-medium text-xl text-brand-white">Une erreur critique est survenue!</h2>
+                <button class="rounded-full px-4 py-1 bg-brand-light" onClick={reset}>
+                  Redémarrer
+                </button>
+                <pre class="text-sm opacity-60">{error}</pre>
+              </div>
+            )}>
+              <Routes>
+                <FileRoutes />
+              </Routes>
+            </ErrorBoundary>
+          </Suspense>
+        </LocalesProvider>
+
         <Scripts />
       </Body>
     </Html>

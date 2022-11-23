@@ -1,11 +1,10 @@
 import type { Component } from "solid-js";
 
 import {
-  callUserHomeworksAPI,
   getCurrentWeekNumber,
-
   getDayNameFromDayNumber,
 
+  callUserHomeworksAPI,
   parseHomeworks
 } from "@/utils/client";
 

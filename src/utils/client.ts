@@ -19,12 +19,22 @@ import type {
 import { aes, capitalizeFirstLetter, credentials as credentials_utility } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
-import { PronoteApiAccountId, PronoteApiOnglets, PronoteApiUserData, PronoteApiUserHomeworks, PronoteApiUserTimetable, PronoteApiUserTimetableContentType } from "@/types/pronote";
+import {
+  type PronoteApiUserData,
+  type PronoteApiUserHomeworks,
+  type PronoteApiUserTimetable,
+
+  PronoteApiUserTimetableContentType,
+  PronoteApiAccountId,
+  PronoteApiOnglets
+} from "@/types/pronote";
 
 import {
   ResponseErrorCode,
   ClientErrorCode
 } from "@/types/errors";
+
+import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
 import app, { AppBannerMessage } from "@/stores/app";
 import credentials from "@/stores/credentials";
@@ -37,6 +47,7 @@ import dayjs from "dayjs";
 
 import dayjsCustomDuration from "dayjs/plugin/duration";
 import dayjsCustomParse from "dayjs/plugin/customParseFormat";
+
 dayjs.extend(dayjsCustomParse);
 dayjs.extend(dayjsCustomDuration);
 
@@ -105,11 +116,6 @@ export const callAPI = async <Api extends {
     if (response.code === ResponseErrorCode.SessionExpired) {
       if (user.slug) {
         const old_session = user.session;
-
-        app.setBannerMessage({
-          message: AppBannerMessage.RestoringSession,
-          is_loader: true
-        });
 
         // When the session expired while connected to a user.
         try {
@@ -182,13 +188,7 @@ export const callAPI = async <Api extends {
         catch (error) {
           // Ask for new credentials.
           // User can choose if they'll be saved or not.
-          app.setBannerMessage({
-            is_error: true,
-            is_loader: false,
-            message: AppBannerMessage.NeedCredentials
-          });
-
-          app.setModal("needs_scratch_session", true);
+          SessionFromScratchModal.show();
           throw error;
         }
       }
@@ -200,11 +200,6 @@ export const callAPI = async <Api extends {
         });
       }
     }
-
-    app.setBannerMessage({
-      is_error: true,
-      message: AppBannerMessage.UnknownError
-    });
 
     throw new ApiError(response);
   }
@@ -221,7 +216,6 @@ export const callAPI = async <Api extends {
     typed_response.received && await endpoints.upsert(user.slug, path(), typed_response.received);
   }
 
-  app.setBannerToIdle();
   return response.data;
 };
 
@@ -503,24 +497,16 @@ export const callUserTimetableAPI = async (week: number) => {
   const local_response = await endpoints.get<ApiUserTimetable>(user.slug, endpoint);
   if (local_response && !local_response.expired) return local_response;
 
-  try {
+  app.enqueue_fetch(AppBannerMessage.FetchingTimetable, async () => {
     console.info("[timetable] renew");
 
-    app.setBannerMessage({
-      message: AppBannerMessage.FetchingTimetable,
-      is_loader: true
-    });
-
-    const data = await callAPI<ApiUserTimetable>(endpoint, () => ({
+    await callAPI<ApiUserTimetable>(endpoint, () => ({
       ressource: user.endpoints["/user/data"].donnees.ressource,
       session: user.session
     }));
+  });
 
-    return data.received;
-  }
-  catch {
-    return local_response?.data;
-  }
+  return local_response?.data;
 };
 
 export interface TimetableLesson {
@@ -683,23 +669,15 @@ export const callUserHomeworksAPI = async (week: number) => {
   const local_response = await endpoints.get<ApiUserHomeworks>(user.slug, endpoint);
   if (local_response && !local_response.expired) return local_response;
 
-  try {
+  app.enqueue_fetch(AppBannerMessage.FetchingHomeworks, async () => {
     console.info("[homeworks] renew");
 
-    app.setBannerMessage({
-      message: AppBannerMessage.FetchingHomeworks,
-      is_loader: true
-    });
-
-    const data = await callAPI<ApiUserHomeworks>(endpoint, () => ({
+    await callAPI<ApiUserHomeworks>(endpoint, () => ({
       session: user.session
     }));
+  });
 
-    return data.received;
-  }
-  catch {
-    return local_response?.data;
-  }
+  return local_response?.data;
 };
 
 /**
@@ -742,23 +720,15 @@ export const callUserRessourcesAPI = async (week: number) => {
   const local_response = await endpoints.get<ApiUserRessources>(user.slug, endpoint);
   if (local_response && !local_response.expired) return local_response;
 
-  try {
+  app.enqueue_fetch(AppBannerMessage.FetchingRessources, async () => {
     console.info("[ressources]: renew");
 
-    app.setBannerMessage({
-      message: AppBannerMessage.FetchingRessources,
-      is_loader: true
-    });
-
-    const data = await callAPI<ApiUserRessources>(endpoint, () => ({
+    await callAPI<ApiUserRessources>(endpoint, () => ({
       session: user.session
     }));
+  });
 
-    return data.received;
-  }
-  catch {
-    return local_response?.data;
-  }
+  return local_response?.data;
 };
 
 export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
@@ -825,24 +795,16 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
   const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint());
   if (local_response && !local_response.expired) return local_response;
 
-  try {
-    console.info("[debug][grades]: renew");
+  app.enqueue_fetch(AppBannerMessage.FetchingGrades, async () => {
+    console.info("[grades]: renew");
 
-    app.setBannerMessage({
-      message: AppBannerMessage.FetchingGrades,
-      is_loader: true
-    });
-
-    const data = await callAPI<ApiUserGrades>(endpoint, () => ({
+    await callAPI<ApiUserGrades>(endpoint, () => ({
       session: user.session,
       period: period()
     }));
+  });
 
-    return data.received;
-  }
-  catch {
-    return local_response?.data;
-  }
+  return local_response?.data;
 };
 
 export const getDayNameFromDayNumber = (day_number: string | number) => {

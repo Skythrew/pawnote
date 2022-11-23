@@ -1,6 +1,16 @@
-import type { Component, Accessor } from "solid-js";
-import { type TimetableLesson, getTimeFormattedDiff, callUserGradesAPI, getCurrentPeriod } from "@/utils/client";
+import type { Component } from "solid-js";
 import type { ApiUserGrades } from "@/types/api";
+
+import {
+  type TimetableLesson,
+
+  getTimeFormattedDiff,
+  getCurrentPeriod,
+
+  callUserGradesAPI
+} from "@/utils/client";
+
+
 import { PronoteApiOnglets } from "@/types/pronote";
 
 import app from "@/stores/app";

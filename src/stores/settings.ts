@@ -1,5 +1,3 @@
-// import localforage from "localforage";
-
 /** Helper to get the mode stored in localStorage. */
 const localStorageGlobalThemeMode = () => {
   if (isServer) return "light";

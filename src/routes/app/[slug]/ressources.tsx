@@ -1,5 +1,4 @@
 import type { Component } from "solid-js";
-import type { ApiUserRessources } from "@/types/api";
 
 import {
   callUserRessourcesAPI,
@@ -8,15 +7,13 @@ import {
 
 const AppRessources: Component = () => {
   const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
-  const [weekRessources, setWeekRessources] = createSignal<ApiUserRessources["response"]["received"] | null>(null);
 
-  /**
-   * Reload the ressources depending
-   * on the week number.
-   */
-  createEffect(on(weekNumber, async (week_number) => {
-    const data = await callUserRessourcesAPI(week_number);
-    setWeekRessources(data);
+  /** Renew the ressources when needed. */
+  createEffect(on(weekNumber, async (week) => {
+    console.groupCollapsed(`Week ${week}`);
+    onCleanup(() => console.groupEnd());
+
+    await callUserRessourcesAPI(week);
   }));
 
   return (
