@@ -1,6 +1,9 @@
-import { ResponseErrorCode, ClientErrorCode } from "@/types/errors";
+import type { Language } from ".";
 
-export const API_ERRORS = {
+import { ResponseErrorCode, ClientErrorCode } from "@/types/errors";
+import { AppStateCode } from "@/stores/app";
+
+export const API_ERRORS: Language["API_ERRORS"] = {
   [ResponseErrorCode.SessionExpired]: "The session was expired. Restore the session and try again.",
   [ResponseErrorCode.RequestPayloadBroken]: "A mistake was made in the request payload.",
   [ResponseErrorCode.UserUnavailable]: "User is not into the session.",
@@ -22,12 +25,34 @@ export const API_ERRORS = {
   [ResponseErrorCode.OngletUnauthorized]: "User is not authorized to access this onglet."
 };
 
-export const CLIENT_ERRORS = {
+export const CLIENT_ERRORS: Language["CLIENT_ERRORS"] = {
   [ClientErrorCode.SessionCantRestore]: "Can't restore the session, please enter your credentials again.",
   [ClientErrorCode.NetworkFail]: "A network error happened, please retry."
 };
 
+export const APP_STATE: Language["APP_STATE"] = {
+  [AppStateCode.Idle]: "Viewing data from {{date}}",
+  [AppStateCode.FetchingGrades]: "Refreshing grades",
+  [AppStateCode.FetchingHomeworks]: "Refreshing homeworks",
+  [AppStateCode.FetchingRessources]: "Refreshing ressources",
+  [AppStateCode.FetchingTimetable]: "Refreshing timetable"
+};
+
+export const PAGES: Language["PAGES"] = {
+  INDEX: {
+    dark: "Dark",
+    light: "Light",
+    description: "Unofficial client for Pronote.",
+    link_account: "Link a Pronote account!",
+    link_new_account: "Link another Pronote account",
+    loading_accounts: "Loading accounts..."
+  }
+};
+
 export default {
+  PAGES,
+  APP_STATE,
   API_ERRORS,
   CLIENT_ERRORS
-};
+} as Language;
+

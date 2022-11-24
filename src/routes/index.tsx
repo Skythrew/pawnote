@@ -3,6 +3,14 @@ import type { ApiUserData } from "@/types/api";
 
 import { A } from "solid-start";
 
+import {
+  type languages,
+  fullNameLanguages,
+
+  useLocale,
+  switchLanguage
+} from "@/locales";
+
 import settings from "@/stores/settings";
 import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
@@ -14,6 +22,7 @@ interface AvailableSession {
 }
 
 const RootHomePage: Component = () => {
+  const [t, { locale }] = useLocale();
   const [availableSessions, setAvailableSessions] = createSignal<AvailableSession[] | null>(null);
 
   onMount(async () => {
@@ -38,20 +47,29 @@ const RootHomePage: Component = () => {
       <header class="w-full flex flex-col items-center justify-start md:justify-between md:flex-row">
         <div class="flex flex-col items-center md:items-start">
           <h1 class="font-bold text-3xl dark:text-brand-primary">{APP_NAME}</h1>
-          <p class="text-lg text-brand-light mb-4">Client Pronote non-officiel.</p>
+          <p class="text-lg text-brand-light mb-4">{t("PAGES.INDEX.description")}</p>
         </div>
-        <button class="rounded-md py-1 px-3 flex border-2 bg-brand-dark border-brand-dark dark:border-brand-white dark:bg-brand-dark dark:hover:border-brand-primary dark:hover:bg-brand-primary dark:text-brand-white items-center gap-2 transition-colors" onClick={settings.toggleGlobalThemeMode}>
-          {settings.globalThemeMode() === "dark"
-            ? <><IconRiMoonClearLine /> Sombre</>
-            : <><IconRiSunLine /> Clair</>
-          }
-        </button>
+
+        <div class="flex gap-2">
+          <select class="rounded-md py-1 px-3 flex border-2 bg-brand-dark border-brand-dark dark:border-brand-white dark:bg-brand-dark dark:hover:border-brand-primary dark:hover:bg-brand-primary dark:text-brand-white items-center gap-2 transition-colors" onChange={(event) => switchLanguage(event.currentTarget.value as keyof typeof languages)}>
+            <For each={Object.keys(fullNameLanguages)}>
+              {lang_name => <option  selected={fullNameLanguages[lang_name] === locale()} value={fullNameLanguages[lang_name]}>{lang_name}</option>}
+            </For>
+          </select>
+          <button class="rounded-md py-1 px-3 flex border-2 bg-brand-dark border-brand-dark dark:border-brand-white dark:bg-brand-dark dark:hover:border-brand-primary dark:hover:bg-brand-primary dark:text-brand-white items-center gap-2 transition-colors" onClick={settings.toggleGlobalThemeMode}>
+            {settings.globalThemeMode() === "dark"
+              ? <><IconRiMoonClearLine /> {t("PAGES.INDEX.dark")}</>
+              : <><IconRiSunLine /> {t("PAGES.INDEX.light")}</>
+            }
+          </button>
+        </div>
+
       </header>
       <section class="w-full flex flex-col gap-4 items-center justify-center px-4">
         <Show keyed
           when={availableSessions()}
           fallback={
-            <p class="bg-brand-white text-brand-primary rounded-full px-4 py-1 dark:bg-brand-primary dark:text-brand-light">Chargement des comptes...</p>
+            <p class="bg-brand-white text-brand-primary rounded-full px-4 py-1 dark:bg-brand-primary dark:text-brand-light">{t("PAGES.INDEX.loading_accounts")}</p>
           }
         >
           {sessions => (
@@ -59,7 +77,7 @@ const RootHomePage: Component = () => {
               when={sessions.length > 0}
               fallback={
                 <A href="/link" class="text-center font-medium px-4 py-2 rounded-full dark:bg-brand-primary dark:bg-opacity-20 dark:border-2 dark:border-brand-primary bg-brand-light text-brand-primary dark:text-brand-light border-2 border-brand-primary">
-                  Associer un compte Pronote !
+                  {t("PAGES.INDEX.link_account")}
                 </A>
               }
             >
@@ -80,7 +98,7 @@ const RootHomePage: Component = () => {
                 )}
               </For>
               <A href="/link">
-                Ajouter un autre compte Pronote
+                {t("PAGES.INDEX.link_new_account")}
               </A>
             </Show>
           )}

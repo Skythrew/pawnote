@@ -36,7 +36,7 @@ import {
 
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
-import app, { AppBannerMessage } from "@/stores/app";
+import app, { AppStateCode } from "@/stores/app";
 import credentials from "@/stores/credentials";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
@@ -508,7 +508,7 @@ export const callUserTimetableAPI = async (week: number) => {
   const local_response = await endpoints.get<ApiUserTimetable>(user.slug, endpoint);
   if (local_response && !local_response.expired) return local_response;
 
-  app.enqueue_fetch(AppBannerMessage.FetchingTimetable, async () => {
+  app.enqueue_fetch(AppStateCode.FetchingTimetable, async () => {
     console.info("[timetable] renew");
 
     await callAPI<ApiUserTimetable>(endpoint, () => ({
@@ -680,7 +680,7 @@ export const callUserHomeworksAPI = async (week: number) => {
   const local_response = await endpoints.get<ApiUserHomeworks>(user.slug, endpoint);
   if (local_response && !local_response.expired) return local_response;
 
-  app.enqueue_fetch(AppBannerMessage.FetchingHomeworks, async () => {
+  app.enqueue_fetch(AppStateCode.FetchingHomeworks, async () => {
     console.info("[homeworks] renew");
 
     await callAPI<ApiUserHomeworks>(endpoint, () => ({
@@ -731,7 +731,7 @@ export const callUserRessourcesAPI = async (week: number) => {
   const local_response = await endpoints.get<ApiUserRessources>(user.slug, endpoint);
   if (local_response && !local_response.expired) return local_response;
 
-  app.enqueue_fetch(AppBannerMessage.FetchingRessources, async () => {
+  app.enqueue_fetch(AppStateCode.FetchingRessources, async () => {
     console.info("[ressources]: renew");
 
     await callAPI<ApiUserRessources>(endpoint, () => ({
@@ -806,7 +806,7 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
   const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint());
   if (local_response && !local_response.expired) return local_response;
 
-  app.enqueue_fetch(AppBannerMessage.FetchingGrades, async () => {
+  app.enqueue_fetch(AppStateCode.FetchingGrades, async () => {
     console.info("[grades]: renew");
 
     await callAPI<ApiUserGrades>(endpoint, () => ({

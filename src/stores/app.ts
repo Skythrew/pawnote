@@ -47,23 +47,20 @@ const cleanCurrentUser = () => setCurrentUser({
 });
 
 /// Message that we use to show in the UI.
-export enum AppBannerMessage {
+export enum AppStateCode {
   Idle,
-  RestoringSession,
   FetchingTimetable,
   FetchingHomeworks,
   FetchingRessources,
-  FetchingGrades,
-  NeedCredentials,
-  UnknownError
+  FetchingGrades
 }
 
 const [current_state, setCurrentState] = createStore<{
   fetching: boolean;
-  code: AppBannerMessage
+  code: AppStateCode
 }>({
   fetching: false,
-  code: AppBannerMessage.Idle
+  code: AppStateCode.Idle
 });
 
 const fetch_queue: {
@@ -72,7 +69,7 @@ const fetch_queue: {
   action: () => unknown;
 }[] = [];
 
-const enqueue_fetch = (code: AppBannerMessage, action: () => unknown) => {
+const enqueue_fetch = (code: AppStateCode, action: () => unknown) => {
   return new Promise((resolve, reject) => {
     fetch_queue.push({
       resolve, reject, action: async () => {
@@ -113,7 +110,7 @@ const dequeue_fetch = async () => {
 /** Helper function to reset the state of the banner. */
 const setStateToIdle = () => setCurrentState({
   fetching: false,
-  code: AppBannerMessage.Idle
+  code: AppStateCode.Idle
 });
 
 export default {
