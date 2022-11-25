@@ -1,34 +1,38 @@
 import type { Component } from "solid-js";
-import type { ApiUserGrades } from "@/types/api";
-
 import { PronoteApiOnglets } from "@/types/pronote";
-import app from "@/stores/app";
 
 import {
   getDefaultPeriodOnglet,
   callUserGradesAPI
 } from "@/utils/client";
 
+import app from "@/stores/app";
+
 const AppGrades: Component = () => {
+  onMount(() => console.groupCollapsed("grades"));
+  onCleanup(() => console.groupEnd());
+
   const [period, setPeriod] = createSignal(getDefaultPeriodOnglet(PronoteApiOnglets.Grades));
-  const [periodGrades, setPeriodGrades] = createSignal<ApiUserGrades["response"]["received"] | null>(null);
 
   const periods = () => app.current_user?.endpoints?.["/user/data"].donnees.ressource.listeOngletsPourPeriodes.V.find(
     onglet => onglet.G === PronoteApiOnglets.Grades
   )?.listePeriodes.V;
 
-  /**
-   * Reload the homeworks depending
-   * on the week number.
-   */
-  createEffect(on(period, async (period) => {
-    const data = await callUserGradesAPI(period);
-    setPeriodGrades(data);
+  const endpoint = () => app.current_user.endpoints?.[`/user/grades/${period().N}`];
+
+  /** Renew the grades when needed. */
+  createEffect(on(period, async () => {
+    console.groupCollapsed(`Period ${period()}`);
+    onCleanup(() => console.groupEnd());
+
+    await callUserGradesAPI(period);
   }));
 
+  const grades = () => endpoint() ? endpoint()!.donnees : null;
+
   return (
-    <div>
-      <h2>Notes de la période {period().L} !</h2>
+    <div class="flex flex-col items-center gap-2">
+      <h2>Devoirs du {period().N}</h2>
 
       <select onChange={(event) => {
         const period = periods()?.find(period => period.N === event.currentTarget.value);
@@ -43,9 +47,13 @@ const AppGrades: Component = () => {
         </For>
       </select>
 
-      <Show keyed when={periodGrades()}>
+      <Show keyed when={grades()}
+        fallback={
+          <p>Les notes n'ont pas encore été récupérées</p>
+        }
+      >
         {grades => (
-          <pre>{JSON.stringify(grades.donnees, null, 2)}</pre>
+          <pre>{JSON.stringify(grades, null, 2)}</pre>
         )}
       </Show>
     </div>

@@ -2,14 +2,16 @@ import type { Component } from "solid-js";
 import type { ApiLoginInformations, ApiUserData } from "@/types/api";
 
 import { A } from "solid-start";
+import { useLocale } from "@/locales";
 
-import app, { AppBannerMessage } from "@/stores/app";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
+import app, { AppStateCode } from "@/stores/app";
 
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
 const AppLayout: Component = () => {
+  const [t] = useLocale();
   const navigate = useNavigate();
 
   const params = useParams();
@@ -28,11 +30,6 @@ const AppLayout: Component = () => {
     });
 
     console.groupCollapsed("initialization");
-
-    app.setCurrentState({
-      code: AppBannerMessage.RestoringSession,
-      fetching: true
-    });
 
     const session = await sessions.get(slug());
     if (session === null) {
@@ -68,8 +65,6 @@ const AppLayout: Component = () => {
         }
       });
 
-      app.setStateToIdle();
-
       console.info("[debug]: defined `app.current_user`");
       console.groupEnd();
     });
@@ -101,11 +96,15 @@ const AppLayout: Component = () => {
                 </div>
               </div>
             </A>
-
           </nav>
-          <div class="flex items-center justify-center px-2 h-8 bg-brand-white">
-            <p class="text-center text-sm">{app.current_state.code}</p>
-          </div>
+
+          <Show keyed when={app.current_state.code !== AppStateCode.Idle && app.current_state.code}>
+            {code => (
+              <div class="flex items-center justify-center px-2 h-8 bg-brand-white">
+                <p class="text-center text-sm">{t(`APP_STATE.${code}`)}</p>
+              </div>
+            )}
+          </Show>
         </header>
 
         <main class="mt-26 pt-4">
@@ -122,3 +121,4 @@ const AppLayout: Component = () => {
 };
 
 export default AppLayout;
+

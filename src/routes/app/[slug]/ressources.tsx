@@ -1,12 +1,19 @@
 import type { Component } from "solid-js";
 
 import {
-  callUserRessourcesAPI,
-  getCurrentWeekNumber
+  getCurrentWeekNumber,
+  callUserRessourcesAPI
 } from "@/utils/client";
 
+import app from "@/stores/app";
+
 const AppRessources: Component = () => {
+  onMount(() => console.groupCollapsed("ressources"));
+  onCleanup(() => console.groupEnd());
+
   const [weekNumber, setWeekNumber] = createSignal(getCurrentWeekNumber());
+
+  const endpoint = () => app.current_user.endpoints?.[`/user/ressources/${weekNumber()}`];
 
   /** Renew the ressources when needed. */
   createEffect(on(weekNumber, async (week) => {
@@ -16,16 +23,35 @@ const AppRessources: Component = () => {
     await callUserRessourcesAPI(week);
   }));
 
+  const ressources = () => endpoint() ? endpoint()!.donnees : null;
+
   return (
-    <div>
-      <h2>Devoirs de la semaine {weekNumber()} !</h2>
+    <div class="flex flex-col items-center gap-2">
+      <h2>Ressources de la semaine {weekNumber()}</h2>
+      <div class="flex gap-2 justify-center items-center">
+        <button
+          class="px-4 py-1 rounded-full bg-brand-light flex"
+          onClick={() => setWeekNumber(prev => prev - 1)}
+        >
+          <IconMdiArrowLeft />
+        </button>
+        <button
+          class="px-4 py-1 rounded-full bg-brand-light flex"
+          onClick={() => setWeekNumber(prev => prev + 1)}
+        >
+          <IconMdiArrowRight />
+        </button>
+      </div>
 
-      <button onClick={() => setWeekNumber(prev => prev - 1)}>Avant</button>
-      <button onClick={() => setWeekNumber(prev => prev + 1)}>Après</button>
-
-      <Show keyed when={weekRessources()}>
+      <Show keyed when={ressources()}
+        fallback={
+          <div>
+            <p>Les ressources sont en cours de récupération...</p>
+          </div>
+        }
+      >
         {ressources => (
-          <pre>{JSON.stringify(ressources.donnees, null, 2)}</pre>
+          <pre>{JSON.stringify(ressources, null, 2)}</pre>
         )}
       </Show>
     </div>

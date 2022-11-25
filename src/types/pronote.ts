@@ -471,7 +471,7 @@ export interface PronoteApiLoginInformations {
 
         afficherSequences: boolean;
 
-        /** Pronote own Epoch (?) */
+        /** Pronote's Epoch (?) */
         PremiereHeure: {
           _T: 7;
           V: string;
@@ -486,7 +486,6 @@ export interface PronoteApiLoginInformations {
             /** Hour. */
             L: string;
 
-            /** Absolute hour (eg.: `11h30 => false`) ? */
             A?: boolean;
           }[];
         };
@@ -500,7 +499,6 @@ export interface PronoteApiLoginInformations {
             /** Hour. */
             L: string;
 
-            /** Absolute hour (eg.: `11h30 => false`) ? */
             A?: boolean;
           }[];
         };
@@ -510,7 +508,8 @@ export interface PronoteApiLoginInformations {
         ListePeriodes: {
           /** Name of the period. */
           L: string;
-          N: string; // ID ?
+          /** ID of the period. */
+          N: string;
           G: number;
 
           periodeNotation: number;
@@ -721,6 +720,7 @@ export interface PronoteApiUserData {
               V: {
                 /** Name of the period. */
                 L: string;
+                /** ID of the period. */
                 N: string;
 
                 G: number;

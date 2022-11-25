@@ -1,4 +1,4 @@
-import type { Component } from "solid-js";
+import type { Accessor, Component } from "solid-js";
 import type { ApiUserGrades } from "@/types/api";
 
 import {
@@ -94,11 +94,11 @@ const AppHome: Component = () => {
     : null;
 
   // Call to renew the API when the user data has changed.
-  createEffect(on(gradesCurrentPeriod, async (period) => {
-    if (!period) return;
+  createEffect(on(gradesCurrentPeriod, async () => {
+    if (!gradesCurrentPeriod()) return;
 
-    console.info(`-> Grades Period: ${period.N}`);
-    await callUserGradesAPI(() => period as unknown as ApiUserGrades["request"]["period"]);
+    console.info(`-> Grades Period: ${gradesCurrentPeriod()!.N}`);
+    await callUserGradesAPI(gradesCurrentPeriod as unknown as Accessor<ApiUserGrades["request"]["period"]>);
   }));
 
   return (
