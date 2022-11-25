@@ -65,7 +65,7 @@ const RootHomePage: Component = () => {
         </div>
 
       </header>
-      <section class="w-full flex flex-col gap-4 items-center justify-center px-4">
+      <section class="w-full flex flex-col gap-4 items-center justify-center px-4 max-w-md mx-auto">
         <Show keyed
           when={availableSessions()}
           fallback={
