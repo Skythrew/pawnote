@@ -25,8 +25,6 @@ import {
   ApiError
 } from "@/utils/client";
 
-import app from "@/stores/app";
-
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
 const LinkPronoteAccount: Component = () => {
@@ -124,7 +122,7 @@ const LinkPronoteAccount: Component = () => {
           instance_data: response
         });
 
-        app.setModal("needs_scratch_session", true);
+        SessionFromScratchModal.show();
       });
     }
     catch (err) {
@@ -315,7 +313,7 @@ const LinkPronoteAccount: Component = () => {
         </form>
 
         <Show when={state.instance_data} keyed>
-          {instance => <SessionFromScratchModal
+          {instance => <SessionFromScratchModal.Component
             available_accounts={instance.received.donnees.espaces.V}
             pronote_url={instance.pronote_url}
             ent_url={instance.ent_url}

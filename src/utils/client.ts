@@ -414,29 +414,36 @@ export const connectToPronote = async (options: {
     key: challengeAesKeyBuffer
   });
 
-  const challengeDecrypted = forge.util.decodeUtf8(challengeDecryptedBytes);
+  let resolved_challenge: string | undefined;
 
-  /// Resolving the challenge - Part 2.
-  /// Modifying the plain text by removing every second character.
+  try {
+    /// Resolving the challenge - Part 2.
+    /// Modifying the plain text by removing every second character.
 
-  const challengeDecryptedUnscrambled = new Array(challengeDecrypted.length);
-  for (let i = 0; i < challengeDecrypted.length; i += 1) {
-    if (i % 2 === 0) {
-      challengeDecryptedUnscrambled.push(challengeDecrypted.charAt(i));
+    const challengeDecrypted = forge.util.decodeUtf8(challengeDecryptedBytes);
+
+    const challengeDecryptedUnscrambled = new Array(challengeDecrypted.length);
+    for (let i = 0; i < challengeDecrypted.length; i += 1) {
+      if (i % 2 === 0) {
+        challengeDecryptedUnscrambled.push(challengeDecrypted.charAt(i));
+      }
     }
+
+    /// Resolving the challenge - Part 3.
+    /// Encrypting the modified text back with AES and encoding it as hex.
+    resolved_challenge = aes.encrypt(challengeDecryptedUnscrambled.join(""), {
+      iv: aesIvBuffer,
+      key: challengeAesKeyBuffer
+    });
+
   }
-
-  /// Resolving the challenge - Part 3.
-  /// Encrypting the modified text back with AES and encoding it as hex.
-
-  const challengeEncrypted = aes.encrypt(challengeDecryptedUnscrambled.join(""), {
-    iv: aesIvBuffer,
-    key: challengeAesKeyBuffer
-  });
+  catch {
+    throw new ApiError({ code: ResponseErrorCode.IncorrectCredentials });
+  }
 
   // Send the resolved challenge.
   const authenticate_response = await callAPI<ApiLoginAuthenticate>("/login/authenticate", () => ({
-    solved_challenge: challengeEncrypted,
+    solved_challenge: resolved_challenge!,
     session: identify_response.session,
     cookies: pronote_cookies
   }), { prevent_cache : true });
