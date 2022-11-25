@@ -31,7 +31,6 @@ export const CLIENT_ERRORS: Language["CLIENT_ERRORS"] = {
 };
 
 export const APP_STATE: Language["APP_STATE"] = {
-  [AppStateCode.Idle]: "Viewing data from {{date}}",
   [AppStateCode.FetchingGrades]: "Refreshing grades",
   [AppStateCode.FetchingHomeworks]: "Refreshing homeworks",
   [AppStateCode.FetchingRessources]: "Refreshing ressources",

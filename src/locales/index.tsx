@@ -28,6 +28,10 @@ export const Provider: FlowComponent = (props) => (
   </I18nContext.Provider>
 );
 
+/**
+ * Helper function to switch current locale easily.
+ * It also implements the lazy loading when needed.
+ */
 export const switchLanguage = async (lang: keyof typeof languages) => {
   const [, { add, locale }] = context;
 
@@ -46,16 +50,17 @@ export const switchLanguage = async (lang: keyof typeof languages) => {
   locale(lang);
 };
 
-// Add typings for the `template` function.
+// Helpers typings.
 type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`
 type DotNestedKeys<T> = (T extends object ?
     { [K in Exclude<keyof T, symbol>]: `${K}${DotPrefix<DotNestedKeys<T[K]>>}` }[Exclude<keyof T, symbol>]
     : "") extends infer D ? Extract<D, string> : never;
 
+// Language interface to type check locales.
 export interface Language {
   API_ERRORS: Record<ResponseErrorCode, string>;
   CLIENT_ERRORS: Record<ClientErrorCode, string>;
-  APP_STATE: Record<AppStateCode, string>;
+  APP_STATE: Omit<Record<AppStateCode, string>, AppStateCode.Idle>;
   PAGES: {
     INDEX: Record<
       | "dark"
@@ -68,9 +73,12 @@ export interface Language {
   }
 }
 
-export const useLocale: () => [template: (key: DotNestedKeys<Language>, params?: Record<string, string>, defaultValue?: string) => string, actions: {
+// We re-export the `useI18n` function with typings support.
+export const useLocale: () => [
+  template: (key: DotNestedKeys<Language>, params?: Record<string, string>, defaultValue?: string) => string,
+  actions: {
     add(lang: string, table: Language): void;
     locale: (lang?: string) => string;
     dict: (lang: string) => Record<string, Record<string, unknown>>;
-}] = useI18n;
-
+  }
+] = useI18n;
