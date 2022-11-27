@@ -17,7 +17,7 @@ import {
 } from "@/utils/server";
 
 export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res) => {
-  const body = await req.json() as ApiInstance["request"];
+  const body = await req.raw.json() as ApiInstance["request"];
 
   if (!objectHasProperty(body, "pronote_url"))
     return res.error({

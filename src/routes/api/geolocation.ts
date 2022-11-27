@@ -11,7 +11,7 @@ import haversine from "haversine-distance";
 import { decode } from "html-entities";
 
 export const POST = handleServerRequest<ApiGeolocation["response"]>(async (req, res) => {
-  const body = await req.json() as ApiGeolocation["request"];
+  const body = await req.raw.json() as ApiGeolocation["request"];
 
   if (!objectHasProperty(body, "latitude") || !objectHasProperty(body, "longitude"))
     return res.error({

@@ -18,7 +18,7 @@ import Session from "@/utils/session";
 import forge from "node-forge";
 
 export const POST = handleServerRequest<ApiLoginInformations["response"]>(async (req, res) => {
-  const body = await req.json() as ApiLoginInformations["request"];
+  const body = await req.raw.json() as ApiLoginInformations["request"];
 
   if (!objectHasProperty(body, "pronote_url") || !objectHasProperty(body, "account_type"))
     return res.error({

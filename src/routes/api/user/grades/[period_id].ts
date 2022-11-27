@@ -13,8 +13,8 @@ import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
 export const POST = handleServerRequest<ApiUserGrades["response"]>(async (req, res) => {
-  const body = await req.json() as ApiUserGrades["request"];
-  const period_id = new URL(req.url).pathname.split("/").pop() as string;
+  const body = await req.raw.json() as ApiUserGrades["request"];
+  const period_id = req.params.period_id as string | undefined;
 
   if (!objectHasProperty(body, "session") || !objectHasProperty(body, "period") || !period_id)
     return res.error({

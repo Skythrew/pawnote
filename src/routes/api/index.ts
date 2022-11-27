@@ -1,4 +1,4 @@
-import { json } from "solid-start/server";
+import { json } from "solid-start/api";
 
 export const GET = () => {
   return json ({

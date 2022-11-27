@@ -13,12 +13,12 @@ import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
 export const POST = handleServerRequest<ApiUserRessources["response"]>(async (req, res) => {
-  const body = await req.json() as ApiUserRessources["request"];
-  const week_number = parseInt(new URL(req.url).pathname.split("/").pop() as string);
+  const body = await req.raw.json() as ApiUserRessources["request"];
+  const week_number = parseInt(req.params.week);
 
   if (Number.isNaN(week_number)) return res.error({
     code: ResponseErrorCode.IncorrectParameters,
-    debug: { url: req.url, week_number }
+    debug: { week_number }
   });
 
   if (!objectHasProperty(body, "session"))

@@ -4,22 +4,22 @@ import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
 import type { SessionInstance } from "@/types/session";
 import type { ResponseError } from "@/types/api";
 
-import type { FetchEvent } from "solid-start/server";
-import { json } from "solid-start/server";
+import type { APIEvent } from "solid-start/api";
+import { json } from "solid-start/api";
 import set_cookie from "set-cookie-parser";
 
 import { ResponseErrorCode } from "@/types/errors";
 import { HEADERS_PRONOTE } from "@/utils/constants";
 
 export const handleServerRequest = <T>(callback: (
-  req: FetchEvent["request"],
+  req: { raw: APIEvent["request"], params: APIEvent["params"] },
   res: {
     error: (params: Omit<ResponseError, "success">, options?: ResponseInit) => ReturnType<typeof json>,
     success: (data: T, options?: ResponseInit) => ReturnType<typeof json>
   }
 ) => Promise<unknown>) => {
-  return (evt: FetchEvent) => callback(
-    evt.request, ({
+  return (evt: APIEvent) => callback(
+    { raw: evt.request, params: evt.params }, ({
       error: (
         params,
         options = { status: 500 }

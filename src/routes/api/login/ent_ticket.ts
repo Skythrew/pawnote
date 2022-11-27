@@ -6,7 +6,7 @@ import { objectHasProperty } from "@/utils/globals";
 import { findENT } from "@/utils/ent";
 
 export const POST = handleServerRequest<ApiLoginEntTicket["response"]>(async (req, res) => {
-  const body = await req.json() as ApiLoginEntTicket["request"];
+  const body = await req.raw.json() as ApiLoginEntTicket["request"];
 
   if (!objectHasProperty(body, "ent_url") || !objectHasProperty(body, "ent_cookies"))
     return res.error({

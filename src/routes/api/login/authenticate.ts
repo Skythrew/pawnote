@@ -13,7 +13,7 @@ import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
 export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async (req, res) => {
-  const body = await req.json() as ApiLoginAuthenticate["request"];
+  const body = await req.raw.json() as ApiLoginAuthenticate["request"];
 
   if (!objectHasProperty(body, "session") || !objectHasProperty(body, "solved_challenge"))
     return res.error({
