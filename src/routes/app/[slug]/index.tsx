@@ -13,6 +13,8 @@ import {
 import { PronoteApiOnglets } from "@/types/pronote";
 
 import app from "@/stores/app";
+
+import { unwrap } from "solid-js/store";
 import { A } from "@solidjs/router";
 
 import {
@@ -92,6 +94,22 @@ const AppHome: Component = () => {
   const grades = () => grades_endpoint()
     ? grades_endpoint()!.donnees
     : null;
+
+  const sorted_grades = () => {
+    console.info("[debug] sort grades");
+    const current_grades = [...unwrap(grades()!.listeDevoirs.V)];
+
+    // Sort the grades by the date.
+    current_grades.sort(
+      (a, b) => dayjs(a.date.V, "DD-MM-YYYY").isBefore(dayjs(b.date.V, "DD-MM-YYYY")) ? 1 : -1
+    );
+
+    // Keep the 5 latest grades.
+    // TODO: Make this customizable?
+    current_grades.splice(5);
+
+    return current_grades;
+  };
 
   // Call to renew the API when the user data has changed.
   createEffect(on(gradesCurrentPeriod, async () => {
@@ -303,13 +321,18 @@ const AppHome: Component = () => {
                   <p>Aucune note!</p>
                 </div>
               }>
-                <For each={grades()!.listeDevoirs.V.sort(
-                  (a, b) => (dayjs(a.date.V, "DD-MM-YYYY").isAfter(dayjs(b.date.V, "DD-MM-YYYY")) ? 1 : -1)
-                )}>
+                <For each={sorted_grades()}>
                   {grade => (
-                    <div class="bg-brand-white rounded py-2 px-4">
-                      <h5 class="font-medium">{grade.note.V}/{grade.bareme.V}</h5>
-                      {grade.date.V}
+                    <div class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
+                      style={{
+                        "border-color": grade.service.V.couleur
+                      }}
+                    >
+                      <div class="flex justify-between gap-4">
+                        <h5 class="font-medium">{grade.service.V.L}</h5>
+                        <h5 class="font-medium">{grade.note.V}/{grade.bareme.V}</h5>
+                      </div>
+                      <p class="text-xs opacity-80">Coef. {grade.coefficient} / Classe: {grade.moyenne.V}</p>
                     </div>
                   )}
                 </For>
@@ -317,20 +340,6 @@ const AppHome: Component = () => {
             </div>
           </div>
         </Show>
-        {/*
-      <Show
-        fallback={<A href="ressources">Les ressources pédagogiques n'ont pas encore été récupérées.</A>}
-        when={app.current_user.slug !== null && app.current_user.endpoints[`/user/ressources/${week_number}`]}
-      >
-        <A href="ressources">Voir les ressources pédagogiques de cette semaine.</A>
-      </Show>
-
-      <Show
-        fallback={<A href="grades">Les notes n'ont pas encore été récupérées.</A>}
-        when={app.current_user.slug !== null && app.current_user.endpoints[`/user/grades/${period_grades.N}`]}
-      >
-        <A href="grades">Voir les notes du {period_grades.L}.</A>
-      </Show>*/}
       </div>
     </>
   );
