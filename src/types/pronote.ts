@@ -19,7 +19,8 @@ export enum PronoteApiFunctions {
   Timetable = "PageEmploiDuTemps",
   Homeworks = "PageCahierDeTexte",
   Ressources = "PageCahierDeTexte",
-  Grades = "DernieresNotes"
+  Grades = "DernieresNotes",
+  HomeworkDone = "SaisieTAFFaitEleve"
 }
 
 export enum PronoteApiOnglets {
@@ -1547,5 +1548,29 @@ export interface PronoteApiUserGrades {
         }[];
       }
     }
+  }
+}
+
+export interface PronoteApiUserHomeworkDone {
+  request: {
+		_Signature_: {
+			onglet: PronoteApiOnglets.Homeworks;
+		}
+
+    donnees: {
+      listeTAF: {
+        /** ID of the homework. */
+        N: string;
+        E: 2; // Why 2? I don't even know.
+        /** Homework has been done or not. */
+        TAFFait: boolean;
+      }[];
+    }
+  }
+
+  response: {
+    nom: PronoteApiFunctions.HomeworkDone;
+    RapportSaisie: Record<string, never>;
+    donnees: Record<string, never>;
   }
 }

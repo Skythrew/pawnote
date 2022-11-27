@@ -8,7 +8,8 @@ import type {
   PronoteApiUserTimetable,
   PronoteApiUserHomeworks,
   PronoteApiUserRessources,
-  PronoteApiUserGrades
+  PronoteApiUserGrades,
+  PronoteApiUserHomeworkDone
 } from "@/types/pronote";
 
 import type { SessionExported } from "@/types/session";
@@ -229,3 +230,18 @@ export interface ApiUserGrades {
   path: ApiUserGradesPath;
 }
 
+type ApiUserHomeworkDonePath = `/user/homework/${string}/done`;
+export interface ApiUserHomeworkDone {
+  request: {
+    session: SessionExported;
+    /** Not required, should default to `true`. */
+    done?: boolean;
+  }
+
+  response: {
+    received: PronoteApiUserHomeworkDone["response"];
+    session: SessionExported;
+  }
+
+  path: ApiUserHomeworkDonePath;
+}
