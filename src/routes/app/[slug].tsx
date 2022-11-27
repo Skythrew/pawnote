@@ -96,6 +96,10 @@ const AppLayout: Component = () => {
                 </div>
               </div>
             </A>
+
+            <A class="text-brand-white hover:text-brand-light flex text-2xl" href="/">
+              <IconMdiHome />
+            </A>
           </nav>
 
           <Show keyed when={app.current_state.code !== AppStateCode.Idle && app.current_state.code}>
