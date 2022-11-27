@@ -1,6 +1,5 @@
 import type { PronoteApiLoginInformations } from "@/types/pronote";
 import type { ApiLoginInformations } from "@/types/api";
-
 import { PronoteApiFunctions } from "@/types/pronote";
 import { ResponseErrorCode } from "@/types/errors";
 
@@ -112,7 +111,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
     });
 
     if (response === null) return res.error({
-      code: ResponseErrorCode.ServerSideError
+      code: ResponseErrorCode.NetworkFail
     }, { status: 500 });
 
     const received = session.readPronoteFunctionPayload<PronoteApiLoginInformations["response"]>(response.payload);
@@ -120,7 +119,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
       code: received,
       debug: {
         cookies,
-        response,
+        received,
         request_payload
       }
     }, { status: 400 });
