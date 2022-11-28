@@ -12,8 +12,7 @@ import {
 import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
-export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req, res) => {
-  const body = await req.raw.json() as ApiUserTimetable["request"];
+export const POST = handleServerRequest<ApiUserTimetable>(async (req, res) => {
   const week_number = parseInt(req.params.week);
 
   if (Number.isNaN(week_number)) return res.error({
@@ -21,14 +20,14 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
     debug: { week_number }
   });
 
-  if (!objectHasProperty(body, "session") || !objectHasProperty(body, "ressource"))
+  if (!objectHasProperty(req.body, "session") || !objectHasProperty(req.body, "ressource"))
     return res.error({
       code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: body }
+      debug: { received_body: req.body }
     }, { status: 400 });
 
   try {
-    const session = Session.importFromObject(body.session);
+    const session = Session.importFromObject(req.body.session);
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiUserTimetable["request"]>({
       donnees: {
@@ -45,8 +44,8 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
         NumeroSemaine: week_number,
         numeroSemaine: week_number,
 
-        Ressource: body.ressource,
-        ressource: body.ressource
+        Ressource: req.body.ressource,
+        ressource: req.body.ressource
       },
 
       _Signature_: { onglet: PronoteApiOnglets.Timetable }
@@ -82,3 +81,4 @@ export const POST = handleServerRequest<ApiUserTimetable["response"]>(async (req
     });
   }
 });
+

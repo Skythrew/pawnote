@@ -11,29 +11,48 @@ import set_cookie from "set-cookie-parser";
 import { ResponseErrorCode } from "@/types/errors";
 import { HEADERS_PRONOTE } from "@/utils/constants";
 
-export const handleServerRequest = <T>(callback: (
-  req: { raw: APIEvent["request"], params: APIEvent["params"] },
+const searchParamsToObject = (entries: IterableIterator<[string, string]>) => {
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of entries) {
+    result[key] = value;
+  }
+
+  return result;
+};
+
+export const handleServerRequest = <T extends {
+  request: unknown;
+  response: unknown;
+}>(callback: (
+  req: { body: T["request"], params: APIEvent["params"] },
   res: {
     error: (params: Omit<ResponseError, "success">, options?: ResponseInit) => ReturnType<typeof json>,
-    success: (data: T, options?: ResponseInit) => ReturnType<typeof json>
+    success: (data: T["response"], options?: ResponseInit) => ReturnType<typeof json>
   }
 ) => Promise<unknown>) => {
-  return (evt: APIEvent) => callback(
-    { raw: evt.request, params: evt.params }, ({
-      error: (
-        params,
-        options = { status: 500 }
-      ) => json({
-        success: false,
-        code: params.code,
-        debug: params.debug
-      }, options),
-      success: (
-        data,
-        options = { status: 200 }
-      ) => json({ success: true, data }, options)
-    })
-  );
+  return async (evt: APIEvent) => {
+    const body: T["request"] = evt.request.method.toUpperCase() === "GET"
+      ? searchParamsToObject(new URL(evt.request.url).searchParams.entries())
+      : await evt.request.json();
+
+    return callback(
+      { body, params: evt.params }, ({
+        error: (
+          params,
+          options = { status: 500 }
+        ) => json({
+          success: false,
+          code: params.code,
+          debug: params.debug
+        }, options),
+        success: (
+          data,
+          options = { status: 200 }
+        ) => json({ success: true, data }, options)
+      })
+    );
+  };
 };
 
 export const cleanPronoteUrl = (url: string) => {

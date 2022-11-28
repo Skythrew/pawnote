@@ -10,21 +10,19 @@ import { objectHasProperty } from "@/utils/globals";
 import haversine from "haversine-distance";
 import { decode } from "html-entities";
 
-export const POST = handleServerRequest<ApiGeolocation["response"]>(async (req, res) => {
-  const body = await req.raw.json() as ApiGeolocation["request"];
-
-  if (!objectHasProperty(body, "latitude") || !objectHasProperty(body, "longitude"))
+export const POST = handleServerRequest<ApiGeolocation>(async (req, res) => {
+  if (!objectHasProperty(req.body, "latitude") || !objectHasProperty(req.body, "longitude"))
     return res.error({
       code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: body }
+      debug: { received_body: req.body }
     }, { status: 400 });
 
   try {
     // Build the request we're gonna send to Pronote.
     const request_body: PronoteApiGeolocation["request"] = {
       nomFonction: "geoLoc",
-      lat: body.latitude.toString(),
-      long: body.longitude.toString()
+      lat: req.body.latitude.toString(),
+      long: req.body.longitude.toString()
     };
 
     const response = await fetch(GEOLOCATION_API_URL, {
@@ -53,7 +51,7 @@ export const POST = handleServerRequest<ApiGeolocation["response"]>(async (req, 
       postal_code: parseInt(result.cp),
 
       distance: haversine(
-        { latitude: body.latitude, longitude: body.longitude },
+        { latitude: req.body.latitude, longitude: req.body.longitude },
         { latitude: parseFloat(result.lat), longitude: parseFloat(result.long) }
       )
     }))

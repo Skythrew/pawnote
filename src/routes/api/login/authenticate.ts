@@ -12,29 +12,27 @@ import {
 import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
-export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async (req, res) => {
-  const body = await req.raw.json() as ApiLoginAuthenticate["request"];
-
-  if (!objectHasProperty(body, "session") || !objectHasProperty(body, "solved_challenge"))
+export const POST = handleServerRequest<ApiLoginAuthenticate>(async (req, res) => {
+  if (!objectHasProperty(req.body, "session") || !objectHasProperty(req.body, "solved_challenge"))
     return res.error({
       code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: body }
+      debug: { received_body: req.body }
     }, { status: 400 });
 
   try {
-    const session = Session.importFromObject(body.session);
+    const session = Session.importFromObject(req.body.session);
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiLoginAuthenticate["request"]>({
       donnees: {
         connexion: 0,
-        challenge: body.solved_challenge,
+        challenge: req.body.solved_challenge,
         espace: session.instance.account_type_id
       }
     });
 
     const response = await callPronoteAPI(PronoteApiFunctions.Authenticate, {
       session_instance: session.instance,
-      cookies: body.cookies ?? [],
+      cookies: req.body.cookies ?? [],
       payload: request_payload
     });
 
@@ -48,7 +46,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
       debug: {
         response,
         request_payload,
-        cookies: body.cookies
+        cookies: req.body.cookies
       }
     }, { status: 400 });
 
@@ -57,7 +55,7 @@ export const POST = handleServerRequest<ApiLoginAuthenticate["response"]>(async 
       debug: {
         received,
         request_payload,
-        cookies: body.cookies
+        cookies: req.body.cookies
       }
     }, { status: 403 });
 

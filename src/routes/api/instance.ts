@@ -16,17 +16,15 @@ import {
   callPronoteAPI
 } from "@/utils/server";
 
-export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res) => {
-  const body = await req.raw.json() as ApiInstance["request"];
-
-  if (!objectHasProperty(body, "pronote_url"))
+export const POST = handleServerRequest<ApiInstance>(async (req, res) => {
+  if (!objectHasProperty(req.body, "pronote_url"))
     return res.error({
       code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: body }
+      debug: { received_body: req.body }
     }, { status: 400 });
 
   try {
-    const pronote_url = cleanPronoteUrl(body.pronote_url);
+    const pronote_url = cleanPronoteUrl(req.body.pronote_url);
 
     // Download Pronote page and add `?login=true` at the end to bypass ENT.
     const pronote_page = await downloadPronotePage(pronote_url + "/?login=true");
@@ -106,3 +104,4 @@ export const POST = handleServerRequest<ApiInstance["response"]>(async (req, res
     });
   }
 });
+

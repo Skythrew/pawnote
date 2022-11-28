@@ -17,25 +17,23 @@ import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 import Session from "@/utils/session";
 import forge from "node-forge";
 
-export const POST = handleServerRequest<ApiLoginInformations["response"]>(async (req, res) => {
-  const body = await req.raw.json() as ApiLoginInformations["request"];
-
-  if (!objectHasProperty(body, "pronote_url") || !objectHasProperty(body, "account_type"))
+export const POST = handleServerRequest<ApiLoginInformations>(async (req, res) => {
+  if (!objectHasProperty(req.body, "pronote_url") || !objectHasProperty(req.body, "account_type"))
     return res.error({
       code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: body }
+      debug: { received_body: req.body }
     }, { status: 400 });
 
   try {
-    const pronote_url = cleanPronoteUrl(body.pronote_url);
-    const account_type = PRONOTE_ACCOUNT_TYPES[body.account_type];
+    const pronote_url = cleanPronoteUrl(req.body.pronote_url);
+    const account_type = PRONOTE_ACCOUNT_TYPES[req.body.account_type];
 
     // Don't clean the URL when `raw_url` is set to `true`.
-    const pronote_page_url = body.raw_url && body.raw_url === true
-      ? body.pronote_url
+    const pronote_page_url = req.body.raw_url && req.body.raw_url === true
+      ? req.body.pronote_url
       : pronote_url + `/${account_type.path}?login=true`;
 
-    const pronote_page = await downloadPronotePage(pronote_page_url, body.cookies);
+    const pronote_page = await downloadPronotePage(pronote_page_url, req.body.cookies);
 
     // Check if the Pronote page has been correctly downloaded.
     if (pronote_page === null) return res.error({
@@ -91,7 +89,7 @@ export const POST = handleServerRequest<ApiLoginInformations["response"]>(async 
     // Create "Uuid" property for the request.
     const rsa_uuid = forge.util.encode64(rsa_key.encrypt(aes_iv), 64);
 
-    const cookies = body.cookies ?? [];
+    const cookies = req.body.cookies ?? [];
     for (const cookie of pronote_page.cookies) {
       cookies.push(cookie);
     }

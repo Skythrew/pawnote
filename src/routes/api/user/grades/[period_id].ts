@@ -12,27 +12,26 @@ import {
 import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
-export const POST = handleServerRequest<ApiUserGrades["response"]>(async (req, res) => {
-  const body = await req.raw.json() as ApiUserGrades["request"];
+export const POST = handleServerRequest<ApiUserGrades>(async (req, res) => {
   const period_id = req.params.period_id as string | undefined;
 
-  if (!objectHasProperty(body, "session") || !objectHasProperty(body, "period") || !period_id)
+  if (!objectHasProperty(req.body, "session") || !objectHasProperty(req.body, "period") || !period_id)
     return res.error({
       code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: body }
+      debug: { received_body: req.body }
     }, { status: 400 });
 
-  if (period_id !== body.period.N) return res.error({
+  if (period_id !== req.body.period.N) return res.error({
     code: ResponseErrorCode.IncorrectParameters,
-    debug: { url: period_id, body: body.period.N }
+    debug: { url: period_id, body: req.body.period.N }
   });
 
   try {
-    const session = Session.importFromObject(body.session);
+    const session = Session.importFromObject(req.body.session);
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiUserGrades["request"]>({
       donnees: {
-        Periode: body.period
+        Periode: req.body.period
       },
 
       _Signature_: { onglet: PronoteApiOnglets.Grades }
@@ -68,3 +67,4 @@ export const POST = handleServerRequest<ApiUserGrades["response"]>(async (req, r
     });
   }
 });
+

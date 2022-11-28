@@ -12,29 +12,23 @@ import {
 import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
-export const POST = handleServerRequest<ApiUserHomeworkDone["response"]>(async (req, res) => {
-  const body = await req.raw.json() as ApiUserHomeworkDone["request"];
-  const homework_id = req.params.id as string | undefined;
+export const POST = handleServerRequest<ApiUserHomeworkDone>(async (req, res) => {
+  const homework_id = req.params.id as string;
 
-  if (!homework_id) return res.error({
-    code: ResponseErrorCode.IncorrectParameters,
-    debug: { homework_id }
-  });
-
-  if (!objectHasProperty(body, "session"))
+  if (!objectHasProperty(req.body, "session"))
     return res.error({
       code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: body }
+      debug: { received_body: req.body }
     }, { status: 400 });
 
   try {
-    const session = Session.importFromObject(body.session);
+    const session = Session.importFromObject(req.body.session);
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiUserHomeworkDone["request"]>({
       donnees: {
         listeTAF: [{
           E: 2,
-          TAFFait: body.done ?? true,
+          TAFFait: req.body.done ?? true,
           N: homework_id
         }]
       },
@@ -74,3 +68,4 @@ export const POST = handleServerRequest<ApiUserHomeworkDone["response"]>(async (
     });
   }
 });
+

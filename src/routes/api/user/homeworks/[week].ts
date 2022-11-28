@@ -12,8 +12,7 @@ import {
 import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
-export const POST = handleServerRequest<ApiUserHomeworks["response"]>(async (req, res) => {
-  const body = await req.raw.json() as ApiUserHomeworks["request"];
+export const POST = handleServerRequest<ApiUserHomeworks>(async (req, res) => {
   const week_number = parseInt(req.params.week);
 
   if (Number.isNaN(week_number)) return res.error({
@@ -21,14 +20,14 @@ export const POST = handleServerRequest<ApiUserHomeworks["response"]>(async (req
     debug: { week_number }
   });
 
-  if (!objectHasProperty(body, "session"))
+  if (!objectHasProperty(req.body, "session"))
     return res.error({
       code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: body }
+      debug: { received_body: req.body }
     }, { status: 400 });
 
   try {
-    const session = Session.importFromObject(body.session);
+    const session = Session.importFromObject(req.body.session);
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiUserHomeworks["request"]>({
       donnees: {
@@ -73,3 +72,4 @@ export const POST = handleServerRequest<ApiUserHomeworks["response"]>(async (req
     });
   }
 });
+

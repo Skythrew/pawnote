@@ -12,17 +12,15 @@ import {
 import { objectHasProperty } from "@/utils/globals";
 import Session from "@/utils/session";
 
-export const POST = handleServerRequest<ApiUserData["response"]>(async (req, res) => {
-  const body = await req.raw.json() as ApiUserData["request"];
-
-  if (!objectHasProperty(body, "session"))
+export const POST = handleServerRequest<ApiUserData>(async (req, res) => {
+  if (!objectHasProperty(req.body, "session"))
     return res.error({
       code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: body }
+      debug: { received_body: req.body }
     }, { status: 400 });
 
   try {
-    const session = Session.importFromObject(body.session);
+    const session = Session.importFromObject(req.body.session);
 
     const request_payload = session.writePronoteFunctionPayload<PronoteApiUserData["request"]>({});
     const response = await callPronoteAPI(PronoteApiFunctions.UserData, {
@@ -64,3 +62,4 @@ export const POST = handleServerRequest<ApiUserData["response"]>(async (req, res
     });
   }
 });
+
