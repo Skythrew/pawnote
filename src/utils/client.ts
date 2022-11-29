@@ -44,7 +44,7 @@ import sessions from "@/stores/sessions";
 
 import { unwrap } from "solid-js/store";
 import forge from "node-forge";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
 import dayjsCustomDuration from "dayjs/plugin/duration";
 import dayjsCustomParse from "dayjs/plugin/customParseFormat";
@@ -84,6 +84,16 @@ export class ClientError extends Error {
 
 /** @example `readFloatFromString("10.45")` transforms "10,45" into 10.45 */
 export const readFloatFromString = (value: string) => parseFloat(value.replace(",", "."));
+
+/** TODO: Use an enum and also give translation for the strings. */
+export const readGradeValue = (value: string) => {
+  if (value === "|1") return "Absent";
+  else if (value === "|5") return "N. Rendu";
+
+  const result = readFloatFromString(value);
+
+  return Number.isNaN(result) ? "?" : result;
+};
 
 export const callAPI = async <Api extends {
   path: string;
@@ -836,14 +846,14 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
     /** Maxmimum grade that can be obtained. */
     maximum: number;
     /** Average grade. */
-    average: number;
+    average: number | string;
 
     /** Grade obtained by the current user. */
-    user: number;
+    user: number | string;
     /** Maximum grade obtained by an user. */
-    user_max: number;
+    user_max: number | string;
     /** Minimum grade obtained by an user. */
-    user_min: number;
+    user_min: number | string;
   }
 
   const subjects: {
@@ -851,11 +861,11 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
       name: string;
       color: string;
 
-      user_average: number;
-      global_average: number;
+      user_average: number | string;
+      global_average: number | string;
 
-      max_average: number;
-      min_average: number;
+      max_average: number | string;
+      min_average: number | string;
 
       grades: Grade[];
     }
@@ -866,11 +876,11 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
       name: subject.L,
       color: subject.couleur,
 
-      global_average: readFloatFromString(subject.moyClasse.V),
-      user_average: readFloatFromString(subject.moyEleve.V),
+      global_average: readGradeValue(subject.moyClasse.V),
+      user_average: readGradeValue(subject.moyEleve.V),
 
-      max_average: readFloatFromString(subject.moyMax.V),
-      min_average: readFloatFromString(subject.moyMin.V),
+      max_average: readGradeValue(subject.moyMax.V),
+      min_average: readGradeValue(subject.moyMin.V),
 
       grades: []
     };
@@ -882,12 +892,18 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
       date: dayjs(grade.date.V, "DD-MM-YYYY"),
 
       maximum: readFloatFromString(grade.bareme.V),
-      average: readFloatFromString(grade.moyenne.V),
+      average: readGradeValue(grade.moyenne.V),
 
-      user: readFloatFromString(grade.note.V),
-      user_max: readFloatFromString(grade.noteMax.V),
-      user_min: readFloatFromString(grade.noteMin.V)
+      user: readGradeValue(grade.note.V),
+      user_max: readGradeValue(grade.noteMax.V),
+      user_min: readGradeValue(grade.noteMin.V)
     });
+  }
+
+  for (const subject_id of Object.keys(subjects)) {
+    subjects[subject_id].grades.sort(
+      (a, b) => a.date.isBefore(b.date) ? 1 : -1
+    );
   }
 
   return subjects;
@@ -899,7 +915,9 @@ export const getDayNameFromDayNumber = (day_number: string | number) => {
   const day_name_lowercase = dayjs()
     .day(day_number)
     .toDate()
-    .toLocaleDateString("fr-FR", { weekday: "long" })
+    .toLocaleDateString(undefined /** We use `undefined` to choose the value automatically. */, {
+      weekday: "long"
+    })
     .toLowerCase();
 
   const day_name = capitalizeFirstLetter(day_name_lowercase);
