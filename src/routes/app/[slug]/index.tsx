@@ -247,7 +247,7 @@ const AppHome: Component = () => {
                             }}
                             class="bg-brand-white bg-opacity-20 border-2 border-brand-white flex items-center justify-center rounded m-2"
                             >
-                              <p class="text-brand-white text-sm">Pause de {getLabelOfPosition(lesson.from)} à {getLabelOfPosition(lesson.to)} ({
+                              <p class="text-brand-white text-sm text-center">Pause de {getLabelOfPosition(lesson.from)} à {getLabelOfPosition(lesson.to)} ({
                                 getTimeFormattedDiff(
                                   { value: getLabelOfPosition(lesson.from) as string, format: "HH[h]mm" },
                                   { value: getLabelOfPosition(lesson.to) as string, format: "HH[h]mm" },
