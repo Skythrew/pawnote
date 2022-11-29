@@ -14,20 +14,20 @@ const AppGrades: Component = () => {
   onMount(() => console.groupCollapsed("grades"));
   onCleanup(() => console.groupEnd());
 
-  const [period, setPeriod] = createSignal(getDefaultPeriodOnglet(PronoteApiOnglets.Grades));
+  const [currentPeriod, setCurrentPeriod] = createSignal(getDefaultPeriodOnglet(PronoteApiOnglets.Grades));
 
   const periods = () => app.current_user?.endpoints?.["/user/data"].donnees.ressource.listeOngletsPourPeriodes.V.find(
     onglet => onglet.G === PronoteApiOnglets.Grades
   )?.listePeriodes.V;
 
-  const endpoint = () => app.current_user.endpoints?.[`/user/grades/${period().N}`];
+  const endpoint = () => app.current_user.endpoints?.[`/user/grades/${currentPeriod().N}`];
 
   /** Renew the grades when needed. */
-  createEffect(on(period, async () => {
-    console.groupCollapsed(`Period ${period()}`);
+  createEffect(on(currentPeriod, async () => {
+    console.groupCollapsed(`Period ${currentPeriod().L} (${currentPeriod().N})`);
     onCleanup(() => console.groupEnd());
 
-    await callUserGradesAPI(period);
+    await callUserGradesAPI(currentPeriod);
   }));
 
   const grades = createMemo(() => endpoint()
@@ -36,21 +36,33 @@ const AppGrades: Component = () => {
   );
 
   return (
-    <div class="flex flex-col items-center gap-2">
-      <h2 class="text-lg font-medium">Notes du {period().L}</h2>
+    <div class="flex flex-col items-center gap-2 px-4">
+      <div class="flex pl-4 rounded-full border-2 border-brand-light bg-brand-light">
+        <h2 class="text-lg font-medium pr-2">Notes du</h2>
+        <select class="text-brand-dark bg-brand-white rounded-full px-2" onChange={(event) => {
+          const period = periods()?.find(period => period.N === event.currentTarget.value);
+          if (!period) return;
 
-      <select onChange={(event) => {
-        const period = periods()?.find(period => period.N === event.currentTarget.value);
-        if (!period) return;
+          setCurrentPeriod(period);
+        }}>
+          <For each={periods()}>
+            {period => (
+              <option value={period.N} selected={currentPeriod().N === period.N}>{period.L}</option>
+            )}
+          </For>
+        </select>
+      </div>
 
-        setPeriod(period);
-      }}>
-        <For each={periods()}>
-          {period => (
-            <option value={period.N}>{period.L}</option>
-          )}
-        </For>
-      </select>
+      <div class="flex flex-col md:flex-row gap-4 pb-4 pt-6">
+        <div class="rounded-full border-2 border-brand-primary bg-brand-primary flex items-center justify-between pl-4 gap-2">
+          <p class="text-brand-white">Moyenne Générale</p>
+          <div class="text-brand-primary font-medium bg-brand-light rounded-full py-1 px-6">{endpoint()?.donnees.moyGenerale.V ?? "??"}</div>
+        </div>
+        <div class="rounded-full border border-brand-primary bg-brand-white flex items-center justify-between pl-4 gap-2">
+          <p class="text-brand-primary">Moyenne Classe</p>
+          <div class="text-brand-primary font-medium bg-brand-light rounded-full py-1 px-6">{endpoint()?.donnees.moyGeneraleClasse.V ?? "??"}</div>
+        </div>
+      </div>
 
       <Show keyed when={grades()}
         fallback={
