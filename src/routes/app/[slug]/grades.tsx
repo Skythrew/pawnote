@@ -37,7 +37,7 @@ const AppGrades: Component = () => {
 
   return (
     <div class="flex flex-col items-center gap-2">
-      <h2>Devoirs du {period().N}</h2>
+      <h2 class="text-lg font-medium">Notes du {period().L}</h2>
 
       <select onChange={(event) => {
         const period = periods()?.find(period => period.N === event.currentTarget.value);
@@ -58,21 +58,29 @@ const AppGrades: Component = () => {
         }
       >
         {subjects => (
-          <For each={Object.values(subjects)}>
-            {subject => (
-              <div class="p-4">
-                <h3>{subject.name}</h3>
-                <For each={subject.grades}>
-                  {grade => (
-                    <div>
-                      <h4>{grade.description}</h4>
-                      <p>{grade.user}</p>
-                    </div>
-                  )}
-                </For>
-              </div>
-            )}
-          </For>
+          <div class="w-full max-w-md flex flex-col gap-4 pb-8">
+            <For each={Object.values(subjects)}>
+              {subject => (
+                <div class="flex flex-col">
+                  <div class="px-4 py-2 w-full text-brand-white bg-brand-primary rounded-t-md border border-brand-primary border-b-0 flex justify-between items-center gap-2">
+                    <h3 class="text-lg font-medium">{subject.name}</h3>
+                    <h3 class="px-4 bg-brand-white text-brand-primary font-medium rounded-full">{subject.user_average}</h3>
+                  </div>
+                  <div class="px-4 py-1 w-full text-brand-dark rounded-b-md border border-brand-primary border-t-0">
+                    <For each={subject.grades}>
+                      {grade => (
+                        <div class="py-2 px-4 w-full">
+                          <h4 class="text-lg font-medium">{grade.user}/{grade.maximum}</h4>
+                          <p>{grade.description}</p>
+                          <span class="text-sm">{grade.date.toDate().toLocaleDateString()}</span>
+                        </div>
+                      )}
+                    </For>
+                  </div>
+                </div>
+              )}
+            </For>
+          </div>
         )}
       </Show>
     </div>

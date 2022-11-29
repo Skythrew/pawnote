@@ -44,7 +44,7 @@ import sessions from "@/stores/sessions";
 
 import { unwrap } from "solid-js/store";
 import forge from "node-forge";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 import dayjsCustomDuration from "dayjs/plugin/duration";
 import dayjsCustomParse from "dayjs/plugin/customParseFormat";
@@ -831,14 +831,19 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
 export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) => {
   interface Grade {
     description: string;
+    date: dayjs.Dayjs;
 
-    
-
-    user: number;
+    /** Maxmimum grade that can be obtained. */
+    maximum: number;
+    /** Average grade. */
     average: number;
 
-    max: number;
-    min: number;
+    /** Grade obtained by the current user. */
+    user: number;
+    /** Maximum grade obtained by an user. */
+    user_max: number;
+    /** Minimum grade obtained by an user. */
+    user_min: number;
   }
 
   const subjects: {
@@ -874,12 +879,14 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
   for (const grade of data.listeDevoirs.V) {
     subjects[grade.service.V.N].grades.push({
       description: grade.commentaire,
+      date: dayjs(grade.date.V, "DD-MM-YYYY"),
 
+      maximum: readFloatFromString(grade.bareme.V),
       average: readFloatFromString(grade.moyenne.V),
-      user: readFloatFromString(grade.note.V),
 
-      max: readFloatFromString(grade.noteMax.V),
-      min: readFloatFromString(grade.noteMin.V)
+      user: readFloatFromString(grade.note.V),
+      user_max: readFloatFromString(grade.noteMax.V),
+      user_min: readFloatFromString(grade.noteMin.V)
     });
   }
 
