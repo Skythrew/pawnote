@@ -329,7 +329,7 @@ const AppHome: Component = () => {
                       }}
                     >
                       <div class="flex justify-between gap-4">
-                        <h5 class="font-medium">{grade.service.V.L}</h5>
+                        <h5 class="font-medium break-all">{grade.service.V.L}</h5>
                         <h5 class="font-medium">{grade.note.V}/{grade.bareme.V}</h5>
                       </div>
                       <p class="text-xs opacity-80">Coef. {grade.coefficient} / Classe: {grade.moyenne.V}</p>

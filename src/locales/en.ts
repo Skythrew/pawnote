@@ -42,7 +42,7 @@ export const PAGES: Language["PAGES"] = {
     dark: "Dark",
     light: "Light",
     description: "Unofficial client for Pronote.",
-    link_account: "Link a Pronote account!",
+    link_account: "Link a Pronote account !",
     link_new_account: "Link another Pronote account",
     loading_accounts: "Loading accounts..."
   }

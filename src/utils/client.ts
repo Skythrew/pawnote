@@ -26,7 +26,8 @@ import {
 
   PronoteApiUserTimetableContentType,
   PronoteApiAccountId,
-  PronoteApiOnglets
+  PronoteApiOnglets,
+  PronoteApiUserGrades
 } from "@/types/pronote";
 
 import {
@@ -66,7 +67,6 @@ export class ApiError extends Error {
   }
 }
 
-
 /** Helper class for easier error handling. */
 export class ClientError extends Error {
   public debug?: ResponseError["debug"];
@@ -81,6 +81,9 @@ export class ClientError extends Error {
     this.message = message;
   }
 }
+
+/** @example `readFloatFromString("10.45")` transforms "10,45" into 10.45 */
+export const readFloatFromString = (value: string) => parseFloat(value.replace(",", "."));
 
 export const callAPI = async <Api extends {
   path: string;
@@ -825,6 +828,64 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
   return local_response?.data;
 };
 
+export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) => {
+  interface Grade {
+    description: string;
+
+    
+
+    user: number;
+    average: number;
+
+    max: number;
+    min: number;
+  }
+
+  const subjects: {
+    [subject_id: string]: {
+      name: string;
+      color: string;
+
+      user_average: number;
+      global_average: number;
+
+      max_average: number;
+      min_average: number;
+
+      grades: Grade[];
+    }
+  } = {};
+
+  for (const subject of data.listeServices.V) {
+    subjects[subject.N] = {
+      name: subject.L,
+      color: subject.couleur,
+
+      global_average: readFloatFromString(subject.moyClasse.V),
+      user_average: readFloatFromString(subject.moyEleve.V),
+
+      max_average: readFloatFromString(subject.moyMax.V),
+      min_average: readFloatFromString(subject.moyMin.V),
+
+      grades: []
+    };
+  }
+
+  for (const grade of data.listeDevoirs.V) {
+    subjects[grade.service.V.N].grades.push({
+      description: grade.commentaire,
+
+      average: readFloatFromString(grade.moyenne.V),
+      user: readFloatFromString(grade.note.V),
+
+      max: readFloatFromString(grade.noteMax.V),
+      min: readFloatFromString(grade.noteMin.V)
+    });
+  }
+
+  return subjects;
+};
+
 export const getDayNameFromDayNumber = (day_number: string | number) => {
   if (typeof day_number === "string") day_number = parseInt(day_number);
 
@@ -837,4 +898,3 @@ export const getDayNameFromDayNumber = (day_number: string | number) => {
   const day_name = capitalizeFirstLetter(day_name_lowercase);
   return day_name;
 };
-

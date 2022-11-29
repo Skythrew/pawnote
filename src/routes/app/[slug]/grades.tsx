@@ -3,7 +3,9 @@ import { PronoteApiOnglets } from "@/types/pronote";
 
 import {
   getDefaultPeriodOnglet,
-  callUserGradesAPI
+  callUserGradesAPI,
+
+  parseGrades
 } from "@/utils/client";
 
 import app from "@/stores/app";
@@ -28,7 +30,10 @@ const AppGrades: Component = () => {
     await callUserGradesAPI(period);
   }));
 
-  const grades = () => endpoint() ? endpoint()!.donnees : null;
+  const grades = createMemo(() => endpoint()
+    ? parseGrades(endpoint()!.donnees)
+    : null
+  );
 
   return (
     <div class="flex flex-col items-center gap-2">
@@ -52,8 +57,22 @@ const AppGrades: Component = () => {
           <p>Les notes n'ont pas encore été récupérées</p>
         }
       >
-        {grades => (
-          <pre>{JSON.stringify(grades, null, 2)}</pre>
+        {subjects => (
+          <For each={Object.values(subjects)}>
+            {subject => (
+              <div class="p-4">
+                <h3>{subject.name}</h3>
+                <For each={subject.grades}>
+                  {grade => (
+                    <div>
+                      <h4>{grade.description}</h4>
+                      <p>{grade.user}</p>
+                    </div>
+                  )}
+                </For>
+              </div>
+            )}
+          </For>
         )}
       </Show>
     </div>
