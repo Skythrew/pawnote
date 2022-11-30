@@ -94,4 +94,4 @@ const removeAllStartingWith = async (slug: string, match: string) => {
   }
 };
 
-export default { get, upsert, removeAllStartingWith };
+export default { get, upsert, removeAllStartingWith, raw_database: database };

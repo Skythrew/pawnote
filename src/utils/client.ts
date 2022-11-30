@@ -876,6 +876,7 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
     }
   } = {};
 
+  // Store every subjects in the object.
   for (const subject of data.listeServices.V) {
     subjects[subject.N] = {
       name: subject.L,
@@ -891,6 +892,7 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
     };
   }
 
+  // Add grades to the `subjects` object.
   for (const grade of data.listeDevoirs.V) {
     subjects[grade.service.V.N].grades.push({
       description: grade.commentaire,
@@ -905,6 +907,7 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
     });
   }
 
+  // Sort the grades with the latest first.
   for (const subject_id of Object.keys(subjects)) {
     subjects[subject_id].grades.sort(
       (a, b) => a.date.isBefore(b.date) ? 1 : -1
@@ -946,13 +949,25 @@ export const callUserHomeworkDoneAPI = async (options: {
   const endpoint: ApiUserHomeworkDone["path"] = `/user/homework/${options.homework_id}/done`;
 
   app.enqueue_fetch(AppStateCode.ChangingHomeworkState, async () => {
-    // Update local homeworks endpoint.
-    app.setCurrentUser("endpoints", `/user/homeworks/${options.week_number}`, "donnees", "ListeTravauxAFaire", "V", homework => homework.N === options.homework_id, "TAFFait", options.done ?? true);
-
+    // Call the API to update the homework state.
     await callAPI<ApiUserHomeworkDone>(endpoint, () => ({
       session: user.session,
       done: options.done
-    }));
+    }), { prevent_cache: true });
+
+    // Update local state for the homeworks endpoint.
+    app.setCurrentUser(
+      "endpoints", `/user/homeworks/${options.week_number}`,
+      "donnees", "ListeTravauxAFaire", "V",
+      homework => homework.N === options.homework_id,
+      "TAFFait", options.done ?? true
+    );
+
+    // Update cached data for the homeworks endpoint.
+    await endpoints.raw_database(user.slug).setItem(
+      `/user/homeworks/${options.week_number}`,
+      unwrap(app.current_user.endpoints?.[`/user/homeworks/${options.week_number}`])
+    );
   });
 };
 
