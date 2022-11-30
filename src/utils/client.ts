@@ -13,7 +13,8 @@ import type {
   ApiUserHomeworks,
   ApiUserData,
   ApiUserRessources,
-  ApiUserGrades
+  ApiUserGrades,
+  ApiUserHomeworkDone
 } from "@/types/api";
 
 import { aes, capitalizeFirstLetter, credentials as credentials_utility } from "@/utils/globals";
@@ -720,6 +721,8 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
   console.info("[debug][homeworks]: parse");
 
   const output: { [key: number]: {
+    id: string;
+
     subject_name: string;
     description: string;
     done: boolean;
@@ -732,6 +735,8 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
     if (!output[day]) output[day] = [];
 
     output[day].push({
+      id: homework.N,
+
       description: homework.descriptif.V,
       subject_name: homework.Matiere.V.L,
       done: homework.TAFFait
@@ -923,3 +928,31 @@ export const getDayNameFromDayNumber = (day_number: string | number) => {
   const day_name = capitalizeFirstLetter(day_name_lowercase);
   return day_name;
 };
+
+/**
+ * Calls the API and automatically updates
+ * the endpoints with the correct data.
+ */
+export const callUserHomeworkDoneAPI = async (options: {
+   homework_id: string;
+   week_number: number;
+   done?: boolean;
+}) => {
+  const user = app.current_user;
+  if (!user.slug) throw new ApiError ({
+    code: ResponseErrorCode.UserUnavailable
+  });
+
+  const endpoint: ApiUserHomeworkDone["path"] = `/user/homework/${options.homework_id}/done`;
+
+  app.enqueue_fetch(AppStateCode.ChangingHomeworkState, async () => {
+    // Update local homeworks endpoint.
+    app.setCurrentUser("endpoints", `/user/homeworks/${options.week_number}`, "donnees", "ListeTravauxAFaire", "V", homework => homework.N === options.homework_id, "TAFFait", options.done ?? true);
+
+    await callAPI<ApiUserHomeworkDone>(endpoint, () => ({
+      session: user.session,
+      done: options.done
+    }));
+  });
+};
+

@@ -52,7 +52,8 @@ export enum AppStateCode {
   FetchingTimetable,
   FetchingHomeworks,
   FetchingRessources,
-  FetchingGrades
+  FetchingGrades,
+  ChangingHomeworkState
 }
 
 const [current_state, setCurrentState] = createStore<{

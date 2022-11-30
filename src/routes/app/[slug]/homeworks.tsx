@@ -5,6 +5,7 @@ import {
   getDayNameFromDayNumber,
 
   callUserHomeworksAPI,
+  callUserHomeworkDoneAPI
   parseHomeworks
 } from "@/utils/client";
 
@@ -65,7 +66,17 @@ const AppHomeworks: Component = () => {
                         <div class="p-2 rounded bg-brand-white flex-col">
                           <div class="flex justify-between items-center">
                             <h3 class="font-medium">{homework.subject_name}</h3>
-                            <input type="checkbox" checked={homework.done} />
+                            <input
+                              type="checkbox"
+                              checked={homework.done}
+                              onChange={(event) => {
+                                callUserHomeworkDoneAPI({
+                                  homework_id: homework.id,
+                                  week_number: weekNumber(),
+                                  done: event.currentTarget.checked
+                                });
+                              }}
+                            />
                           </div>
 
                           <div innerHTML={homework.description} />

@@ -245,3 +245,4 @@ export interface ApiUserHomeworkDone {
 
   path: ApiUserHomeworkDonePath;
 }
+
