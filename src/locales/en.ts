@@ -34,17 +34,29 @@ export const APP_STATE: Language["APP_STATE"] = {
   [AppStateCode.FetchingGrades]: "Refreshing grades",
   [AppStateCode.FetchingHomeworks]: "Refreshing homeworks",
   [AppStateCode.FetchingRessources]: "Refreshing ressources",
-  [AppStateCode.FetchingTimetable]: "Refreshing timetable"
+  [AppStateCode.FetchingTimetable]: "Refreshing timetable",
+  [AppStateCode.ChangingHomeworkState]: "Updating an homework"
 };
 
 export const PAGES: Language["PAGES"] = {
+  _: {
+    LOADING: "Loading Pornote...",
+    ERROR: "Critical error happened !",
+    RESTART: "Restart"
+  },
+
   INDEX: {
-    dark: "Dark",
-    light: "Light",
-    description: "Unofficial client for Pronote.",
-    link_account: "Link a Pronote account !",
-    link_new_account: "Link another Pronote account",
-    loading_accounts: "Loading accounts..."
+    DESCRIPTION: "Unofficial client for Pronote.",
+    LINK_FIRST: "Link a Pronote account !",
+    LINK_ANOTHER: "Link another Pronote account",
+    LOADING: "Loading accounts..."
+  },
+
+  APP: {
+    _: {
+      FETCHING: "Retreiving local data",
+      WAIT: "Please wait..."
+    }
   }
 };
 
@@ -54,4 +66,3 @@ export default {
   API_ERRORS,
   CLIENT_ERRORS
 } as Language;
-

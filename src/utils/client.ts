@@ -43,6 +43,8 @@ import credentials from "@/stores/credentials";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
 
+import { context as locale } from "@/locales";
+
 import { unwrap } from "solid-js/store";
 import forge from "node-forge";
 import dayjs from "dayjs";
@@ -59,7 +61,10 @@ export class ApiError extends Error {
   public message: string;
 
   constructor (response: Omit<ResponseError, "success">) {
-    const message = `ResponseErrorCode[#${response.code}]`;
+    const [t] = locale;
+
+    const error_message = t(`API_ERRORS.${response.code}`);
+    const message = `ResponseErrorCode[#${response.code}]: ${error_message}`;
     super(message);
 
     this.name = "ApiError";

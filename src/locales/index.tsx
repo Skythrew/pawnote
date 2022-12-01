@@ -20,7 +20,7 @@ export const languages = {
 };
 
 // By default, only add French so we can lazy load the other locales.
-const context = createI18nContext({ fr }, "fr");
+export const context = createI18nContext({ fr }, "fr");
 
 export const Provider: FlowComponent = (props) => (
   <I18nContext.Provider value={context}>
@@ -62,14 +62,28 @@ export interface Language {
   CLIENT_ERRORS: Record<ClientErrorCode, string>;
   APP_STATE: Omit<Record<AppStateCode, string>, AppStateCode.Idle>;
   PAGES: {
-    INDEX: Record<
-      | "dark"
-      | "light"
-      | "description"
-      | "link_account"
-      | "link_new_account"
-      | "loading_accounts"
+    /** Corresponds to `@/root.tsx` */
+    _: Record<
+      | "LOADING"
+      | "ERROR"
+      | "RESTART"
     , string>
+
+    /** Corresponds to `@/routes/index.tsx` */
+    INDEX: Record<
+      | "DESCRIPTION"
+      | "LINK_FIRST"
+      | "LINK_ANOTHER"
+      | "LOADING"
+    , string>
+
+    APP: {
+      /** Corresponds to `@/routes/app/[slug].tsx` */
+      _: Record<
+        | "FETCHING"
+        | "WAIT"
+      , string>
+    }
   }
 }
 

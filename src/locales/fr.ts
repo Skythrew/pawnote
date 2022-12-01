@@ -10,41 +10,53 @@ export const API_ERRORS: Language["API_ERRORS"] = {
   [ResponseErrorCode.MissingParameters]: "Paramètres manquants dans le corps de la requête.",
   [ResponseErrorCode.IncorrectParameters]: "Paramètres incorrects dans l'URL ou le corps de la requête.",
   [ResponseErrorCode.ServerSideError]: "Une erreur est survenue lors de l'appel a l'API de Pronote.",
-  [ResponseErrorCode.PronotePageDownload]: "Something went wrong when downloading the Pronote page.",
-  [ResponseErrorCode.ENTAvailableCheck]: "Something went wrong when checking if ENT was available.",
+  [ResponseErrorCode.PronotePageDownload]: "Une erreur s'est produite lors du téléchargement de la page Pronote.",
+  [ResponseErrorCode.ENTAvailableCheck]: "Une erreur s'est produite lors de la vérification d'existance ENT.",
   [ResponseErrorCode.PronoteBannedIP]: "Cette adresse IP a ete temporairement suspendue.",
   [ResponseErrorCode.PronoteClosedInstance]: "Cette instance Pronote est ferme.",
   [ResponseErrorCode.SessionReadData]: "Une erreur est survenue lors du parsing des données de session.",
-  [ResponseErrorCode.NetworkFail]: "Une erreur reseau est survenue.",
-  [ResponseErrorCode.NotMatchingOrders]: "L'ordre local et l'ordre recu ne sont pas egaux.",
-  [ResponseErrorCode.NoIVForAESCreated]: "L'IV pour l'encryption AES n'a pas ete cree.",
-  [ResponseErrorCode.NotFoundENT]: "ENT actuellement non disponible.",
-  [ResponseErrorCode.PronoteTicketFetch]: "Error while fetching the Pronote URL ticket. Please, try again.",
-  [ResponseErrorCode.ENTCookiesFetch]: "Error while fetching the ENT cookies. Maybe bad credentials, please try again.",
+  [ResponseErrorCode.NetworkFail]: "Une erreur réseau est survenue.",
+  [ResponseErrorCode.NotMatchingOrders]: "L'ordre local et l'ordre reçu ne sont pas égaux.",
+  [ResponseErrorCode.NoIVForAESCreated]: "L'IV pour l'encryption AES n'a pas été crée.",
+  [ResponseErrorCode.NotFoundENT]: "ENT actuellement non supporté par Pornote.",
+  [ResponseErrorCode.PronoteTicketFetch]: "Erreur lors de la récupération du ticket URL de Pronote, veuillez réessayer.",
+  [ResponseErrorCode.ENTCookiesFetch]: "Erreur lors de la récupération des cookies ENT cookies. Celà peut être dû à de mauvais identifiants, réessayez.",
   [ResponseErrorCode.IncorrectCredentials]: "Nom d'utilisateur ou mot de passe incorrect.",
-  [ResponseErrorCode.OngletUnauthorized]: "Votre compte n'est pas autorise a acceder cet onglet."
+  [ResponseErrorCode.OngletUnauthorized]: "Votre compte n'est pas autorisé à accéder à cet onglet."
 };
 
 export const CLIENT_ERRORS: Language["CLIENT_ERRORS"] = {
-  [ClientErrorCode.SessionCantRestore]: "Session non recuperable, entrez a nouveau vos identifants.",
-  [ClientErrorCode.NetworkFail]: "Une erreur reseau est survenue."
+  [ClientErrorCode.SessionCantRestore]: "Session non récupérable, entrez à nouveau vos identifants.",
+  [ClientErrorCode.NetworkFail]: "Une erreur réseau est survenue."
 };
 
 export const APP_STATE: Language["APP_STATE"] = {
   [AppStateCode.FetchingGrades]: "Actualisation des notes",
   [AppStateCode.FetchingHomeworks]: "Actualisation des devoirs",
   [AppStateCode.FetchingRessources]: "Actualisation des ressources pédagogiques",
-  [AppStateCode.FetchingTimetable]: "Actualisation de l'emploi du temps"
+  [AppStateCode.FetchingTimetable]: "Actualisation de l'emploi du temps",
+  [AppStateCode.ChangingHomeworkState]: "Mise à jour d'un devoir"
 };
 
 export const PAGES: Language["PAGES"] = {
+  _: {
+    LOADING: "Chargement de Pornote...",
+    ERROR: "Une erreur critique est survenue !",
+    RESTART: "Redémarrer"
+  },
+
   INDEX: {
-    dark: "Sombre",
-    light: "Clair",
-    description: "Client non-officiel pour Pronote.",
-    link_account: "Associer un compte Pronote !",
-    link_new_account: "Associer un autre compte Pronote",
-    loading_accounts: "Chargement des comptes..."
+    DESCRIPTION: "Client non-officiel pour Pronote.",
+    LINK_FIRST: "Associer un compte Pronote !",
+    LINK_ANOTHER: "Associer un autre compte Pronote",
+    LOADING: "Chargement des comptes..."
+  },
+
+  APP: {
+    _: {
+      FETCHING: "Récupération des données",
+      WAIT: "Veuillez patienter..."
+    }
   }
 };
 
