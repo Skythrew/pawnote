@@ -19,9 +19,11 @@ import {
 import { Provider as LocalesProvider } from "@/locales";
 
 export default function Root () {
-  const isDarkMode = () => isServer
-    ? false // `window` doesn't exist on the server.
-    : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  // `window` doesn't exist on the server.
+  const colorSchemeMatchMedia = !isServer ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  const [isDarkMode, setDarkMode] = createSignal(colorSchemeMatchMedia?.matches);
+
+  onMount(() => colorSchemeMatchMedia?.addEventListener("change", evt => setDarkMode(evt.matches)));
 
   return (
     <Html

@@ -239,9 +239,9 @@ const SessionFromScratchModal: Component<{
                   </Show>
 
                   <Show when={!credentials.use_ent && !app.current_user.slug}>
-                    <label>Espace à utiliser
+                    <label class="text-brand-dark">Espace à utiliser
                       <select
-                        class="px-2 py-1 rounded-md border border-brand-dark w-full bg-brand-dark bg-opacity-0 hover:bg-opacity-10 outline-brand-primary focus:bg-brand-light focus:bg-opacity-100"
+                        class="appearance-none outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
                         onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}
                       >
                         <For each={props.available_accounts}>
@@ -253,20 +253,20 @@ const SessionFromScratchModal: Component<{
                     </label>
                   </Show>
 
-                  <label>
+                  <label class="text-brand-dark">
                     Nom d'utilisateur
                     <input
-                      class="px-2 py-1 rounded-md border border-brand-dark w-full bg-brand-dark bg-opacity-0 hover:bg-opacity-10 outline-brand-primary focus:bg-brand-light focus:bg-opacity-100"
+                      class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
                       type="text"
                       value={credentials.username}
                       onChange={event => setCredentials("username", event.currentTarget.value)}
                       autocomplete="username"
                     />
                   </label>
-                  <label>
+                  <label class="text-brand-dark">
                     Mot de passe
                     <input
-                      class="px-2 py-1 rounded-md border border-brand-dark w-full bg-brand-dark bg-opacity-0 hover:bg-opacity-10 outline-brand-primary focus:bg-brand-light focus:bg-opacity-100"
+                      class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
                       type="password"
                       value={credentials.password}
                       onChange={event => setCredentials("password", event.currentTarget.value)}
@@ -340,7 +340,6 @@ const SessionFromScratchModal: Component<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-
               <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
                 <DialogTitle
                   as="h3"
@@ -355,12 +354,12 @@ const SessionFromScratchModal: Component<{
                   Vous êtes connecté en tant que {slugModalData()?.endpoints["/user/data"].donnees.ressource.L} à l'instance {slugModalData()?.endpoints["/user/data"].donnees.ressource.Etablissement.V.L.trim()}.
                 </DialogDescription>
 
-                <p class="my-4">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
+                <p class="my-4 text-brand-dark">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
 
                 <form onSubmit={processSlugSave}>
                   <input
                     type="text"
-                    class="px-2 py-1 rounded-md border border-brand-dark w-full bg-brand-dark bg-opacity-0 hover:bg-opacity-10 outline-brand-primary focus:bg-brand-light focus:bg-opacity-100"
+                    class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
                     value={credentials.slug}
                     onInput={event => {
                       const cleanedValue = event.currentTarget.value
@@ -385,6 +384,6 @@ const SessionFromScratchModal: Component<{
 };
 
 export default {
-  show: () => setModalVisibility(true),
+  show: (value = true) => setModalVisibility(value),
   Component: SessionFromScratchModal
 };

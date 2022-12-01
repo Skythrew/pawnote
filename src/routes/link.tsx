@@ -131,6 +131,9 @@ const LinkPronoteAccount: Component = () => {
     }
   };
 
+  // When the page is closed, we force remove the modal just in case.
+  onCleanup(() => SessionFromScratchModal.show(false));
+
   return (
     <div class="min-h-screen bg-brand-primary dark:bg-brand-dark">
       <header class="p-4 pb-8">
@@ -260,10 +263,10 @@ const LinkPronoteAccount: Component = () => {
                                     class="cursor-default select-none relative py-2 pl-10 pr-4 transitions"
                                   >
                                     <span
-                                      class="block text-brand-dark"
+                                      class="block"
                                       classList={{
                                         "font-medium text-brand-white": isSelected(),
-                                        "font-normal": !isSelected()
+                                        "font-normal text-brand-dark": !isSelected()
                                       }}
                                     >
                                       {instance.name} ({Math.floor(instance.distance / 1000)}km)

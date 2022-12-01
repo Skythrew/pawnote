@@ -51,7 +51,7 @@ const RootHomePage: Component = () => {
 
         <div class="flex gap-2">
           <select
-            class="rounded-md py-1 px-3 flex items-center gap-2 transition-colors outline-none border-2 bg-brand-dark border-brand-dark dark:(border-brand-white bg-brand-dark hover:(border-brand-primary bg-brand-primary bg-opacity-40) text-brand-white)"
+            class="appearance-none rounded-md py-1 px-3 flex items-center gap-2 transition-colors outline-none border-2 bg-brand-dark border-brand-dark dark:(border-brand-white bg-brand-dark text-brand-white) dark:hover:(border-brand-primary bg-brand-primary bg-opacity-40)"
             onChange={(event) => switchLanguage(event.currentTarget.value as keyof typeof languages)}
           >
             <For each={Object.keys(fullNameLanguages)}>

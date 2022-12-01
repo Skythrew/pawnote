@@ -142,7 +142,7 @@ const AppHome: Component = () => {
           fallback={<A href="homeworks">Les devoirs n'ont pas encore été récupérés.</A>}
           when={app.current_user.slug !== null && homeworks() !== null}
         >
-          <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary py-2">
+          <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md text-brand-dark bg-brand-primary py-2">
             <div class="flex gap-1 justify-between items-center px-6 py-2">
               <div class="flex flex-col">
                 <A href="homeworks">
@@ -202,7 +202,7 @@ const AppHome: Component = () => {
           when={app.current_user.slug !== null && timetable_lessons()}
         >
           {lessons => (
-            <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary py-2">
+            <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary text-brand-dark py-2">
               <div class="flex gap-1 justify-between items-center px-6 py-2">
                 <div class="flex flex-col">
                   <A href="timetable">
@@ -291,7 +291,7 @@ const AppHome: Component = () => {
           fallback={<A href="grades">Les notes n'ont pas encore été récupérées.</A>}
           when={app.current_user.slug !== null && grades()}
         >
-          <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary py-2">
+          <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md text-brand-dark bg-brand-primary py-2">
             <div class="flex gap-1 justify-between items-center px-6 py-2">
               <div class="flex flex-col">
                 <A href="grades">
