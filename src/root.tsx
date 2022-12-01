@@ -30,6 +30,7 @@ export default function Root () {
     >
       <Head>
         <Meta charset="utf-8" />
+        <Meta name="color-scheme" content="dark light" />
         <Meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
         <Link rel="icon" href="/favicon.ico" sizes="any" />
