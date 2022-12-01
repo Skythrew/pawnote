@@ -11,7 +11,6 @@ import {
   switchLanguage
 } from "@/locales";
 
-import settings from "@/stores/settings";
 import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
 
@@ -46,22 +45,19 @@ const RootHomePage: Component = () => {
     <div class="min-h-screen py-4 px-6 flex flex-col justify-between gap-12 bg-brand-primary dark:bg-brand-dark text-brand-white">
       <header class="w-full flex flex-col items-center justify-start md:justify-between md:flex-row">
         <div class="flex flex-col items-center md:items-start">
-          <h1 class="font-bold text-3xl dark:text-brand-primary">{APP_NAME}</h1>
-          <p class="text-lg text-brand-light mb-4">{t("PAGES.INDEX.description")}</p>
+          <h1 class="font-bold text-3xl">{APP_NAME}</h1>
+          <p class="text-lg text-brand-light mb-4 dark:(text-brand-white text-opacity-60)">{t("PAGES.INDEX.description")}</p>
         </div>
 
         <div class="flex gap-2">
-          <select class="rounded-md py-1 px-3 flex border-2 bg-brand-dark border-brand-dark dark:border-brand-white dark:bg-brand-dark dark:hover:border-brand-primary dark:hover:bg-brand-primary dark:text-brand-white items-center gap-2 transition-colors" onChange={(event) => switchLanguage(event.currentTarget.value as keyof typeof languages)}>
+          <select
+            class="rounded-md py-1 px-3 flex items-center gap-2 transition-colors outline-none border-2 bg-brand-dark border-brand-dark dark:(border-brand-white bg-brand-dark hover:(border-brand-primary bg-brand-primary bg-opacity-40) text-brand-white)"
+            onChange={(event) => switchLanguage(event.currentTarget.value as keyof typeof languages)}
+          >
             <For each={Object.keys(fullNameLanguages)}>
               {lang_name => <option  selected={fullNameLanguages[lang_name] === locale()} value={fullNameLanguages[lang_name]}>{lang_name}</option>}
             </For>
           </select>
-          <button class="rounded-md py-1 px-3 flex border-2 bg-brand-dark border-brand-dark dark:border-brand-white dark:bg-brand-dark dark:hover:border-brand-primary dark:hover:bg-brand-primary dark:text-brand-white items-center gap-2 transition-colors" onClick={settings.toggleGlobalThemeMode}>
-            {settings.globalThemeMode() === "dark"
-              ? <><IconRiMoonClearLine /> {t("PAGES.INDEX.dark")}</>
-              : <><IconRiSunLine /> {t("PAGES.INDEX.light")}</>
-            }
-          </button>
         </div>
 
       </header>

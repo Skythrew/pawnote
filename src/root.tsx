@@ -16,18 +16,18 @@ import {
   ErrorBoundary
 } from "solid-start";
 
-import settings from "@/stores/settings";
 import { Provider as LocalesProvider } from "@/locales";
 
 export default function Root () {
-  createEffect(() => {
-    // Make sure to use dark mode when user sets it.
-    // Automatically defaults to light mode.
-    document.body.classList.toggle("dark", settings.globalThemeMode() === "dark");
-  });
+  const isDarkMode = () => isServer
+    ? false // `window` doesn't exist on the server.
+    : window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   return (
-    <Html lang="fr">
+    <Html
+      lang="fr"
+      classList={{ dark: isDarkMode() }}
+    >
       <Head>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
@@ -35,7 +35,10 @@ export default function Root () {
         <Link rel="icon" href="/favicon.ico" sizes="any" />
         <Link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 
-        <Meta name="theme-color" content={settings.globalThemeMode() === "dark" ? "#222222" : "#17AA67"} />
+        <Meta name="theme-color" content={isDarkMode()
+          ? "#222222" // Dark
+          : "#17AA67" // Light
+        }/>
 
         <Title>{APP_NAME}</Title>
         <Meta name="title" content={APP_NAME} />
@@ -59,14 +62,14 @@ export default function Root () {
 
           <Suspense fallback={
             <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">
-              <h2 class="font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white">Chargement de Pornote...</h2>
-              <span class="text-brand-light text-sm font-medium">v{APP_VERSION} - BETA</span>
+              <h2 class="font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white dark:(bg-brand-primary text-brand-white)">Chargement de Pornote...</h2>
+              <span class="text-brand-light text-sm font-medium dark:(text-brand-white text-opacity-60)">v{APP_VERSION} - BETA</span>
             </div>
           }>
             <ErrorBoundary fallback={(error, reset) => (
-              <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">
+              <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 px-4 bg-brand-primary dark:bg-brand-dark">
                 <h2 class="font-medium text-xl text-brand-white">Une erreur critique est survenue!</h2>
-                <button class="rounded-full px-4 py-1 bg-brand-light" onClick={reset}>
+                <button class="font-medium text-md rounded-full text-brand-primary px-4 py-1 bg-brand-white dark:(bg-brand-primary text-brand-white)" onClick={reset}>
                   Redémarrer
                 </button>
                 <pre class="text-sm opacity-60">{error}</pre>
