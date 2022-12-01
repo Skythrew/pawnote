@@ -25,8 +25,11 @@ import {
 } from "@/utils/client";
 
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
+import { useLocale } from "@/locales";
 
 const LinkPronoteAccount: Component = () => {
+  const [t] = useLocale();
+
   const [state, setState] = createStore<{
     info_dialog_open: boolean;
     show_geolocation_data: boolean;
@@ -95,7 +98,7 @@ const LinkPronoteAccount: Component = () => {
 
       if (err instanceof ApiError) {
         console.error(err.message);
-        alert("Une erreur est survenue. Vérifiez la console.");
+        prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
       }
     }
   };
@@ -126,8 +129,11 @@ const LinkPronoteAccount: Component = () => {
     }
     catch (err) {
       setState("loading_instance", false);
-      console.error(err);
-      alert("Une erreur est survenue pendant la connexion à l'instance choisie.");
+
+      if (err instanceof ApiError) {
+        console.error(err.message);
+        prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
+      }
     }
   };
 

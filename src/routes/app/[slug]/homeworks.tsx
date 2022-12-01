@@ -60,13 +60,13 @@ const AppHomeworks: Component = () => {
             <For each={Object.keys(homeworks).map(Number)}>
               {day_index => (
                 <Show when={homeworks[day_index].length > 0}>
-                  <div class="px-2 py-5 rounded-md bg-brand-primary max-w-md w-full flex flex-col gap-2 relative">
-                    <h2 class="absolute bg-brand-light -left-4 -top-5 text-md font-medium text-brand-primary pl-6 right-4 py-1 rounded-full shadow">{getDayNameFromDayNumber(day_index)}</h2>
+                  <div class="px-2 py-5 rounded-md bg-brand-primary dark:bg-dark-100 max-w-md w-full flex flex-col gap-2 relative">
+                    <h2 class="absolute dark:(bg-brand-primary text-brand-light) bg-brand-light -left-4 -top-5 text-md font-medium text-brand-primary pl-6 right-4 py-1 rounded-full shadow">{getDayNameFromDayNumber(day_index)}</h2>
                     <For each={homeworks[day_index]}>
                       {homework => (
-                        <div class="p-2 rounded bg-brand-white flex-col">
+                        <div class="py-2 px-4 rounded bg-brand-white dark:(bg-brand-dark text-brand-white) flex-col">
                           <div class="flex justify-between items-center">
-                            <h3 class="font-medium">{homework.subject_name}</h3>
+                            <h3 class="font-medium font-semibold">{homework.subject_name}</h3>
                             <input
                               type="checkbox"
                               checked={homework.done}
@@ -80,7 +80,7 @@ const AppHomeworks: Component = () => {
                             />
                           </div>
 
-                          <div innerHTML={homework.description} />
+                          <div class="px-2" innerHTML={homework.description} />
                         </div>
                       )}
                     </For>

@@ -46,7 +46,7 @@ const RootHomePage: Component = () => {
       <header class="w-full flex flex-col items-center justify-start md:justify-between md:flex-row">
         <div class="flex flex-col items-center md:items-start">
           <h1 class="font-bold text-3xl">{APP_NAME}</h1>
-          <p class="text-lg text-brand-light mb-4 dark:(text-brand-white text-opacity-60)">{t("PAGES.INDEX.description")}</p>
+          <p class="text-lg text-brand-light mb-4 dark:(text-brand-white text-opacity-60)">{t("PAGES.INDEX.DESCRIPTION")}</p>
         </div>
 
         <div class="flex gap-2">
@@ -65,7 +65,7 @@ const RootHomePage: Component = () => {
         <Show keyed
           when={availableSessions()}
           fallback={
-            <p class="bg-brand-white text-brand-primary rounded-full px-4 py-1 dark:bg-brand-primary dark:text-brand-light">{t("PAGES.INDEX.loading_accounts")}</p>
+            <p class="bg-brand-white text-brand-primary rounded-full px-4 py-1 dark:bg-brand-primary dark:text-brand-light">{t("PAGES.INDEX.LOADING")}</p>
           }
         >
           {sessions => (
@@ -73,7 +73,7 @@ const RootHomePage: Component = () => {
               when={sessions.length > 0}
               fallback={
                 <A href="/link" class="text-center font-medium px-4 py-2 rounded-full dark:bg-brand-primary dark:bg-opacity-20 dark:border-2 dark:border-brand-primary bg-brand-light text-brand-primary dark:text-brand-light border-2 border-brand-primary">
-                  {t("PAGES.INDEX.link_account")}
+                  {t("PAGES.INDEX.LINK_FIRST")}
                 </A>
               }
             >
@@ -94,7 +94,7 @@ const RootHomePage: Component = () => {
                 )}
               </For>
               <A href="/link">
-                {t("PAGES.INDEX.link_new_account")}
+                {t("PAGES.INDEX.LINK_ANOTHER")}
               </A>
             </Show>
           )}

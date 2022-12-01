@@ -75,9 +75,12 @@ const AppLayout: Component = () => {
 
   return (
     <>
-      <Title>{slug()} - Pornote</Title>
+      <Title>{slug()} - Accueil - Pornote</Title>
       <Show when={user().slug} fallback={
-        <p>Récupération des données, veuillez patienter.</p>
+        <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 px-4 bg-brand-primary dark:bg-brand-dark">
+          <h2 class="text-center font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white dark:(bg-brand-primary text-brand-white)">{t("PAGES.APP._.FETCHING")}</h2>
+          <span class="text-brand-light text-sm font-medium dark:(text-brand-white text-opacity-60)">{t("PAGES.APP._.WAIT")}</span>
+        </div>
       }>
         <header class="fixed z-50 top-0 right-0 left-0 flex flex-col shadow-md">
           <nav class="flex justify-between items-center px-4 h-18 bg-brand-primary">
@@ -104,14 +107,14 @@ const AppLayout: Component = () => {
 
           <Show keyed when={app.current_state.code !== AppStateCode.Idle && app.current_state.code}>
             {code => (
-              <div class="flex items-center justify-center px-2 h-8 bg-brand-white">
-                <p class="text-center text-sm">{t(`APP_STATE.${code}`)}</p>
+              <div class="flex items-center justify-center px-2 h-8 bg-brand-white text-brand-white dark:(bg-brand-light text-brand-primary)">
+                <p class="text-center text-sm">{t(`APP_STATE.${code}`)}...</p>
               </div>
             )}
           </Show>
         </header>
 
-        <main class="mt-26 pt-4">
+        <main class="min-h-screen bg-brand-white dark:bg-brand-dark pt-30">
           <Outlet />
         </main>
 
