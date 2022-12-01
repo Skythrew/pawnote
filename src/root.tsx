@@ -16,13 +16,14 @@ import {
   ErrorBoundary
 } from "solid-start";
 
-import { Provider as LocalesProvider } from "@/locales";
+import { Provider as LocalesProvider, context as locale } from "@/locales";
 
 export default function Root () {
+  const [t] = locale;
+
   // `window` doesn't exist on the server.
   const colorSchemeMatchMedia = !isServer ? window.matchMedia("(prefers-color-scheme: dark)") : null;
   const [isDarkMode, setDarkMode] = createSignal(colorSchemeMatchMedia?.matches);
-
   onMount(() => colorSchemeMatchMedia?.addEventListener("change", evt => setDarkMode(evt.matches)));
 
   return (
@@ -62,18 +63,17 @@ export default function Root () {
       </Head>
       <Body>
         <LocalesProvider>
-
           <Suspense fallback={
             <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">
-              <h2 class="font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white dark:(bg-brand-primary text-brand-white)">Chargement de Pornote...</h2>
+              <h2 class="font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white dark:(bg-brand-primary text-brand-white)">{t("PAGES._.LOADING")}</h2>
               <span class="text-brand-light text-sm font-medium dark:(text-brand-white text-opacity-60)">v{APP_VERSION} - BETA</span>
             </div>
           }>
             <ErrorBoundary fallback={(error, reset) => (
               <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 px-4 bg-brand-primary dark:bg-brand-dark">
-                <h2 class="font-medium text-xl text-brand-white">Une erreur critique est survenue!</h2>
+                <h2 class="font-medium text-xl text-brand-white">{t("PAGES._.ERROR")}</h2>
                 <button class="font-medium text-md rounded-full text-brand-primary px-4 py-1 bg-brand-white dark:(bg-brand-primary text-brand-white)" onClick={reset}>
-                  Redémarrer
+                  {t("PAGES._.RESTART")}
                 </button>
                 <pre class="text-sm opacity-60">{error}</pre>
               </div>
