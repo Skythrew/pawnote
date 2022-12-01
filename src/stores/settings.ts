@@ -4,6 +4,11 @@ const localStorageGlobalThemeMode = () => {
 
   const value = localStorage.getItem("theme");
   if (!value || !(value === "dark" || value === "light")) {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      localStorage.setItem("theme", "dark");
+      return "dark";
+    }
+
     localStorage.setItem("theme", "light");
     return "light";
   }
