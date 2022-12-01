@@ -352,7 +352,7 @@ const SessionFromScratchModal: Component<{
                   as="p"
                   class="text-sm text-brand-dark text-opacity-80"
                 >
-                  Vous êtes connecté en tant que {slugModalData()?.endpoints["/user/data"].donnees.ressource.L} à l'instance {slugModalData()?.endpoints["/user/data"].donnees.ressource.Etablissement.V.L}.
+                  Vous êtes connecté en tant que {slugModalData()?.endpoints["/user/data"].donnees.ressource.L} à l'instance {slugModalData()?.endpoints["/user/data"].donnees.ressource.Etablissement.V.L.trim()}.
                 </DialogDescription>
 
                 <p class="my-4">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>

@@ -252,28 +252,28 @@ const LinkPronoteAccount: Component = () => {
                               <ListboxOption class="focus:outline-none group" value={instance.url}>
                                 {({ isSelected }) => (
                                   <div
-                                    class={classNames(
-                                      isSelected() ? "text-brand-white bg-brand-primary" :
-                                        "group-hover:text-brand-primary group-hover:bg-brand-light",
-                                      "cursor-default select-none relative py-2 pl-10 pr-4",
-                                      "transitions"
-                                    )}
+                                    classList={{
+                                      "text-brand-white bg-brand-primary": isSelected(),
+                                      "group-hover:text-brand-primary group-hover:bg-brand-light": !isSelected()
+                                    }}
+                                    class="cursor-default select-none relative py-2 pl-10 pr-4 transitions"
                                   >
                                     <span
-                                      class={classNames(
-                                        isSelected() ? "font-medium" : "font-normal",
-                                        "block",
-                                      )}
+                                      class="block text-brand-dark"
+                                      classList={{
+                                        "font-medium": isSelected(),
+                                        "font-normal": !isSelected()
+                                      }}
                                     >
                                       {instance.name} ({Math.floor(instance.distance / 1000)}km)
                                     </span>
-                                    {isSelected() ? (
+                                    <Show when={isSelected()}>
                                       <span
                                         class="text-brand-white absolute inset-y-0 left-0 flex items-center pl-3"
                                       >
                                         <IconMdiCheck class="w-5 h-5" aria-hidden="true" />
                                       </span>
-                                    ) : null}
+                                    </Show>
                                   </div>
                                 )}
                               </ListboxOption>
