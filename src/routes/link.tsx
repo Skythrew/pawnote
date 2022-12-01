@@ -19,7 +19,6 @@ import {
 
 import {
   callAPI,
-  classNames,
   getGeolocationPosition,
 
   ApiError
@@ -226,7 +225,7 @@ const LinkPronoteAccount: Component = () => {
             <Show when={state.show_geolocation_data}>
               <Listbox defaultOpen value={state.pronote_url} onSelectChange={instanceSelectChange}>
                 <div class="relative w-full min-w-0">
-                  <ListboxButton type="button" class="relative w-full h-full py-2 pl-4 pr-10 text-left bg-brand-white rounded-lg rounded-r-none cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-brand-primary focus-visible:ring-offset-2 focus-visible:border-brand-primary sm:text-sm">
+                  <ListboxButton type="button" class="relative w-full h-full py-2 pl-4 pr-10 text-left bg-brand-white text-brand-dark rounded-lg rounded-r-none cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-brand-primary focus-visible:ring-offset-2 focus-visible:border-brand-primary sm:text-sm">
                     <span class="block truncate text-sm">{checkMatchPronoteUrl()?.name || state.pronote_url}</span>
                     <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                       <IconMdiChevronRight
@@ -246,7 +245,9 @@ const LinkPronoteAccount: Component = () => {
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                       >
-                        <ListboxOptions class="list-none p-0 absolute py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg h-[35vh] ring-1 ring-black ring-opacity-5 focus:outline-none text-sm md:text-base">
+                        <ListboxOptions
+                          class="list-none p-0 absolute py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg h-[35vh] ring-1 ring-black ring-opacity-5 focus:outline-none text-sm md:text-base"
+                        >
                           <For each={state.geolocation_data}>
                             {instance => (
                               <ListboxOption class="focus:outline-none group" value={instance.url}>
@@ -254,14 +255,14 @@ const LinkPronoteAccount: Component = () => {
                                   <div
                                     classList={{
                                       "text-brand-white bg-brand-primary": isSelected(),
-                                      "group-hover:text-brand-primary group-hover:bg-brand-light": !isSelected()
+                                      "group-hover:(text-brand-primary bg-brand-light)": !isSelected()
                                     }}
                                     class="cursor-default select-none relative py-2 pl-10 pr-4 transitions"
                                   >
                                     <span
                                       class="block text-brand-dark"
                                       classList={{
-                                        "font-medium": isSelected(),
+                                        "font-medium text-brand-white": isSelected(),
                                         "font-normal": !isSelected()
                                       }}
                                     >
@@ -285,20 +286,24 @@ const LinkPronoteAccount: Component = () => {
                   </HeadlessDisclosureChild>
                 </div>
               </Listbox>
-              <button class="bg-brand-light p-2 px-4 rounded-lg flex rounded-l-none text-brand-dark dark:bg-brand-primary dark:text-brand-light" type="button" onClick={() => setState("show_geolocation_data", false)}>
+              <button
+                type="button"
+                class="bg-brand-light p-2 px-4 rounded-lg flex rounded-l-none text-brand-dark dark:(bg-brand-primary text-brand-light)"
+                onClick={() => setState("show_geolocation_data", false)}
+              >
                 <IconMdiPencil />
               </button>
             </Show>
 
             <Show when={!state.show_geolocation_data}>
-              <input class="w-full rounded-lg rounded-r-none outline-none px-4 text-sm"
+              <input class="w-full rounded-lg rounded-r-none outline-none px-4 text-sm bg-brand-white text-brand-dark"
                 type="url"
                 placeholder="URL Pronote"
                 value={state.pronote_url}
                 onChange={event => setState("pronote_url", event.currentTarget.value)}
               />
 
-              <button disabled={state.loading_geolocation} class="bg-brand-light py-2 px-4 rounded-lg flex rounded-l-none text-brand-dark dark:bg-brand-primary dark:text-brand-light disabled:opacity-60" type="button" onClick={handleGeolocation}>
+              <button disabled={state.loading_geolocation} class="bg-brand-light py-2 px-4 rounded-lg flex rounded-l-none text-brand-dark dark:(bg-brand-primary text-brand-light) disabled:opacity-60" type="button" onClick={handleGeolocation}>
                 {state.loading_geolocation
                   ? <IconMdiDotsHorizontal />
                   : <IconMdiMapMarkerRadius />
@@ -307,7 +312,7 @@ const LinkPronoteAccount: Component = () => {
             </Show>
           </div>
 
-          <button disabled={!state.pronote_url || state.loading_instance} class="disabled:opacity-40 bg-brand-light px-4 py-2 rounded-lg w-full dark:bg-brand-primary dark:text-brand-light" type="submit">
+          <button disabled={!state.pronote_url || state.loading_instance} class="disabled:opacity-40 bg-brand-light px-4 py-2 rounded-lg w-full dark:(bg-brand-primary text-brand-light)" type="submit">
             {state.loading_instance ? "Connexion..." : "Etablir une connexion"}
           </button>
         </form>
