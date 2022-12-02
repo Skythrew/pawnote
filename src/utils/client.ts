@@ -696,7 +696,7 @@ export const getTimeFormattedDiff = (
   return duration.format(format);
 };
 
-export const callUserHomeworksAPI = async (week: number) => {
+export const callUserHomeworksAPI = async (week: number, options = { force: false }) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
     code: ResponseErrorCode.UserUnavailable
@@ -704,7 +704,7 @@ export const callUserHomeworksAPI = async (week: number) => {
 
   const endpoint: ApiUserHomeworks["path"] = `/user/homeworks/${week}`;
   const local_response = await endpoints.get<ApiUserHomeworks>(user.slug, endpoint);
-  if (local_response && !local_response.expired) return local_response;
+  if (local_response && !local_response.expired && !options.force) return local_response;
 
   app.enqueue_fetch(AppStateCode.FetchingHomeworks, async () => {
     console.info("[homeworks] renew");
@@ -857,6 +857,7 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
     maximum: number;
     /** Average grade. */
     average: number | string;
+    ratio: number;
 
     /** Grade obtained by the current user. */
     user: number | string;
@@ -905,6 +906,7 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
 
       maximum: readFloatFromString(grade.bareme.V),
       average: readGradeValue(grade.moyenne.V),
+      ratio: grade.coefficient,
 
       user: readGradeValue(grade.note.V),
       user_max: readGradeValue(grade.noteMax.V),

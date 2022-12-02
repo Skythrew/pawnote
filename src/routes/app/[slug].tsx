@@ -82,7 +82,7 @@ const AppLayout: Component = () => {
           <span class="text-brand-light text-sm font-medium dark:(text-brand-white text-opacity-60)">{t("PAGES.APP._.WAIT")}</span>
         </div>
       }>
-        <header class="fixed z-50 top-0 right-0 left-0 flex flex-col shadow-md">
+        <header class="fixed z-50 top-0 right-0 left-0 flex flex-col shadow dark:shadow-md">
           <nav class="flex justify-between items-center px-4 h-18 bg-brand-primary">
             <A href={`/app/${user().slug}`}>
               <div class="flex flex-col">
@@ -107,7 +107,7 @@ const AppLayout: Component = () => {
 
           <Show keyed when={app.current_state.code !== AppStateCode.Idle && app.current_state.code}>
             {code => (
-              <div class="flex items-center justify-center px-2 h-8 bg-brand-white text-brand-white dark:(bg-brand-light text-brand-primary)">
+              <div class="flex items-center justify-center px-2 h-8 bg-brand-white text-brand-dark dark:(bg-brand-light text-brand-primary)">
                 <p class="text-center text-sm">{t(`APP_STATE.${code}`)}...</p>
               </div>
             )}

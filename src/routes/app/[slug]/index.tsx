@@ -273,7 +273,7 @@ const AppHome: Component = () => {
                                 class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
                               >
                                 <h5 class="truncate font-medium text-lg">{lesson.name}</h5>
-                                <span class="block text-sm">{lesson.room} - {lesson.teacher}</span>
+                                <span class="block text-sm">{[lesson.room, lesson.teacher].filter(Boolean).join(" - ")}</span>
                               </div>
                             </>
                           )}
@@ -318,7 +318,7 @@ const AppHome: Component = () => {
 
                 <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
                   <IconMdiCheck />
-                  <p>Aucune note!</p>
+                  <p>Aucune note !</p>
                 </div>
               }>
                 <For each={sorted_grades()}>

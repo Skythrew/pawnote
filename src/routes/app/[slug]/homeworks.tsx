@@ -35,18 +35,20 @@ const AppHomeworks: Component = () => {
       <h2>Devoirs de la semaine {weekNumber()}</h2>
       <div class="flex gap-2 justify-center items-center">
         <button
-          class="px-4 py-1 rounded-full bg-brand-light flex"
+          class="px-4 py-1 rounded-full bg-brand-light dark:bg-brand-primary flex"
           onClick={() => setWeekNumber(prev => prev - 1)}
         >
           <IconMdiArrowLeft />
         </button>
         <button
-          class="px-4 py-1 rounded-full bg-brand-light flex"
+          class="px-4 py-1 rounded-full bg-brand-light dark:bg-brand-primary flex"
           onClick={() => setWeekNumber(prev => prev + 1)}
         >
           <IconMdiArrowRight />
         </button>
       </div>
+
+      <button onClick={() => callUserHomeworksAPI(weekNumber(), { force: true })}>Actualiser</button>
 
       <Show keyed when={homeworks()}
         fallback={
@@ -80,7 +82,7 @@ const AppHomeworks: Component = () => {
                             />
                           </div>
 
-                          <div class="px-2" innerHTML={homework.description} />
+                          <div class="px-2 break-all" innerHTML={homework.description} />
                         </div>
                       )}
                     </For>

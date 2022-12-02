@@ -72,13 +72,13 @@ const AppTimetable: Component = () => {
 
       <div class="flex gap-2 items-center justify">
         <button
-          class="px-4 py-1 bg-brand-light rounded-full flex"
+          class="px-4 py-1 bg-brand-light dark:bg-brand-primary rounded-full flex"
           onClick={() => setWeekNumber(prev => prev - 1)}
         >
           <IconMdiArrowLeft />
         </button>
         <button
-          class="px-4 py-1 bg-brand-light rounded-full flex"
+          class="px-4 py-1 bg-brand-light dark:bg-brand-primary rounded-full flex"
           onClick={() => setWeekNumber(prev => prev + 1)}
         >
           <IconMdiArrowRight />
@@ -131,7 +131,7 @@ const AppTimetable: Component = () => {
 
                     <Show when={lessons.length > 0}
                       fallback={
-                        <div class="w-full bg-brand-white p-2">
+                        <div class="w-full bg-brand-white dark:bg-dark-200 p-2">
                           <span class="block text-center font-medium">
                             Aucun cours
                           </span>
@@ -145,7 +145,7 @@ const AppTimetable: Component = () => {
                               <Match keyed when={lesson_raw().type === "break" && lesson_raw() as TimetableBreak}>
                                 {lesson => (
                                   <div
-                                    class="bg-brand-white bg-opacity-20 flex flex-col items-center justify-center"
+                                    class="bg-brand-white bg-opacity-20 dark:(bg-dark-300 bg-opacity-20) flex flex-col items-center justify-center"
                                     style={{
                                       "height": item_height() * (lesson.to - lesson.from) + "px"
                                     }}
@@ -173,16 +173,16 @@ const AppTimetable: Component = () => {
                               <Match keyed when={lesson_raw().type === "lesson" && lesson_raw() as TimetableLesson}>
                                 {lesson => (
                                   <>
-                                    <span class="absolute z-20 -top-2.5 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position)}</span>
+                                    <span class="text-brand-dark absolute z-20 -top-2.5 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position)}</span>
                                     <div
                                       style={{
                                         "border-left-color": lesson.color,
                                         "height": item_height() * lesson.duration + "px"
                                       }}
-                                      class="border-l-4 border-l-brand-primary bg-brand-white px-4 py-3"
+                                      class="border-l-4 border-l-brand-primary bg-brand-white dark:(bg-dark-200 text-brand-white) px-4 py-3"
                                     >
                                       <Show when={lesson?.status}>
-                                        <span class="absolute py-1 z-10 -top-2.5 border border-brand-light bg-brand-light font-medium px-2 -left-1 rounded text-xs w-max leading-none mr-auto">{lesson.status}</span>
+                                        <span class="text-brand-dark absolute py-1 z-10 -top-2.5 border border-brand-light bg-brand-light font-medium px-2 -left-1 rounded text-xs w-max leading-none mr-auto">{lesson.status}</span>
                                       </Show>
                                       <h5
                                         class="whitespace-nowrap truncate font-medium"
@@ -191,10 +191,11 @@ const AppTimetable: Component = () => {
                                       </h5>
                                       <span
                                         classList={{ "hidden": (item_height() * lesson.duration) <= 60 }}
-                                        class="truncate block text-sm">{[lesson.room, lesson.teacher].filter(Boolean).join(" - ")}</span>
+                                        class="truncate block text-sm dark:opacity-80">{[lesson.room, lesson.teacher].filter(Boolean).join(" - ")}
+                                      </span>
                                     </div>
                                     <Show when={lesson_index === lessons.length - 1}>
-                                      <span class="absolute -bottom-2.5 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position + lesson.duration)}</span>
+                                      <span class="text-brand-dark absolute -bottom-2.5 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position + lesson.duration)}</span>
                                     </Show>
                                   </>
                                 )}
