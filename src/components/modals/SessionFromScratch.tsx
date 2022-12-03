@@ -41,6 +41,8 @@ const SessionFromScratchModal: Component<{
     Awaited<ReturnType<typeof connectToPronote>> | null
   >(null);
 
+  const [loading, setLoading] = createSignal(false);
+
   const [credentials, setCredentials] = createStore<{
     account_type: PronoteApiAccountId;
     use_ent: boolean;
@@ -76,6 +78,8 @@ const SessionFromScratchModal: Component<{
     if (account_type === null || !objectHasProperty(PRONOTE_ACCOUNT_TYPES, account_type)) return;
 
     try {
+      setLoading(true);
+
       const data = await connectToPronote({
         pronote_url: props.pronote_url,
         use_credentials: true,
@@ -95,7 +99,10 @@ const SessionFromScratchModal: Component<{
         )
       });
 
-      setModalVisibility(false);
+      batch(() => {
+        setModalVisibility(false);
+        setLoading(false);
+      });
 
       if (app.current_user.slug) {
         await saveIntoSlug(app.current_user.slug, data);
@@ -106,7 +113,9 @@ const SessionFromScratchModal: Component<{
       setSlugModalData(data);
     }
     catch (err) {
+      setLoading(false);
       console.error(err);
+      alert("Une erreur s'est produite lors de la connexion au compte.");
     }
   };
 
@@ -141,12 +150,16 @@ const SessionFromScratchModal: Component<{
 
     const data = slugModalData();
     const slug = credentials.slug;
-
     if (!slug) return;
+
+    setLoading(true);
     await saveIntoSlug(slug, data);
 
-    setSlugModalData(null);
-    navigate("/");
+    batch(() => {
+      setLoading(false);
+      setSlugModalData(null);
+      navigate("/");
+    });
   };
 
   return (
@@ -291,10 +304,11 @@ const SessionFromScratchModal: Component<{
                   </label>
 
                   <button
-                    class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2"
+                    disabled={loading()}
+                    class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2 disabled:opacity-40"
                     type="submit"
                   >
-                    Connexion !
+                    {loading() ? "Connexion en cours..." : "Connexion !"}
                   </button>
                 </form>
               </DialogPanel>
@@ -368,10 +382,12 @@ const SessionFromScratchModal: Component<{
                       return setCredentials("slug", cleanedValue);
                     }}
                   />
-                  <button type="submit"
-                    class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2"
+                  <button
+                    type="submit"
+                    disabled={loading()}
+                    class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2 disabled:opacity-40"
                   >
-                    Sauvegarder la session
+                    {loading() ? "Sauvegarde..." : "Sauvegarder la session"}
                   </button>
                 </form>
               </DialogPanel>

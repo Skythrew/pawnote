@@ -25,11 +25,8 @@ import {
 } from "@/utils/client";
 
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
-import { useLocale } from "@/locales";
 
 const LinkPronoteAccount: Component = () => {
-  const [t] = useLocale();
-
   const [state, setState] = createStore<{
     info_dialog_open: boolean;
     show_geolocation_data: boolean;
