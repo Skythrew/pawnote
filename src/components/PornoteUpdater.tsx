@@ -23,11 +23,11 @@ const PornoteUpdater: Component = () => {
     setNeedRefresh(false);
   };
 
-  createEffect(() => {
-    if (offlineReady()) {
+  createEffect(on(offlineReady, (isOfflineReady) => {
+    if (isOfflineReady) {
       toast("Pornote est prêt à être utilisé hors-ligne !");
     }
-  });
+  }));
 
   return (
     <Modal open={needRefresh()} onClose={close}>
