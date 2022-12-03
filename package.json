@@ -1,13 +1,13 @@
 {
   "name": "pornote",
   "description": "Client web non-officiel Pronote.",
-	"author": "Mikkel RINGAUD <mikkel@milescode.dev> (https://github.com/Vexcited)",
-	"repository": "github:Vexcited/pornote",
+  "author": "Mikkel RINGAUD <mikkel@milescode.dev> (https://github.com/Vexcited)",
+  "repository": "github:Vexcited/pornote",
   "homepage": "https://www.pornote.ml",
-  "version": "0.0.0",
-	"license": "MIT",
-	"type": "module",
-	"private": true,
+  "version": "0.0.1",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
   "scripts": {
     "dev": "solid-start dev",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
@@ -67,9 +67,9 @@
       "tagName": "v${version}"
     },
     "github": {
-			"draft": false,
+      "draft": false,
       "release": true,
-			"releaseName": "v${version}"
+      "releaseName": "v${version}"
     },
     "npm": {
       "publish": false
