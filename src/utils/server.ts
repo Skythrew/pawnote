@@ -11,6 +11,18 @@ import set_cookie from "set-cookie-parser";
 import { ResponseErrorCode } from "@/types/errors";
 import { HEADERS_PRONOTE } from "@/utils/constants";
 
+interface RateLimitData {
+  date: number;
+  count: number;
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var _ipRateLimit: {
+    [ip: string]: RateLimitData
+  };
+}
+
 const searchParamsToObject = (entries: IterableIterator<[string, string]>) => {
   const result: Record<string, unknown> = {};
 
@@ -32,6 +44,45 @@ export const handleServerRequest = <T extends {
   }
 ) => Promise<unknown>) => {
   return async (evt: APIEvent) => {
+    const ip = evt.request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+
+    if (!global._ipRateLimit) (
+      global._ipRateLimit = {}
+    );
+
+    if (!global._ipRateLimit[ip]) {
+      global._ipRateLimit[ip] = {
+        count: 0,
+        date: Date.now()
+      };
+    }
+
+    // Every 2 seconds.
+    const timeLimit = 1000 * 2;
+    const countLimit = 30;
+
+    // If the time limit isn't reset.
+    if ((global._ipRateLimit[ip].date + timeLimit) >= Date.now()) {
+      global._ipRateLimit[ip].count++;
+    }
+    else {
+      global._ipRateLimit[ip] = {
+        count: 0,
+        date: Date.now()
+      };
+    }
+
+    if (global._ipRateLimit[ip].count >= countLimit) return json({
+      success: false,
+      code: ResponseErrorCode.RateLimit,
+      debug: {
+        time_interval_in_ms: timeLimit,
+        time_left_in_ms: global._ipRateLimit[ip].date + timeLimit - Date.now(),
+        count_limit: countLimit,
+        current_count: global._ipRateLimit[ip].count
+      }
+    }, { status: 403 });
+
     const body: T["request"] = evt.request.method.toUpperCase() === "GET"
       ? searchParamsToObject(new URL(evt.request.url).searchParams.entries())
       : await evt.request.json();
