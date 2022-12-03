@@ -857,6 +857,7 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
     maximum: number;
     /** Average grade. */
     average: number | string;
+    optional: boolean;
     ratio: number;
 
     /** Grade obtained by the current user. */
@@ -906,6 +907,7 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
 
       maximum: readFloatFromString(grade.bareme.V),
       average: readGradeValue(grade.moyenne.V),
+      optional: grade.estFacultatif,
       ratio: grade.coefficient,
 
       user: readGradeValue(grade.note.V),

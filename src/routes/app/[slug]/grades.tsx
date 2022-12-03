@@ -96,9 +96,14 @@ const AppGrades: Component = () => {
                     <For each={subject.grades}>
                       {grade => (
                         <div class="py-2 px-4 w-full">
-                          <h4 class="text-lg font-medium dark:text-brand-white">{grade.user}/{grade.maximum} <span class="text-sm opacity-80">x{grade.ratio}</span></h4>
+                          <h4 class="text-lg font-medium dark:text-brand-white">
+                            {typeof grade.user === "string"
+                              ? grade.user
+                              : <>{grade.user}/{grade.maximum} {grade.optional && <span class="text-md text-opacity-80">Facultatif</span>} <span class="text-sm opacity-70">Coef. {grade.ratio}</span></>
+                            }
+                          </h4>
                           <p class="text-sm dark:(text-brand-white text-opacity-60)">{grade.description}</p>
-                          <span class="text-xs dark:(text-brand-white text-opacity-40)">Le {grade.date.toDate().toLocaleDateString()} ; Max: {grade.user_max} ; Min: {grade.user_min}</span>
+                          <span class="text-xs dark:(text-brand-white text-opacity-40)">Le {grade.date.toDate().toLocaleDateString()} ; Moy: {grade.average} ; Max: {grade.user_max} ; Min: {grade.user_min}</span>
                         </div>
                       )}
                     </For>
