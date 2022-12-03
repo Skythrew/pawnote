@@ -18,6 +18,9 @@ import {
 
 import { Provider as LocalesProvider, context as locale } from "@/locales";
 
+import PornoteUpdater from "@/components/PornoteUpdater";
+import { Toaster } from "solid-toast";
+
 export default function Root () {
   const [t] = locale;
 
@@ -63,6 +66,11 @@ export default function Root () {
       </Head>
       <Body>
         <LocalesProvider>
+          <PornoteUpdater />
+          <Toaster position="bottom-right" toastOptions={{
+            className: "!bg-brand-white !text-brand-dark !dark:bg-dark-200 !dark:text-brand-white !border-2 !border-brand-primary"
+          }} />
+
           <Suspense fallback={
             <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">
               <h2 class="font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white dark:(bg-brand-primary text-brand-white)">{t("PAGES._.LOADING")}</h2>
@@ -78,6 +86,7 @@ export default function Root () {
                 <pre class="text-sm opacity-60">{error}</pre>
               </div>
             )}>
+
               <Routes>
                 <FileRoutes />
               </Routes>

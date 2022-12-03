@@ -2,6 +2,7 @@ import type { Component } from "solid-js";
 import type { ApiUserData } from "@/types/api";
 
 import { A } from "solid-start";
+import { toast } from "solid-toast";
 
 import {
   type languages,
@@ -52,10 +53,14 @@ const RootHomePage: Component = () => {
         <div class="flex gap-2">
           <select
             class="appearance-none rounded-md py-1 px-3 flex items-center gap-2 transition-colors outline-none border-2 bg-brand-dark border-brand-dark dark:(border-brand-white bg-brand-dark text-brand-white) dark:hover:(border-brand-primary bg-brand-primary bg-opacity-40)"
-            onChange={(event) => switchLanguage(event.currentTarget.value as keyof typeof languages)}
+            onChange={(event) => {
+              const lang_name = event.currentTarget.value as keyof typeof languages;
+              toast(`Passage en ${Object.keys(fullNameLanguages)[Object.values(fullNameLanguages).findIndex(v => v === lang_name)]}`);
+              switchLanguage(lang_name);
+            }}
           >
             <For each={Object.keys(fullNameLanguages)}>
-              {lang_name => <option  selected={fullNameLanguages[lang_name] === locale()} value={fullNameLanguages[lang_name]}>{lang_name}</option>}
+              {lang_name => <option selected={fullNameLanguages[lang_name] === locale()} value={fullNameLanguages[lang_name]}>{lang_name}</option>}
             </For>
           </select>
         </div>

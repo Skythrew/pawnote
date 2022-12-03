@@ -1,7 +1,4 @@
 import { defineConfig } from "vite";
-import crypto from "crypto";
-import path from "path";
-import fs from "fs";
 
 import solid from "solid-start/vite";
 import vercel from "solid-start-vercel";
@@ -12,6 +9,12 @@ import icons from "unplugin-icons/vite";
 
 import auto from "unplugin-auto-import/vite";
 import icons_resolver from "unplugin-icons/resolver";
+
+// These packages are needed to determine
+// the revision of the rendered index.html file.
+import crypto from "node:crypto";
+import path from "node:path";
+import fs from "node:fs";
 
 const indexHtmlRevision = () => {
   const index_path = path.resolve(__dirname, ".solid/index.html");
@@ -56,11 +59,8 @@ export default defineConfig ({
 
     pwa ({
       base: "/",
-      includeAssets: [
-        "robots.txt",
-        "favicon.ico",
-        "apple-touch-icon.png"
-      ],
+      registerType: "prompt",
+      includeAssets: ["favicon.ico", "apple-touch-icon.png"],
 
       workbox: {
         // Environment variable set only when building the client.
