@@ -16,8 +16,6 @@ import {
   ErrorBoundary
 } from "solid-start";
 
-import { HttpHeader } from "solid-start/server";
-
 import { Provider as LocalesProvider, context as locale } from "@/locales";
 
 export default function Root () {
@@ -64,9 +62,6 @@ export default function Root () {
         {/* <Meta property="twitter:image" content="/banner.png" /> */}
       </Head>
       <Body>
-        <HttpHeader name="X-FRAME-OPTIONS" value="DENY" />
-        <HttpHeader name="Content-Security-Policy" value="default-src 'self'; script-src 'self'; child-src www.pornote.ml; style-src 'self' www.pornote.ml; font-src 'self';" />
-
         <LocalesProvider>
           <Suspense fallback={
             <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 bg-brand-primary dark:bg-brand-dark">

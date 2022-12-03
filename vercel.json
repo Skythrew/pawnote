@@ -16,12 +16,27 @@
           "value": "application/manifest+json"
         }
       ]
+    },
+		{
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "x-frame-options",
+          "value": "deny"
+        },
+				{
+					"key": "x-xss-protection",
+					"value": "1; mode=block"
+				},
+				{
+					"key": "x-content-type-options",
+					"value": "nosniff"
+				},
+				{
+					"key": "content-security-policy",
+					"value": "default-src 'self';"
+				}
+      ]
     }
-  ],
-  
-  "build": {
-    "env": {
-      "ENABLE_VC_BUILD": "1"
-    }
-  }
+  ]
 }
