@@ -4,23 +4,16 @@ import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
 import type { SessionInstance } from "@/types/session";
 import type { ResponseError } from "@/types/api";
 
-import type { APIEvent } from "solid-start/api";
-import { json } from "solid-start/api";
+import rate_limiter, { type RateLimiter } from "lambda-rate-limiter";
+import { type APIEvent, json } from "solid-start/api";
 import set_cookie from "set-cookie-parser";
 
 import { ResponseErrorCode } from "@/types/errors";
 import { HEADERS_PRONOTE } from "@/utils/constants";
 
-interface RateLimitData {
-  date: number;
-  count: number;
-}
-
 declare global {
   // eslint-disable-next-line no-var
-  var _ipRateLimit: {
-    [ip: string]: RateLimitData
-  };
+  var _rate_limiter: RateLimiter;
 }
 
 const searchParamsToObject = (entries: IterableIterator<[string, string]>) => {
@@ -44,48 +37,47 @@ export const handleServerRequest = <T extends {
   }
 ) => Promise<unknown>) => {
   return async (evt: APIEvent) => {
-    const ip = evt.request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const ip = evt.request.headers.get("x-real-ip") || evt.request.headers.get("x-forwarded-for") || "127.0.0.1";
+    const limit_count = 30;
 
-    if (!global._ipRateLimit) (
-      global._ipRateLimit = {}
+    if (!global._rate_limiter) (
+      global._rate_limiter = rate_limiter({
+        interval: 1000 * 2, // 2 seconds.
+        uniqueTokenPerInterval: 500
+      })
     );
 
-    if (!global._ipRateLimit[ip]) {
-      global._ipRateLimit[ip] = {
-        count: 0,
-        date: Date.now()
-      };
+    try {
+      await global._rate_limiter.check(limit_count, ip);
+    }
+    catch (count) {
+      return json({
+        success: false,
+        code: ResponseErrorCode.RateLimit,
+        debug: {
+          current_count: count,
+          limit_count
+        }
+      }, { status: 429 });
     }
 
-    // Every 2 seconds.
-    const timeLimit = 1000 * 2;
-    const countLimit = 30;
+    let body: T["request"] | undefined;
 
-    // If the time limit isn't reset.
-    if ((global._ipRateLimit[ip].date + timeLimit) >= Date.now()) {
-      global._ipRateLimit[ip].count++;
+    try {
+      body = evt.request.method.toUpperCase() === "GET"
+        ? searchParamsToObject(new URL(evt.request.url).searchParams.entries())
+        : await evt.request.json();
     }
-    else {
-      global._ipRateLimit[ip] = {
-        count: 0,
-        date: Date.now()
-      };
+    catch {
+      return json({
+        success: false,
+        code: ResponseErrorCode.IncorrectParameters
+      });
     }
 
-    if (global._ipRateLimit[ip].count >= countLimit) return json({
-      success: false,
-      code: ResponseErrorCode.RateLimit,
-      debug: {
-        time_interval_in_ms: timeLimit,
-        time_left_in_ms: global._ipRateLimit[ip].date + timeLimit - Date.now(),
-        count_limit: countLimit,
-        current_count: global._ipRateLimit[ip].count
-      }
-    }, { status: 403 });
-
-    const body: T["request"] = evt.request.method.toUpperCase() === "GET"
-      ? searchParamsToObject(new URL(evt.request.url).searchParams.entries())
-      : await evt.request.json();
+    if (typeof body === "undefined") (
+      body = {} as T["request"]
+    );
 
     return callback(
       { body, params: evt.params }, ({
