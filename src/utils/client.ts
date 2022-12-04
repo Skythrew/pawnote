@@ -154,81 +154,73 @@ export const callAPI = async <Api extends {
         const old_session = user.session;
 
         // When the session expired while connected to a user.
-        try {
-          const creds = await credentials.get(user.slug);
-          let data: Awaited<ReturnType<typeof connectToPronote>> | undefined;
+        const creds = await credentials.get(user.slug);
+        let data: Awaited<ReturnType<typeof connectToPronote>> | undefined;
 
-          // Directly use the crendentials when we have them.
-          if (creds) {
-            data = await connectToPronote({
-              pronote_url: old_session.instance.pronote_url,
-              use_credentials: true,
-              username: creds.username,
-              password: creds.password,
-              ...(old_session.instance.use_ent
-                ? { // When creating a new session using ENT cookies.
-                  use_ent: true,
-                  ent_url: old_session.instance.ent_url as string
-                }
-                : { // When restoring a session using Pronote cookies.
-                  use_ent: false,
-                  account_type: old_session.instance.account_type_id
-                }
-              )
-            });
-          }
-          // Use the cookies otherwise, but session restoring can fail.
-          else {
-            data = await connectToPronote({
-              pronote_url: old_session.instance.pronote_url,
-              use_credentials: false,
-              ...(old_session.instance.use_ent
-                ? { // When creating a new session using ENT cookies.
-                  use_ent: true,
-                  ent_cookies: old_session.instance.ent_cookies,
-                  ent_url: old_session.instance.ent_url as string
-                }
-                : { // When restoring a session using Pronote cookies.
-                  use_ent: false,
-                  account_type: old_session.instance.account_type_id,
-                  pronote_cookies: old_session.instance.pronote_cookies
-                }
-              )
-            });
-          }
-
-          if (!data) {
-            throw new ClientError({
-              code: ClientErrorCode.SessionCantRestore
-            });
-          }
-
-          const is_saved = await sessions.upsert(user.slug, data.session);
-
-          // Endpoints with some session defined ID
-          // can't be saved because these IDs are renewed.
-          await endpoints.removeAllStartingWith(user.slug, "/user/grades/");
-
-          if (is_saved) {
-            await endpoints.upsert<ApiUserData>(
-              user.slug, "/user/data", data.endpoints["/user/data"]
-            );
-
-            await endpoints.upsert<ApiLoginInformations>(
-              user.slug, "/login/informations", data.endpoints["/login/informations"]
-            );
-          }
-
-          if (options.prevent_catch_rerun) throw new ApiError(response);
-
-          return callAPI<Api>(path, body, options);
+        // Directly use the crendentials when we have them.
+        if (creds) {
+          data = await connectToPronote({
+            pronote_url: old_session.instance.pronote_url,
+            use_credentials: true,
+            username: creds.username,
+            password: creds.password,
+            ...(old_session.instance.use_ent
+              ? { // When creating a new session using ENT cookies.
+                use_ent: true,
+                ent_url: old_session.instance.ent_url as string
+              }
+              : { // When restoring a session using Pronote cookies.
+                use_ent: false,
+                account_type: old_session.instance.account_type_id
+              }
+            )
+          });
         }
-        catch (error) {
-          // Ask for new credentials.
-          // User can choose if they'll be saved or not.
-          SessionFromScratchModal.show();
-          throw error;
+        // Use the cookies otherwise, but session restoring can fail.
+        else {
+          data = await connectToPronote({
+            pronote_url: old_session.instance.pronote_url,
+            use_credentials: false,
+            ...(old_session.instance.use_ent
+              ? { // When creating a new session using ENT cookies.
+                use_ent: true,
+                ent_cookies: old_session.instance.ent_cookies,
+                ent_url: old_session.instance.ent_url as string
+              }
+              : { // When restoring a session using Pronote cookies.
+                use_ent: false,
+                account_type: old_session.instance.account_type_id,
+                pronote_cookies: old_session.instance.pronote_cookies
+              }
+            )
+          });
         }
+
+        if (!data) {
+          throw new ClientError({
+            code: ClientErrorCode.SessionCantRestore
+          });
+        }
+
+        const is_saved = await sessions.upsert(user.slug, data.session);
+
+        // Endpoints with some session defined ID
+        // can't be saved because these IDs are renewed.
+        await endpoints.removeAllStartingWith(user.slug, "/user/grades/");
+
+        if (is_saved) {
+          await endpoints.upsert<ApiUserData>(
+            user.slug, "/user/data", data.endpoints["/user/data"]
+          );
+
+          await endpoints.upsert<ApiLoginInformations>(
+            user.slug, "/login/informations", data.endpoints["/login/informations"]
+          );
+        }
+
+        if (options.prevent_catch_rerun) throw new ApiError(response);
+
+        return callAPI<Api>(path, body, options);
       }
 
       // Should be a first-time login.
@@ -244,14 +236,14 @@ export const callAPI = async <Api extends {
 
   // When we want to store the data, we also need a slug.
   // When the response contains a session or a Pronote response, we store it.
-  if (!options.prevent_cache && user.slug) {
+  if (user.slug) {
     const typed_response = response.data as unknown as {
       session?: SessionExported;
       received?: unknown;
     };
 
     typed_response.session && await sessions.upsert(user.slug, typed_response.session);
-    typed_response.received && await endpoints.upsert(user.slug, path(), typed_response.received);
+    !options.prevent_cache && typed_response.received && await endpoints.upsert(user.slug, path(), typed_response.received);
   }
 
   return response.data;
@@ -380,7 +372,7 @@ export const connectToPronote = async (options: {
     // If the URL is not the same, we should use it as raw.
     raw_url: options.pronote_url !== pronote_url
   }), { // Here, we prevent the cache even if we'll cache it later.
-    prevent_cache : true
+    prevent_cache: true
   });
 
   // Add cookies we got from the request.
@@ -398,6 +390,7 @@ export const connectToPronote = async (options: {
     // Ask for new credentials.
     // User can choose if they'll be saved or not.
     SessionFromScratchModal.show();
+
     throw new ClientError({
       code: ClientErrorCode.SessionCantRestore
     });
@@ -407,7 +400,7 @@ export const connectToPronote = async (options: {
     pronote_username,
     cookies: pronote_cookies,
     session: informations_response.session
-  }), { prevent_cache : true });
+  }), { prevent_cache: true });
 
   if (identify_response.received.donnees.modeCompLog) {
     pronote_username = pronote_username.toLowerCase();
@@ -478,7 +471,7 @@ export const connectToPronote = async (options: {
     solved_challenge: resolved_challenge!,
     session: identify_response.session,
     cookies: pronote_cookies
-  }), { prevent_cache : true });
+  }), { prevent_cache: true });
 
   // Remove the stored cookie "CASTJU" if exists.
   pronote_cookies = pronote_cookies.filter(cookie => !cookie.startsWith("CASTJU="));

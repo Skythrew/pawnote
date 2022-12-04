@@ -168,10 +168,9 @@ class Session {
     }
 
     this.instance.order++;
+    const response = JSON.parse(response_body) as PronoteApiFunctionPayload<Res>;
 
     try {
-      const response = JSON.parse(response_body) as PronoteApiFunctionPayload<Res>;
-
       // Check the local order number with the received one.
       const { aes_iv, aes_key } = this.encryption_aes();
       const decrypted_order = aes.decrypt(response.numeroOrdre, {
@@ -206,7 +205,7 @@ class Session {
       return final_data;
     }
     catch (error) {
-      console.error("[session:read...]", error);
+      console.error("[session:read...]", error, "\nres:", response);
       return ResponseErrorCode.SessionExpired;
     }
   }
