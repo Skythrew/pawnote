@@ -58,7 +58,7 @@ const GradeInfoModal: Component = () => {
           </div>
         </div>
 
-        <Show when={true}>
+        <Show when={grade()?.optional}>
           <div class="bg-brand-primary dark:bg-dark-200 px-4 py-2 rounded-md">
             <p class="text-sm font-medium text-center text-brand-white">Cette note est facultative.</p>
           </div>
