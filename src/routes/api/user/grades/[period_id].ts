@@ -38,7 +38,8 @@ export const POST = handleServerRequest<ApiUserGrades>(async (req, res) => {
     });
     const response = await callPronoteAPI(PronoteApiFunctions.Grades, {
       session_instance: session.instance,
-      payload: request_payload
+      payload: request_payload,
+      user_agent: req.user_agent
     });
 
     if (response === null) return res.error({

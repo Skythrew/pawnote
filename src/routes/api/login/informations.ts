@@ -33,7 +33,11 @@ export const POST = handleServerRequest<ApiLoginInformations>(async (req, res) =
       ? req.body.pronote_url
       : pronote_url + `/${account_type.path}?login=true`;
 
-    const pronote_page = await downloadPronotePage(pronote_page_url, req.body.cookies);
+    const pronote_page = await downloadPronotePage({
+      url: pronote_page_url,
+      cookies: req.body.cookies,
+      user_agent: req.user_agent
+    });
 
     // Check if the Pronote page has been correctly downloaded.
     if (pronote_page === null) return res.error({
@@ -105,7 +109,8 @@ export const POST = handleServerRequest<ApiLoginInformations>(async (req, res) =
       cookies,
       pronote_url,
       payload: request_payload,
-      session_instance: session.instance
+      session_instance: session.instance,
+      user_agent: req.user_agent
     });
 
     if (response === null) return res.error({

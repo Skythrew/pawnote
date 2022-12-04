@@ -29,7 +29,7 @@ export const handleServerRequest = <T extends {
   request: unknown;
   response: unknown;
 }>(callback: (
-  req: { body: T["request"], params: APIEvent["params"] },
+  req: { body: T["request"], user_agent: string, params: APIEvent["params"] },
   res: {
     error: (params: Omit<ResponseError, "success">, options?: ResponseInit) => ReturnType<typeof json>,
     success: (data: T["response"], options?: ResponseInit) => ReturnType<typeof json>
@@ -78,8 +78,19 @@ export const handleServerRequest = <T extends {
       body = {} as T["request"]
     );
 
+    const user_agent = evt.request.headers.get("user-agent");
+    if (!user_agent) return json({
+      success: false,
+      code: ResponseErrorCode.IncorrectParameters,
+      debug: { user_agent }
+    });
+
     return callback(
-      { body, params: evt.params }, ({
+      {
+        body,
+        user_agent,
+        params: evt.params
+      }, ({
         error: (
           params,
           options = { status: 500 }

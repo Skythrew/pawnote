@@ -27,7 +27,10 @@ export const POST = handleServerRequest<ApiInstance>(async (req, res) => {
     const pronote_url = cleanPronoteUrl(req.body.pronote_url);
 
     // Download Pronote page and add `?login=true` at the end to bypass ENT.
-    const pronote_page = await downloadPronotePage(pronote_url + "/?login=true");
+    const pronote_page = await downloadPronotePage({
+      url: pronote_url + "/?login=true",
+      user_agent: req.user_agent
+    });
 
     // Check if the Pronote page has been correctly downloaded.
     if (pronote_page === null) return res.error({
@@ -39,7 +42,10 @@ export const POST = handleServerRequest<ApiInstance>(async (req, res) => {
     });
 
     // We don't add anything at the end to be redirected to the ENT page if available.
-    const ent = await checkAvailableENT(pronote_url);
+    const ent = await checkAvailableENT({
+      url: pronote_url,
+      user_agent: req.user_agent
+    });
 
     // Check if the ENT check has been successful.
     if (ent === null) return res.error({
@@ -77,7 +83,8 @@ export const POST = handleServerRequest<ApiInstance>(async (req, res) => {
 
     const response = await callPronoteAPI(PronoteApiFunctions.Instance, {
       payload: request_payload,
-      session_instance: session.instance
+      session_instance: session.instance,
+      user_agent: req.user_agent
     });
 
     if (response === null) return res.error({

@@ -40,7 +40,8 @@ export const POST = handleServerRequest<ApiLoginIdentify>(async (req, res) => {
     const response = await callPronoteAPI(PronoteApiFunctions.Identify, {
       session_instance: session.instance,
       cookies: req.body.cookies ?? [],
-      payload: request_payload
+      payload: request_payload,
+      user_agent: req.user_agent
     });
 
     if (response === null) return res.error({

@@ -1,7 +1,7 @@
 import type { PronoteApiGeolocation } from "@/types/pronote";
 import type { ApiGeolocation } from "@/types/api";
 
-import { GEOLOCATION_API_URL, HEADERS_PRONOTE } from "@/utils/constants";
+import { GEOLOCATION_API_URL } from "@/utils/constants";
 import { ResponseErrorCode } from "@/types/errors";
 
 import { handleServerRequest } from "@/utils/server";
@@ -28,7 +28,7 @@ export const POST = handleServerRequest<ApiGeolocation>(async (req, res) => {
     const response = await fetch(GEOLOCATION_API_URL, {
       method: "POST",
       headers: {
-        ...HEADERS_PRONOTE,
+        "User-Agent": req.user_agent,
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       },
       body: `data=${JSON.stringify(request_body)}`

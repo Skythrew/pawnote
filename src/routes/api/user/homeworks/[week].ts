@@ -43,7 +43,8 @@ export const POST = handleServerRequest<ApiUserHomeworks>(async (req, res) => {
     });
     const response = await callPronoteAPI(PronoteApiFunctions.Homeworks, {
       session_instance: session.instance,
-      payload: request_payload
+      payload: request_payload,
+      user_agent: req.user_agent
     });
 
     if (response === null) return res.error({

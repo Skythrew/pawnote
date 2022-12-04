@@ -26,7 +26,8 @@ export const POST = handleServerRequest<ApiUserData>(async (req, res) => {
     const response = await callPronoteAPI(PronoteApiFunctions.UserData, {
       session_instance: session.instance,
       cookies: session.instance.pronote_cookies,
-      payload: request_payload
+      payload: request_payload,
+      user_agent: req.user_agent
     });
 
     if (response === null) return res.error({
