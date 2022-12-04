@@ -218,6 +218,7 @@ export const callAPI = async <Api extends {
           );
         }
 
+        toast("La session a été restorée.");
         if (options.prevent_catch_rerun) throw new ApiError(response);
 
         return callAPI<Api>(path, body, options);

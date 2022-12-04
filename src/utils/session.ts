@@ -161,7 +161,7 @@ class Session {
    * Returns an object when the request was successful
    * and `string` if an error has been found.
    */
-  readPronoteFunctionPayload <Res>(response_body: string): Res | ResponseErrorCode.SessionExpired | ResponseErrorCode.NotMatchingOrders {
+  readPronoteFunctionPayload <Res>(response_body: string): Res | ResponseErrorCode {
     if (response_body.includes("La page a expir")) {
       this.instance.order--; // Prevent broken response to take the order.
       return ResponseErrorCode.SessionExpired;
@@ -206,7 +206,7 @@ class Session {
     }
     catch (error) {
       console.error("[session:read...]", error, "\nres:", response);
-      return ResponseErrorCode.SessionExpired;
+      return ResponseErrorCode.ResponsePayloadBroken;
     }
   }
 }

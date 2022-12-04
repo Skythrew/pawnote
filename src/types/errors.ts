@@ -20,7 +20,8 @@ export enum ResponseErrorCode {
   OngletUnauthorized = 118,
   NotMatchingOrders = 119,
   SessionExpired = 120,
-  RateLimit = 121
+  RateLimit = 121,
+  ResponsePayloadBroken = 122
 }
 
 /** Client error codes. Starting from 200. */

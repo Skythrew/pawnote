@@ -22,7 +22,9 @@ export const API_ERRORS: Language["API_ERRORS"] = {
   [ResponseErrorCode.PronoteTicketFetch]: "Error while fetching the Pronote URL ticket. Please, try again.",
   [ResponseErrorCode.ENTCookiesFetch]: "Error while fetching the ENT cookies. Maybe bad credentials, please try again.",
   [ResponseErrorCode.IncorrectCredentials]: "Incorrect username and/or password.",
-  [ResponseErrorCode.OngletUnauthorized]: "User is not authorized to access this onglet."
+  [ResponseErrorCode.OngletUnauthorized]: "User is not authorized to access this onglet.",
+  [ResponseErrorCode.RateLimit]: "You do too many requests per second, please slow down.",
+  [ResponseErrorCode.ResponsePayloadBroken]: "Error was made in the response payload, please retry."
 };
 
 export const CLIENT_ERRORS: Language["CLIENT_ERRORS"] = {

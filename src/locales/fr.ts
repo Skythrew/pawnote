@@ -12,7 +12,7 @@ export const API_ERRORS: Language["API_ERRORS"] = {
   [ResponseErrorCode.ServerSideError]: "Une erreur est survenue lors de l'appel a l'API de Pronote.",
   [ResponseErrorCode.PronotePageDownload]: "Une erreur s'est produite lors du téléchargement de la page Pronote.",
   [ResponseErrorCode.ENTAvailableCheck]: "Une erreur s'est produite lors de la vérification d'existance ENT.",
-  [ResponseErrorCode.PronoteBannedIP]: "Cette adresse IP a ete temporairement suspendue.",
+  [ResponseErrorCode.PronoteBannedIP]: "Cette adresse IP a été temporairement suspendue.",
   [ResponseErrorCode.PronoteClosedInstance]: "Cette instance Pronote est ferme.",
   [ResponseErrorCode.SessionReadData]: "Une erreur est survenue lors du parsing des données de session.",
   [ResponseErrorCode.NetworkFail]: "Une erreur réseau est survenue.",
@@ -22,7 +22,9 @@ export const API_ERRORS: Language["API_ERRORS"] = {
   [ResponseErrorCode.PronoteTicketFetch]: "Erreur lors de la récupération du ticket URL de Pronote, veuillez réessayer.",
   [ResponseErrorCode.ENTCookiesFetch]: "Erreur lors de la récupération des cookies ENT cookies. Celà peut être dû à de mauvais identifiants, réessayez.",
   [ResponseErrorCode.IncorrectCredentials]: "Nom d'utilisateur ou mot de passe incorrect.",
-  [ResponseErrorCode.OngletUnauthorized]: "Votre compte n'est pas autorisé à accéder à cet onglet."
+  [ResponseErrorCode.OngletUnauthorized]: "Votre compte n'est pas autorisé à accéder à cet onglet.",
+  [ResponseErrorCode.RateLimit]: "Vous effectuez trop de requêtes par secondes, veuillez ralentir.",
+  [ResponseErrorCode.ResponsePayloadBroken]: "Une erreur a été produite dans le payload de la réponse."
 };
 
 export const CLIENT_ERRORS: Language["CLIENT_ERRORS"] = {
