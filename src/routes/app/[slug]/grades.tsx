@@ -59,7 +59,9 @@ const AppGrades: Component = () => {
           </select>
         </div>
 
-        <div class="flex flex-col md:flex-row gap-4 pb-4 pt-6">
+        <button class="mt-2 mb-6" onClick={() => callUserGradesAPI(currentPeriod, { force: true })}>Actualiser</button>
+
+        <div class="flex flex-col md:flex-row gap-4 pb-4">
           <Show keyed when={endpoint()?.donnees.moyGenerale.V}>
             {value => (
               <div class="rounded-full border-2 border-brand-primary bg-brand-primary flex items-center justify-between pl-4 gap-2">
@@ -78,7 +80,6 @@ const AppGrades: Component = () => {
           </Show>
         </div>
 
-        <button onClick={() => callUserGradesAPI(currentPeriod, { force: true })}>Actualiser</button>
 
         <Show keyed when={grades()}
           fallback={
