@@ -3,15 +3,8 @@ import type { Component, JSX } from "solid-js";
 import type { PronoteApiAccountId } from "@/types/pronote";
 import type { ApiInstance, ApiLoginInformations, ApiUserData } from "@/types/api";
 
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-  DialogOverlay,
-  DialogDescription
-} from "solid-headless";
+import Modal from "@/components/Modal";
+import { DialogDescription, DialogTitle } from "solid-headless";
 
 import { connectToPronote } from "@/utils/client";
 import { objectHasProperty } from "@/utils/globals";
@@ -166,242 +159,167 @@ const SessionFromScratchModal: Component<{
   };
 
   return (
-    <Portal>
-      <Transition
-        appear
-        show={visibility()}
+    <>
+      <Modal open={visibility()} onClose={() => setModalVisibility(false)}>
+        <div class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
+          <DialogTitle
+            as="h3"
+            class="text-center text-lg font-medium leading-6 text-brand-dark"
+          >
+            {app.current_user.slug
+              ? "Connexion perdue!"
+              : "Première connexion"
+            }
+          </DialogTitle>
+          <DialogDescription
+            as="p"
+            class="text-sm text-brand-dark text-opacity-80"
+          >
+            {app.current_user.slug
+              ? `
+                Renseignez de nouveau vos identifiants pour créer
+                une nouvelle session en fonction de l'ancienne.
+                Vos données ne seront pas perdues.
+              `
+              : `
+                Créez une nouvelle session sur cette instance en entrant vos identifiants.
+              `
+            }
+
+          </DialogDescription>
+
+          <form
+            class="flex flex-col gap-3 mt-6 w-full"
+            onSubmit={processUserAuthentication}
+          >
+            <Show when={props.ent_url}>
+              <label
+                class="inline mx-auto rounded-full px-3 py-1 border flex items-center justify-center gap-1 transition mb-2"
+                classList={{
+                  "bg-brand-light border-brand-primary text-brand-primary": credentials.use_ent,
+                  "text-brand-dark border-brand-dark": !credentials.use_ent
+                }}
+              >
+                {credentials.use_ent ? <IconMdiCheck /> : <IconMdiClose />} ENT
+                <input
+                  type="checkbox"
+                  checked={credentials.use_ent}
+                  onChange={event => setCredentials("use_ent", event.currentTarget.checked)}
+                  hidden
+                />
+              </label>
+            </Show>
+
+            <Show when={!credentials.use_ent && !app.current_user.slug}>
+              <label class="text-brand-dark">Espace à utiliser
+                <select
+                  class="appearance-none outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
+                  onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}
+                >
+                  <For each={props.available_accounts}>
+                    {espace => (
+                      <option value={espace.G}>{espace.L}</option>
+                    )}
+                  </For>
+                </select>
+              </label>
+            </Show>
+
+            <label class="text-brand-dark">
+              Nom d'utilisateur
+              <input
+                class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
+                type="text"
+                value={credentials.username}
+                onChange={event => setCredentials("username", event.currentTarget.value)}
+                autocomplete="username"
+              />
+            </label>
+            <label class="text-brand-dark">
+              Mot de passe
+              <input
+                class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
+                type="password"
+                value={credentials.password}
+                onChange={event => setCredentials("password", event.currentTarget.value)}
+                autocomplete="current-password"
+              />
+            </label>
+
+            <label
+              class="rounded-full border inline mx-auto px-3 py-1 my-2 transition"
+              classList={{
+                "bg-brand-light text-brand-primary border-brand-primary": credentials.save,
+                "border-brand-dark text-brand-dark":!credentials.save
+              }}
+            >
+              Se souvenir de mes identifiants
+              <input
+                type="checkbox"
+                checked={credentials.save}
+                onChange={(event) => setCredentials("save", event.currentTarget.checked)}
+                hidden
+              />
+            </label>
+
+            <button
+              disabled={loading()}
+              class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2 disabled:opacity-40"
+              type="submit"
+            >
+              {loading() ? "Connexion en cours..." : "Connexion !"}
+            </button>
+          </form>
+        </div>
+      </Modal>
+
+
+      <Modal
+        open={slugModalData() !== null}
+        onClose={() => batch(() => {
+          setSlugModalData(null);
+          app.setCurrentState({ restoring_session: false });
+        })}
       >
-        <Dialog
-          isOpen
-          class="fixed inset-0 z-10 overflow-y-auto"
-          onClose={() => setModalVisibility(false)}
-        >
-          <div class="min-h-screen px-4 flex items-center justify-center">
-            <TransitionChild
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
+        <div class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
+          <DialogTitle
+            as="h3"
+            class="text-center text-lg font-medium leading-6 text-brand-dark"
+          >
+            Connexion établie !
+          </DialogTitle>
+          <DialogDescription
+            as="p"
+            class="text-sm text-brand-dark text-opacity-80"
+          >
+            Vous êtes connecté en tant que {slugModalData()?.endpoints["/user/data"].donnees.ressource.L} à l'instance {slugModalData()?.endpoints["/user/data"].donnees.ressource.Etablissement.V.L.trim()}.
+          </DialogDescription>
+
+          <p class="my-4 text-brand-dark">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
+
+          <form onSubmit={processSlugSave}>
+            <input
+              type="text"
+              class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
+              value={credentials.slug}
+              onInput={event => {
+                const cleanedValue = event.currentTarget.value
+                // Clean-up the value to make sure it's a slug.
+                  .toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+                return setCredentials("slug", cleanedValue);
+              }}
+            />
+            <button
+              type="submit"
+              disabled={loading()}
+              class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2 disabled:opacity-40"
             >
-              <DialogOverlay class="fixed inset-0 bg-brand-dark bg-opacity-50" />
-            </TransitionChild>
-
-            {/* This element is to trick the browser into centering the modal contents. */}
-            <span
-              class="inline-block h-screen align-middle"
-              aria-hidden="true"
-            >
-              &#8203;
-            </span>
-            <TransitionChild
-              class="transform"
-              enter="ease-out duration-200"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-
-              <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
-                <DialogTitle
-                  as="h3"
-                  class="text-center text-lg font-medium leading-6 text-brand-dark"
-                >
-                  {app.current_user.slug
-                    ? "Connexion perdue!"
-                    : "Première connexion"
-                  }
-                </DialogTitle>
-                <DialogDescription
-                  as="p"
-                  class="text-sm text-brand-dark text-opacity-80"
-                >
-                  {app.current_user.slug
-                    ? `
-                      Renseignez de nouveau vos identifiants pour créer
-                      une nouvelle session en fonction de l'ancienne.
-                      Vos données ne seront pas perdues.
-                    `
-                    : `
-                      Créez une nouvelle session sur cette instance en entrant vos identifiants.
-                    `
-                  }
-
-                </DialogDescription>
-
-                <form
-                  class="flex flex-col gap-3 mt-6 w-full"
-                  onSubmit={processUserAuthentication}
-                >
-                  <Show when={props.ent_url}>
-                    <label
-                      class="inline mx-auto rounded-full px-3 py-1 border flex items-center justify-center gap-1 transition mb-2"
-                      classList={{
-                        "bg-brand-light border-brand-primary text-brand-primary": credentials.use_ent,
-                        "text-brand-dark border-brand-dark": !credentials.use_ent
-                      }}
-                    >
-                      <Show when={credentials.use_ent} fallback={<IconMdiClose />}><IconMdiCheck /></Show> ENT
-                      <input
-                        type="checkbox"
-                        checked={credentials.use_ent}
-                        onChange={event => setCredentials("use_ent", event.currentTarget.checked)}
-                        hidden
-                      />
-                    </label>
-                  </Show>
-
-                  <Show when={!credentials.use_ent && !app.current_user.slug}>
-                    <label class="text-brand-dark">Espace à utiliser
-                      <select
-                        class="appearance-none outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
-                        onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}
-                      >
-                        <For each={props.available_accounts}>
-                          {espace => (
-                            <option value={espace.G}>{espace.L}</option>
-                          )}
-                        </For>
-                      </select>
-                    </label>
-                  </Show>
-
-                  <label class="text-brand-dark">
-                    Nom d'utilisateur
-                    <input
-                      class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
-                      type="text"
-                      value={credentials.username}
-                      onChange={event => setCredentials("username", event.currentTarget.value)}
-                      autocomplete="username"
-                    />
-                  </label>
-                  <label class="text-brand-dark">
-                    Mot de passe
-                    <input
-                      class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
-                      type="password"
-                      value={credentials.password}
-                      onChange={event => setCredentials("password", event.currentTarget.value)}
-                      autocomplete="current-password"
-                    />
-                  </label>
-
-                  <label
-                    class="rounded-full border inline mx-auto px-3 py-1 my-2 transition"
-                    classList={{
-                      "bg-brand-light text-brand-primary border-brand-primary": credentials.save,
-                      "border-brand-dark text-brand-dark":!credentials.save
-                    }}
-                  >
-                    Se souvenir de mes identifiants
-                    <input
-                      type="checkbox"
-                      checked={credentials.save}
-                      onChange={(event) => setCredentials("save", event.currentTarget.checked)}
-                      hidden
-                    />
-                  </label>
-
-                  <button
-                    disabled={loading()}
-                    class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2 disabled:opacity-40"
-                    type="submit"
-                  >
-                    {loading() ? "Connexion en cours..." : "Connexion !"}
-                  </button>
-                </form>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </Dialog>
-      </Transition>
-
-      <Transition
-        appear
-        show={slugModalData() !== null}
-      >
-        <Dialog
-          isOpen
-          class="fixed inset-0 z-10 overflow-y-auto"
-          onClose={() => batch(() => {
-            setSlugModalData(null);
-            app.setCurrentState({ restoring_session: false });
-          })}
-        >
-          <div class="min-h-screen px-4 flex items-center justify-center">
-            <TransitionChild
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <DialogOverlay class="fixed inset-0 bg-brand-dark bg-opacity-50" />
-            </TransitionChild>
-
-            {/* This element is to trick the browser into centering the modal contents. */}
-            <span
-              class="inline-block h-screen align-middle"
-              aria-hidden="true"
-            >
-              &#8203;
-            </span>
-            <TransitionChild
-              class="transform"
-              enter="ease-out duration-200"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <DialogPanel class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
-                <DialogTitle
-                  as="h3"
-                  class="text-center text-lg font-medium leading-6 text-brand-dark"
-                >
-                  Connexion établie !
-                </DialogTitle>
-                <DialogDescription
-                  as="p"
-                  class="text-sm text-brand-dark text-opacity-80"
-                >
-                  Vous êtes connecté en tant que {slugModalData()?.endpoints["/user/data"].donnees.ressource.L} à l'instance {slugModalData()?.endpoints["/user/data"].donnees.ressource.Etablissement.V.L.trim()}.
-                </DialogDescription>
-
-                <p class="my-4 text-brand-dark">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
-
-                <form onSubmit={processSlugSave}>
-                  <input
-                    type="text"
-                    class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
-                    value={credentials.slug}
-                    onInput={event => {
-                      const cleanedValue = event.currentTarget.value
-                      // Clean-up the value to make sure it's a slug.
-                        .toLowerCase().replace(/[^a-z0-9-]+/g, "-");
-                      return setCredentials("slug", cleanedValue);
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading()}
-                    class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2 disabled:opacity-40"
-                  >
-                    {loading() ? "Sauvegarde..." : "Sauvegarder la session"}
-                  </button>
-                </form>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </Dialog>
-      </Transition>
-    </Portal>
+              {loading() ? "Sauvegarde..." : "Sauvegarder la session"}
+            </button>
+          </form>
+        </div>
+      </Modal>
+    </>
   );
 };
 
