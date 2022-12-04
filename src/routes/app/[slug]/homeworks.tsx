@@ -68,7 +68,7 @@ const AppHomeworks: Component = () => {
                       {homework => (
                         <div class="py-2 px-4 rounded bg-brand-white dark:(bg-brand-dark text-brand-white) flex-col">
                           <div class="flex justify-between items-center">
-                            <h3 class="font-medium font-semibold">{homework.subject_name}</h3>
+                            <h3 class="font-medium">{homework.subject_name}</h3>
                             <input
                               type="checkbox"
                               checked={homework.done}

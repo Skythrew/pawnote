@@ -7,7 +7,8 @@ import {
   getTimeFormattedDiff,
   getCurrentPeriod,
 
-  callUserGradesAPI
+  callUserGradesAPI,
+  callUserHomeworkDoneAPI
 } from "@/utils/client";
 
 import { PronoteApiOnglets } from "@/types/pronote";
@@ -186,8 +187,22 @@ const AppHome: Component = () => {
                 }>
                   {homework => (
                     <div class="bg-brand-white rounded py-2 px-4">
-                      <h5 class="font-medium">{homework.subject_name}</h5>
-                      <div innerHTML={homework.description} />
+                      <div class="flex justify-between items-center">
+                        <h5 class="text-md font-medium">{homework.subject_name}</h5>
+                        <input
+                          type="checkbox"
+                          checked={homework.done}
+                          onChange={(event) => {
+                            callUserHomeworkDoneAPI({
+                              homework_id: homework.id,
+                              week_number: weekNumber(),
+                              done: event.currentTarget.checked
+                            });
+                          }}
+                        />
+                      </div>
+
+                      <div class="p-2 break-all" innerHTML={homework.description} />
                     </div>
                   )}
                 </For>
