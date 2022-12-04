@@ -39,7 +39,7 @@ const AppGrades: Component = () => {
 
   return (
     <>
-      <Title>{app.current_user.slug} - Notes - Pornote</Title>
+      <Title>{app.current_user.slug} - Notes - {APP_NAME}</Title>
       <GradeInfoModal.Component />
 
       <div class="flex flex-col items-center gap-2 px-4">
@@ -77,6 +77,8 @@ const AppGrades: Component = () => {
             )}
           </Show>
         </div>
+
+        <button onClick={() => callUserGradesAPI(currentPeriod, { force: true })}>Actualiser</button>
 
         <Show keyed when={grades()}
           fallback={
