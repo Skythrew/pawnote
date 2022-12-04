@@ -1561,7 +1561,7 @@ export interface PronoteApiUserHomeworkDone {
       listeTAF: {
         /** ID of the homework. */
         N: string;
-        E: 2; // Why 2? I don't even know.
+        E: 2; // Why 2 ? I don't even know.
         /** Homework has been done or not. */
         TAFFait: boolean;
       }[];

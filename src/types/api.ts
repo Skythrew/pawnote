@@ -234,8 +234,7 @@ type ApiUserHomeworkDonePath = `/user/homework/${string}/done`;
 export interface ApiUserHomeworkDone {
   request: {
     session: SessionExported;
-    /** Not required, should default to `true`. */
-    done?: boolean;
+    done: boolean;
   }
 
   response: {

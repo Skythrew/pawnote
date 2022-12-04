@@ -1,7 +1,7 @@
-import type { PronoteApiUserHomeworkDone } from "@/types/pronote";
+import { PronoteApiOnglets, PronoteApiUserHomeworkDone } from "@/types/pronote";
 import type { ApiUserHomeworkDone } from "@/types/api";
 
-import { PronoteApiFunctions, PronoteApiOnglets } from "@/types/pronote";
+import { PronoteApiFunctions } from "@/types/pronote";
 import { ResponseErrorCode } from "@/types/errors";
 
 import {
@@ -15,7 +15,7 @@ import Session from "@/utils/session";
 export const POST = handleServerRequest<ApiUserHomeworkDone>(async (req, res) => {
   const homework_id = req.params.id as string;
 
-  if (!objectHasProperty(req.body, "session"))
+  if (!objectHasProperty(req.body, "session") || !objectHasProperty(req.body, "done"))
     return res.error({
       code: ResponseErrorCode.MissingParameters,
       debug: { received_body: req.body }
@@ -28,7 +28,7 @@ export const POST = handleServerRequest<ApiUserHomeworkDone>(async (req, res) =>
       donnees: {
         listeTAF: [{
           E: 2,
-          TAFFait: req.body.done ?? true,
+          TAFFait: req.body.done,
           N: homework_id
         }]
       },
