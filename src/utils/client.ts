@@ -537,7 +537,7 @@ export const getCurrentWeekNumber = (): number => {
   return week_number;
 };
 
-export const callUserTimetableAPI = async (week: number) => {
+export const callUserTimetableAPI = async (week: number, options = { force: false }) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
     code: ResponseErrorCode.UserUnavailable
@@ -545,7 +545,7 @@ export const callUserTimetableAPI = async (week: number) => {
 
   const endpoint: ApiUserTimetable["path"] = `/user/timetable/${week}`;
   const local_response = await endpoints.get<ApiUserTimetable>(user.slug, endpoint);
-  if (local_response && !local_response.expired) return local_response;
+  if (local_response && !local_response.expired && !options.force) return local_response;
 
   app.enqueue_fetch(AppStateCode.FetchingTimetable, async () => {
     console.info("[timetable] renew");
@@ -839,7 +839,7 @@ export const getCurrentPeriod = (periods: PronoteApiUserData["response"]["donnee
   return current_period;
 };
 
-export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"]["period"]>) => {
+export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"]["period"]>, options = { force: false }) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
     code: ResponseErrorCode.UserUnavailable
@@ -847,7 +847,7 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
 
   const endpoint = (): ApiUserGrades["path"] => `/user/grades/${period().N}`;
   const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint());
-  if (local_response && !local_response.expired) return local_response;
+  if (local_response && !local_response.expired && !options.force) return local_response;
 
   app.enqueue_fetch(AppStateCode.FetchingGrades, async () => {
     console.info("[grades]: renew");
