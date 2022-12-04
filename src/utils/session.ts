@@ -168,40 +168,47 @@ class Session {
     }
 
     this.instance.order++;
-    const response = JSON.parse(response_body) as PronoteApiFunctionPayload<Res>;
 
-    // Check the local order number with the received one.
-    const { aes_iv, aes_key } = this.encryption_aes();
-    const decrypted_order = aes.decrypt(response.numeroOrdre, {
-      iv: aes_iv, key: aes_key
-    });
+    try {
+      const response = JSON.parse(response_body) as PronoteApiFunctionPayload<Res>;
 
-    if (this.instance.order !== parseInt(decrypted_order))
-      return ResponseErrorCode.NotMatchingOrders;
-
-    let final_data = response.donneesSec;
-
-    if (!this.instance.skip_encryption) {
-      const decrypted_data = aes.decrypt(final_data as string, {
+      // Check the local order number with the received one.
+      const { aes_iv, aes_key } = this.encryption_aes();
+      const decrypted_order = aes.decrypt(response.numeroOrdre, {
         iv: aes_iv, key: aes_key
       });
 
-      final_data = this.instance.skip_compression
-        ? JSON.parse(decrypted_data)
-        : forge.util.bytesToHex(decrypted_data);
-    }
+      if (this.instance.order !== parseInt(decrypted_order))
+        return ResponseErrorCode.NotMatchingOrders;
 
-    if (!this.instance.skip_compression) {
-      const compressed = Buffer.from(final_data as string, "hex");
-      final_data = pako.inflateRaw(compressed, { to: "string" });
-    }
+      let final_data = response.donneesSec;
 
-    if (typeof final_data === "string") {
-      final_data = forge.util.decodeUtf8(final_data);
-      final_data = JSON.parse(final_data) as Res;
-    }
+      if (!this.instance.skip_encryption) {
+        const decrypted_data = aes.decrypt(final_data as string, {
+          iv: aes_iv, key: aes_key
+        });
 
-    return final_data;
+        final_data = this.instance.skip_compression
+          ? JSON.parse(decrypted_data)
+          : forge.util.bytesToHex(decrypted_data);
+      }
+
+      if (!this.instance.skip_compression) {
+        const compressed = Buffer.from(final_data as string, "hex");
+        final_data = pako.inflateRaw(compressed, { to: "string" });
+      }
+
+      if (typeof final_data === "string") {
+        final_data = forge.util.decodeUtf8(final_data);
+        final_data = JSON.parse(final_data) as Res;
+      }
+
+      return final_data;
+    }
+    catch (error) {
+      console.error("[session:read...]", error);
+      return ResponseErrorCode.SessionExpired;
+    }
   }
 }
 
