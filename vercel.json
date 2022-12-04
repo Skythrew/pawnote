@@ -34,7 +34,7 @@
 				},
 				{
 					"key": "content-security-policy",
-					"value": "default-src 'self'; style-src 'unsafe-inline';"
+					"value": "default-src 'self'; style-src 'self' 'unsafe-inline' https://www.pornote.ml;"
 				}
       ]
     }
