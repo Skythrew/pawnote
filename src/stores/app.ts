@@ -92,25 +92,8 @@ const enqueue_fetch = (code: AppStateCode, action: () => unknown) => {
 const dequeue_fetch = async () => {
   if (current_state.fetching) return false;
 
-  // Waiting for the session to restore before continue.
-  if (current_state.restoring_session) {
-    await new Promise<void>(resolve => {
-      createRoot(dispose => {
-        createEffect(() => {
-          console.info("[restoring_session] effect...");
-          if (!current_state.restoring_session) {
-            console.info("[restoring_session] resolved!");
-
-            resolve();
-            dispose();
-          }
-        });
-      });
-    });
-  }
-
   const item = fetch_queue.shift();
-  if (!item) return false;
+  if (!item || current_state.restoring_session) return false;
 
   try {
     const payload = await item.action();
@@ -129,9 +112,10 @@ const dequeue_fetch = async () => {
   return true;
 };
 
-/** Helper function to reset the state of the banner. */
+/** Helper function to reset the state of the app. */
 const setStateToIdle = () => setCurrentState({
   fetching: false,
+  restoring_session: false,
   code: AppStateCode.Idle
 });
 
