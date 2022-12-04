@@ -22,8 +22,11 @@ const AppLayout: Component = () => {
 
     onCleanup(() => {
       console.groupCollapsed("cleanup");
+
       app.cleanCurrentUser();
-      console.info("[debug]: cleaned 'app.current_user'");
+      SessionFromScratchModal.show(false);
+
+      console.info("[debug]: cleaned 'app.current_user' and 'SessionFromScratchModal' state");
       console.groupEnd();
 
       console.groupEnd(); // Closes '=> {slug}'.
@@ -32,7 +35,7 @@ const AppLayout: Component = () => {
     console.groupCollapsed("initialization");
 
     const session = await sessions.get(slug());
-    if (session === null) {
+    if (!session) {
       console.error("[debug] no session found");
       console.groupEnd();
       return navigate("/link");
@@ -75,7 +78,7 @@ const AppLayout: Component = () => {
 
   return (
     <>
-      <Title>{slug()} - Accueil - Pornote</Title>
+      <Title>{slug()} - {APP_NAME}</Title>
       <Show when={user().slug} fallback={
         <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 px-4 bg-brand-primary dark:bg-brand-dark">
           <h2 class="text-center font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white dark:(bg-brand-primary text-brand-white)">{t("PAGES.APP._.FETCHING")}</h2>
