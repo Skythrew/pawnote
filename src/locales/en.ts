@@ -12,7 +12,7 @@ export const API_ERRORS: Language["API_ERRORS"] = {
   [ResponseErrorCode.ServerSideError]: "Something went wrong when calling Pronote API.",
   [ResponseErrorCode.PronotePageDownload]: "Something went wrong when downloading the Pronote page.",
   [ResponseErrorCode.ENTAvailableCheck]: "Something went wrong when checking if ENT was available.",
-  [ResponseErrorCode.PronoteBannedIP]: "Your IP address has been temporary banned.",
+  [ResponseErrorCode.PronoteBannedIP]: "Your IP address has been temporary banned by Pronote, retry later.",
   [ResponseErrorCode.PronoteClosedInstance]: "This Pronote instance is closed.",
   [ResponseErrorCode.SessionReadData]: "Error while parsing session data.",
   [ResponseErrorCode.NetworkFail]: "A network error happened, please retry.",

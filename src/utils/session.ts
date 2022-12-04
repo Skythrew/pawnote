@@ -163,8 +163,11 @@ class Session {
    */
   readPronoteFunctionPayload <Res>(response_body: string): Res | ResponseErrorCode {
     if (response_body.includes("La page a expir")) {
-      this.instance.order--; // Prevent broken response to take the order.
       return ResponseErrorCode.SessionExpired;
+    }
+
+    if (response_body.includes("Votre adresse IP est provisoirement suspendue")) {
+      return ResponseErrorCode.PronoteBannedIP;
     }
 
     this.instance.order++;

@@ -12,7 +12,7 @@ export const API_ERRORS: Language["API_ERRORS"] = {
   [ResponseErrorCode.ServerSideError]: "Une erreur est survenue lors de l'appel a l'API de Pronote.",
   [ResponseErrorCode.PronotePageDownload]: "Une erreur s'est produite lors du téléchargement de la page Pronote.",
   [ResponseErrorCode.ENTAvailableCheck]: "Une erreur s'est produite lors de la vérification d'existance ENT.",
-  [ResponseErrorCode.PronoteBannedIP]: "Cette adresse IP a été temporairement suspendue.",
+  [ResponseErrorCode.PronoteBannedIP]: "Votre adresse IP a été temporairement suspendue par Pronote, réessayez plus tard.",
   [ResponseErrorCode.PronoteClosedInstance]: "Cette instance Pronote est ferme.",
   [ResponseErrorCode.SessionReadData]: "Une erreur est survenue lors du parsing des données de session.",
   [ResponseErrorCode.NetworkFail]: "Une erreur réseau est survenue.",
