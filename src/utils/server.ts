@@ -88,7 +88,8 @@ export const handleServerRequest = <T extends {
     return callback(
       {
         body,
-        user_agent,
+        // We prevent Pronote to recognize that the device is a mobile device.
+        user_agent: user_agent.replace(/Mobile?(.*) /gi, ""),
         params: evt.params
       }, ({
         error: (
@@ -144,10 +145,6 @@ export const retrieveSentCookies = (response: Response) => {
   return sent_cookies;
 };
 
-/**
- * @param url - URL to download the data from.
- * @param cookies - Cookies to send with the request.
- */
 export const downloadPronotePage = async (options: {
   url: string,
   cookies?: string[],
