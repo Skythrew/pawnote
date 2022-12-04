@@ -18,7 +18,7 @@ import {
 
 import { Provider as LocalesProvider, context as locale } from "@/locales";
 
-import PornoteUpdater from "@/components/PornoteUpdater";
+import PornoteUpdater from "@/components/modals/PornoteUpdater";
 import { Toaster } from "solid-toast";
 
 export default function Root () {
@@ -86,7 +86,6 @@ export default function Root () {
                 <pre class="text-sm opacity-60">{error}</pre>
               </div>
             )}>
-
               <Routes>
                 <FileRoutes />
               </Routes>

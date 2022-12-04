@@ -57,9 +57,12 @@ export enum AppStateCode {
 }
 
 const [current_state, setCurrentState] = createStore<{
+  /** `true` when SessionFromScratch modal is shown/being used. */
+  restoring_session: boolean;
   fetching: boolean;
   code: AppStateCode
 }>({
+  restoring_session: false,
   fetching: false,
   code: AppStateCode.Idle
 });
@@ -88,6 +91,24 @@ const enqueue_fetch = (code: AppStateCode, action: () => unknown) => {
 
 const dequeue_fetch = async () => {
   if (current_state.fetching) return false;
+
+  // Waiting for the session to restore before continue.
+  if (current_state.restoring_session) {
+    await new Promise<void>(resolve => {
+      createRoot(dispose => {
+        createEffect(() => {
+          console.info("[restoring_session] effect...");
+          if (!current_state.restoring_session) {
+            console.info("[restoring_session] resolved!");
+
+            resolve();
+            dispose();
+          }
+        });
+      });
+    });
+  }
+
   const item = fetch_queue.shift();
   if (!item) return false;
 

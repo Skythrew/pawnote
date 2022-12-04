@@ -106,6 +106,7 @@ const SessionFromScratchModal: Component<{
 
       if (app.current_user.slug) {
         await saveIntoSlug(app.current_user.slug, data);
+        app.setCurrentState({ restoring_session: false });
         return;
       }
 
@@ -158,6 +159,8 @@ const SessionFromScratchModal: Component<{
     batch(() => {
       setLoading(false);
       setSlugModalData(null);
+      app.setCurrentState({ restoring_session: false });
+
       navigate("/");
     });
   };
@@ -324,7 +327,10 @@ const SessionFromScratchModal: Component<{
         <Dialog
           isOpen
           class="fixed inset-0 z-10 overflow-y-auto"
-          onClose={() => setSlugModalData(null)}
+          onClose={() => batch(() => {
+            setSlugModalData(null);
+            app.setCurrentState({ restoring_session: false });
+          })}
         >
           <div class="min-h-screen px-4 flex items-center justify-center">
             <TransitionChild
@@ -400,6 +406,9 @@ const SessionFromScratchModal: Component<{
 };
 
 export default {
-  show: (value = true) => setModalVisibility(value),
-  Component: SessionFromScratchModal
+  Component: SessionFromScratchModal,
+  show: (value = true) => batch(() => {
+    app.setCurrentState({ restoring_session: value });
+    setModalVisibility(value);
+  })
 };

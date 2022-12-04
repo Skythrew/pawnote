@@ -9,7 +9,6 @@ import { type APIEvent, json } from "solid-start/api";
 import set_cookie from "set-cookie-parser";
 
 import { ResponseErrorCode } from "@/types/errors";
-import { HEADERS_PRONOTE } from "@/utils/constants";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -138,7 +137,11 @@ export const retrieveSentCookies = (response: Response) => {
  * @param url - URL to download the data from.
  * @param cookies - Cookies to send with the request.
  */
-export const downloadPronotePage = async (url: string, cookies?: string[]): Promise<{
+export const downloadPronotePage = async (options: {
+  url: string,
+  cookies?: string[],
+  user_agent: string
+}): Promise<{
   /** Data **as text** from the given URL. */
   body: string;
 
@@ -149,13 +152,13 @@ export const downloadPronotePage = async (url: string, cookies?: string[]): Prom
   cookies: string[];
 } | null> => {
   try {
-    const response = await fetch(url, {
-      //redirect: "manual", // Bypass redirections.
+    const response = await fetch(options.url, {
+      redirect: "manual", // Bypass redirections.
       headers: {
-        ...HEADERS_PRONOTE,
+        "User-Agent": options.user_agent,
 
         // Append cookies to the request.
-        "Cookie": cookies?.join("; ") ?? ""
+        "Cookie": options.cookies?.join("; ") ?? ""
       }
     });
 
@@ -165,29 +168,29 @@ export const downloadPronotePage = async (url: string, cookies?: string[]): Prom
     };
   }
   catch (error) {
-    console.error("Error when trying to download", url, "with", cookies ?? "no cookies", "\nTrace:", error ?? "(none)");
+    console.error("Error when trying to download", options.url, "with", options.cookies ?? "no cookies", "\nTrace:", error ?? "(none)");
     return null;
   }
 };
 
-/**
- * Check if an ENT is available on a given Pronote URL.
- * @param url - Pronote URL to check.
- */
-export const checkAvailableENT = async (url: string): Promise<(
+/** Check if an ENT is available on a given Pronote URL. */
+export const checkAvailableENT = async (options: {
+  url: string,
+  user_agent: string
+}): Promise<(
   | { available: false }
   | { available: true, url: string }
 ) | null> => {
   try {
-    const response = await fetch(url, {
+    const response = await fetch(options.url, {
       redirect: "follow",
       headers: {
-        ...HEADERS_PRONOTE
+        "User-Agent": options.user_agent
       }
     });
 
     // Get the hostname of the Pronote URL.
-    const pronoteUrlHostname = new URL(url).hostname;
+    const pronoteUrlHostname = new URL(options.url).hostname;
 
     // Get the hostname of the redirected URL.
     const newUrlHostname = new URL(response.url).hostname;
@@ -263,6 +266,7 @@ export const callPronoteAPI = async <T>(
     /** Force to use this URL instead of the one in `session_instance` */
     pronote_url?: string;
     session_instance: SessionInstance;
+    user_agent: string;
     cookies?: string[];
   }) => {
   try {
@@ -271,7 +275,7 @@ export const callPronoteAPI = async <T>(
     const response = await fetch(function_url, {
       method: "POST",
       headers: {
-        ...HEADERS_PRONOTE,
+        "User-Agent": data.user_agent,
         "Content-Type": "application/json",
         "Cookie": data.cookies?.join("; ") ?? ""
       },

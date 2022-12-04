@@ -46,6 +46,7 @@ import sessions from "@/stores/sessions";
 import { context as locale } from "@/locales";
 
 import { unwrap } from "solid-js/store";
+import toast from "solid-toast";
 import forge from "node-forge";
 import dayjs from "dayjs";
 
@@ -64,6 +65,8 @@ export class ApiError extends Error {
     const [t] = locale;
 
     const error_message = t(`API_ERRORS.${response.code}`);
+    toast(error_message);
+
     const message = `ResponseErrorCode[#${response.code}]: ${error_message}`;
     super(message);
 
@@ -79,7 +82,12 @@ export class ClientError extends Error {
   public message: string;
 
   constructor (response: { code: number, debug?: unknown }) {
-    const message = `ClientErrorCode[#${response.code}]`;
+    const [t] = locale;
+
+    const error_message = t(`CLIENT_ERRORS.${response.code}`);
+    toast(error_message);
+
+    const message = `ClientErrorCode[#${response.code}]: ${error_message}`;
     super(message);
 
     this.name = "ClientError";
@@ -386,9 +394,14 @@ export const connectToPronote = async (options: {
     pronote_password = informations_response.setup.password;
   }
 
-  if (!pronote_username || !pronote_password) throw new ClientError({
-    code: ClientErrorCode.SessionCantRestore
-  });
+  if (!pronote_username || !pronote_password) {
+    // Ask for new credentials.
+    // User can choose if they'll be saved or not.
+    SessionFromScratchModal.show();
+    throw new ClientError({
+      code: ClientErrorCode.SessionCantRestore
+    });
+  }
 
   const identify_response = await callAPI<ApiLoginIdentify>("/login/identify", () => ({
     pronote_username,
@@ -848,40 +861,40 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
   return local_response?.data;
 };
 
+export interface Grade {
+  description: string;
+  date: dayjs.Dayjs;
+
+  /** Maxmimum grade that can be obtained. */
+  maximum: number;
+  /** Average grade. */
+  average: number | string;
+  optional: boolean;
+  ratio: number;
+
+  /** Grade obtained by the current user. */
+  user: number | string;
+  /** Maximum grade obtained by an user. */
+  user_max: number | string;
+  /** Minimum grade obtained by an user. */
+  user_min: number | string;
+}
+
+export interface GradeSubject {
+  name: string;
+  color: string;
+
+  user_average: number | string;
+  global_average: number | string;
+
+  max_average: number | string;
+  min_average: number | string;
+
+  grades: Grade[];
+}
+
 export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) => {
-  interface Grade {
-    description: string;
-    date: dayjs.Dayjs;
-
-    /** Maxmimum grade that can be obtained. */
-    maximum: number;
-    /** Average grade. */
-    average: number | string;
-    optional: boolean;
-    ratio: number;
-
-    /** Grade obtained by the current user. */
-    user: number | string;
-    /** Maximum grade obtained by an user. */
-    user_max: number | string;
-    /** Minimum grade obtained by an user. */
-    user_min: number | string;
-  }
-
-  const subjects: {
-    [subject_id: string]: {
-      name: string;
-      color: string;
-
-      user_average: number | string;
-      global_average: number | string;
-
-      max_average: number | string;
-      min_average: number | string;
-
-      grades: Grade[];
-    }
-  } = {};
+  const subjects: { [subject_id: string]: GradeSubject } = {};
 
   // Store every subjects in the object.
   for (const subject of data.listeServices.V) {

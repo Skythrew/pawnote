@@ -1,16 +1,5 @@
 import { PronoteApiAccountId } from "@/types/pronote";
 
-export const HEADERS_PRONOTE = {
-  /**
-   * `User-Agent` to send with every request.
-   * If you don't request with the same `User-Agent` on every
-   * Pronote request, it will fail and log you out.
-   *
-   * Here, we use Chrome on version 106 running in Windows as User-Agent.
-   */
-  "User-Agent": "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
-};
-
 /** URL extracted from the Pronote APK. */
 export const GEOLOCATION_API_URL = "https://www.index-education.com/swie/geoloc.php";
 
