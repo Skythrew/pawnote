@@ -92,8 +92,17 @@ const enqueue_fetch = (code: AppStateCode, action: () => unknown) => {
 const dequeue_fetch = async () => {
   if (current_state.fetching) return false;
 
+  // Clear queue when session is restoring.
+  if (current_state.restoring_session) {
+    while (fetch_queue.length > 0) {
+      fetch_queue.shift();
+    }
+
+    return false;
+  }
+
   const item = fetch_queue.shift();
-  if (!item || current_state.restoring_session) return false;
+  if (!item) return false;
 
   try {
     const payload = await item.action();
