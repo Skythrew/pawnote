@@ -90,8 +90,8 @@ export const handleServerRequest = <T extends {
         body,
         // We prevent Pronote to recognize that the device is a mobile device.
         user_agent: user_agent
-          .replace(/Mobile?(.*) /gi, "")
-          .replace(/iPhone?(.*) /gi, ""),
+          .replace(/iPhone |iPhone/gi, "")
+          .replace(/Mobile?(.*) /gi, ""),
         params: evt.params
       }, ({
         error: (
