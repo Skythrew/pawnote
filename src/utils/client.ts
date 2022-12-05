@@ -738,6 +738,8 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
     id: string;
 
     subject_name: string;
+    subject_color: string;
+
     description: string;
 		attachments: { id: string, name: string }[];
     done: boolean;
@@ -752,9 +754,11 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
     output[day].push({
       id: homework.N,
       done: homework.TAFFait,
-
       description: homework.descriptif.V,
+
       subject_name: homework.Matiere.V.L,
+      subject_color: homework.CouleurFond,
+
       attachments: homework.ListePieceJointe.V.map(attachment => ({
         id: attachment.N,
         name: html_entities_decode(attachment.L)
@@ -994,14 +998,12 @@ export const callUserHomeworkDoneAPI = async (options: {
   });
 };
 
-export const createExternalFileURL = async (options: { id: string, name: string }) => {
-  const prefix = "FichiersExternes";
-  let result = prefix + "/";
-
+export const createExternalFileURL = (options: { id: string, name: string }) => {
   const user_session = app.current_user.session;
   if (!user_session) throw new ApiError({ code: ResponseErrorCode.UserUnavailable });
-
   const session = Session.importFromObject(user_session);
+
+  let result = session.instance.pronote_url + "/FichiersExternes/";
   result += aes.encrypt(JSON.stringify({
     L: options.name,
     N: options.id,
