@@ -1016,6 +1016,7 @@ export interface PronoteApiUserHomeworks {
       ListeTravauxAFaire: {
         _T: 24;
         V: {
+					/** ID of the homwork. */
           N: string;
 
           /** Content of the homework. */
@@ -1084,7 +1085,13 @@ export interface PronoteApiUserHomeworks {
           /** Attachments. */
           ListePieceJointe: {
             _T: 24;
-            V: unknown[];
+            V: {
+							G: number;
+							/** Name of the attachment. */
+							L: string;
+							/** ID of the attachment. */
+							N: string;
+						}[];
           }
         }[];
       }

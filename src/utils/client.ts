@@ -45,7 +45,9 @@ import sessions from "@/stores/sessions";
 
 import { context as locale } from "@/locales";
 
+import { decode as html_entities_decode } from "html-entities";
 import { unwrap } from "solid-js/store";
+import Session from "@/utils/session";
 import toast from "solid-toast";
 import forge from "node-forge";
 import dayjs from "dayjs";
@@ -737,6 +739,7 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
 
     subject_name: string;
     description: string;
+		attachments: { id: string, name: string }[];
     done: boolean;
   }[] } = {};
 
@@ -748,10 +751,14 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
 
     output[day].push({
       id: homework.N,
+      done: homework.TAFFait,
 
       description: homework.descriptif.V,
       subject_name: homework.Matiere.V.L,
-      done: homework.TAFFait
+      attachments: homework.ListePieceJointe.V.map(attachment => ({
+        id: attachment.N,
+        name: html_entities_decode(attachment.L)
+      }))
     });
   }
 
@@ -968,7 +975,7 @@ export const callUserHomeworkDoneAPI = async (options: {
     // Call the API to update the homework state.
     await callAPI<ApiUserHomeworkDone>(endpoint, () => ({
       session: user.session,
-      done: options.done
+      done: options.done ?? true
     }), { prevent_cache: true });
 
     // Update local state for the homeworks endpoint.
@@ -985,5 +992,28 @@ export const callUserHomeworkDoneAPI = async (options: {
       unwrap(app.current_user.endpoints?.[`/user/homeworks/${options.week_number}`])
     );
   });
+};
+
+export const createExternalFileURL = async (options: { id: string, name: string }) => {
+  const prefix = "FichiersExternes";
+  let result = prefix + "/";
+
+  const user_session = app.current_user.session;
+  if (!user_session) throw new ApiError({ code: ResponseErrorCode.UserUnavailable });
+
+  const session = Session.importFromObject(user_session);
+  result += aes.encrypt(JSON.stringify({
+    L: options.name,
+    N: options.id,
+    A: true,
+    E: 0
+  }), {
+    key: forge.util.createBuffer(session.encryption.aes.key as string),
+    iv: forge.util.createBuffer(session.encryption.aes.iv as string)
+  });
+
+  result += "/" + options.name;
+  result += "?Session=" + session.instance.session_id;
+  return result;
 };
 
