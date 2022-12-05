@@ -1,4 +1,6 @@
 import { defineConfig } from "vite";
+import path from "node:path";
+import fs from "node:fs";
 
 import solid from "solid-start/vite";
 import vercel from "solid-start-vercel";
@@ -9,20 +11,6 @@ import icons from "unplugin-icons/vite";
 
 import auto from "unplugin-auto-import/vite";
 import icons_resolver from "unplugin-icons/resolver";
-
-// These packages are needed to determine
-// the revision of the rendered index.html file.
-import crypto from "node:crypto";
-import path from "node:path";
-import fs from "node:fs";
-
-const indexHtmlRevision = () => {
-  const index_path = path.resolve(__dirname, ".solid/index.html");
-  const file_buffer = fs.readFileSync(index_path);
-  const hash = crypto.createHash("md5");
-  hash.update(file_buffer);
-  return hash.digest("hex");
-};
 
 const pkg = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, "package.json"),
@@ -63,13 +51,6 @@ export default defineConfig ({
       includeAssets: ["favicon.ico", "apple-touch-icon.png"],
 
       workbox: {
-        // Environment variable set only when building the client.
-        // See <https://github.com/solidjs/solid-start/blob/df5d22be3db0f76e4ab5d815c1892855ec43b1f2/packages/start/bin.cjs#L398>.
-        additionalManifestEntries: process.env.START_SPA_CLIENT ? [{
-          url: "index.html",
-          revision: indexHtmlRevision()
-        }] : undefined,
-
         globPatterns: [
           "**/*.{js,css,html,svg,png,woff,woff2}"
         ]
@@ -122,10 +103,8 @@ export default defineConfig ({
   ],
 
   define: {
-    APP_URL: JSON.stringify(pkg.homepage),
     APP_NAME: JSON.stringify("Pornote"),
-    APP_VERSION: JSON.stringify(pkg.version),
-    APP_DESCRIPTION: JSON.stringify(pkg.description)
+    APP_VERSION: JSON.stringify(pkg.version)
   },
 
   server: {
