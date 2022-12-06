@@ -29,7 +29,13 @@ const AppHomeworks: Component = () => {
     await callUserHomeworksAPI(week);
   }));
 
-  const homeworks = () => endpoint() ? parseHomeworks(endpoint()!.donnees) : null;
+  const [homeworks, setHomeworks] = createSignal<Awaited<ReturnType<typeof parseHomeworks>> | null>(null);
+  createEffect(on(endpoint, async (data) => {
+    if (!data) return;
+
+    const homeworks = await parseHomeworks(data.donnees);
+    setHomeworks(homeworks);
+  }));
 
   return (
     <>
@@ -61,35 +67,50 @@ const AppHomeworks: Component = () => {
             </div>
           }
         >
-          <div class="my-8 md:px-6 flex flex-col gap-2">
+          <div class="my-8 md:px-6 md:max-w-md w-full flex flex-col">
             <For each={Object.keys(homeworks()!).map(Number)}
               fallback={
-                <div class="border-2 border-brand-primary px-4 py-2 rounded-md">
+                <div class="mx-auto w-max border-2 border-brand-primary px-4 py-2 rounded-md">
                   <p class="text-center">Aucun devoirs cette semaine !</p>
                 </div>
               }
             >
               {day_index => (
                 <Show when={homeworks()![day_index].length > 0}>
-                  <div class="px-2 py-5 rounded-md md:max-w-md w-full flex flex-col relative">
-                    <h2 class="absolute dark:(bg-brand-primary text-brand-light) bg-brand-light left-0 md:-left-4 -top-5 text-md font-medium text-brand-primary pl-6 right-0 md:right-4 py-1 md:rounded-full shadow">{getDayNameFromDayNumber(day_index)}</h2>
+                  <div class="rounded-md flex flex-col relative">
+                    <h2 class="dark:(bg-brand-primary text-brand-light) bg-brand-light md:(absolute -left-4 right-4 rounded-full -top-5) text-md font-medium text-brand-primary pl-6 py-1">{getDayNameFromDayNumber(day_index)}</h2>
                     <For each={homeworks()![day_index]}>
-                      {homework => (
+                      {(homework, homework_index) => (
                         <div style={{ "border-color": homework.subject_color }}
-                          class="py-2 px-4 mx-2 bg-brand-white dark:(bg-brand-dark text-brand-white) border-l-4 flex-col gap-2">
-                          <div class="flex justify-between items-center">
-                            <h3 class="font-medium">{homework.subject_name}</h3>
-                            <input
-                              type="checkbox"
-                              checked={homework.done}
-                              onChange={(event) => {
-                                callUserHomeworkDoneAPI({
-                                  homework_id: homework.id,
-                                  week_number: weekNumber(),
-                                  done: event.currentTarget.checked
-                                });
+                          class="relative py-3 pl-4 mx-4 bg-brand-white dark:(bg-brand-dark text-brand-white) border-l-4 flex-col gap-2">
+                          <div class="flex justify-between items-center mb-2">
+                            <div>
+                            <h3 class="text-md font-medium">{homework.subject_name}</h3>
+                            <p>{homework.subject_timetable_item?.DateDuCours.V}</p>
+                            </div>
+                            <label class="flex text-xs gap-2 rounded-full border px-3 py-1 items-center"
+                              classList={{
+                                "border-brand-primary bg-brand-light text-brand-primary dark:(bg-dark-200 text-brand-light border-transparent)": homework.done,
+                                "border-brand-dark dark:border-brand-white": !homework.done
                               }}
-                            />
+                            >
+                              {homework.done
+                                ? <>Fait <IconMdiCheck /></>
+                                : <>Non Fait <IconMdiClose /></>
+                              }
+                              <input
+                                hidden
+                                type="checkbox"
+                                checked={homework.done}
+                                onChange={(event) => {
+                                  callUserHomeworkDoneAPI({
+                                    homework_id: homework.id,
+                                    week_number: weekNumber(),
+                                    done: event.currentTarget.checked
+                                  });
+                                }}
+                              />
+                            </label>
                           </div>
 
                           <div class="text-sm break-words" innerHTML={homework.description} />
@@ -99,7 +120,7 @@ const AppHomeworks: Component = () => {
                               <For each={homework.attachments}>
                                 {attachment => (
                                   <a
-                                    class="text-xs px-2 py-1 bg-brand-light rounded-md"
+                                    class="text-xs px-2 py-1 bg-brand-light rounded-md dark:text-brand-dark"
                                     href={createExternalFileURL(attachment)}
                                     target="_blank"
                                   >
@@ -108,6 +129,10 @@ const AppHomeworks: Component = () => {
                                 )}
                               </For>
                             </div>
+                          </Show>
+
+                          <Show when={homeworks()![day_index].length - 1 !== homework_index()}>
+                            <span class="z-10 h-[2px] absolute -bottom-[1px] left-2 -right-2 bg-brand-dark opacity-20 dark:opacity-100 dark:bg-dark-200" />
                           </Show>
                         </div>
                       )}

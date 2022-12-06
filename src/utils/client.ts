@@ -522,12 +522,16 @@ export const connectToPronote = async (options: {
 
 /** Gets the current week number based on current user's session. */
 export const getCurrentWeekNumber = (): number => {
+  return getWeekNumber(dayjs());
+};
+
+export const getWeekNumber = (date: dayjs.Dayjs): number => {
   const user = app.current_user;
   if (!user.slug) return 0;
 
   const first_date_raw = user.endpoints["/login/informations"].donnees.General.PremierLundi.V;
   const first_date = dayjs(first_date_raw, "DD-MM-YYYY");
-  const days_since_first = dayjs().diff(first_date, "days");
+  const days_since_first = date.diff(first_date, "days");
   const week_number = 1 + Math.floor(days_since_first / 7);
 
   return week_number;
@@ -726,12 +730,37 @@ export const callUserHomeworksAPI = async (week: number, options = { force: fals
   return local_response?.data;
 };
 
+export const getSubjectFromHomework = async (subject_timetable_id: string, week_number: number) => {
+  const user = app.current_user;
+  if (!user.slug) throw new ApiError ({
+    code: ResponseErrorCode.UserUnavailable
+  });
+
+  const endpoint: ApiUserTimetable["path"] = `/user/timetable/${week_number}`;
+  let timetable_data = (await endpoints.get<ApiUserTimetable>(user.slug, endpoint))?.data;
+  
+  if (!timetable_data) {
+    const response = await callAPI<ApiUserTimetable>(endpoint, () => ({
+      ressource: user.endpoints["/user/data"].donnees.ressource,
+      session: user.session
+    }));
+
+    timetable_data = response.received;
+  }
+
+  const subject = timetable_data.donnees.ListeCours.find(
+    item => item.N === subject_timetable_id
+  );
+
+  return subject;
+}
+
 /**
   * Sort the homeworks by the day they need to be done.
   * Returned object keys is from 0 to 6 (where 0 is Sunday and 6 is Saturday
   * Each item is an array containing the homeworks for that day.
   */
-export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["donnees"]) => {
+export const parseHomeworks = async (homeworks: PronoteApiUserHomeworks["response"]["donnees"]) => {
   console.info("[debug][homeworks]: parse");
 
   const output: { [key: number]: {
@@ -739,6 +768,7 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
 
     subject_name: string;
     subject_color: string;
+    subject_timetable_item?: PronoteApiUserTimetable["response"]["donnees"]["ListeCours"][number];
 
     description: string;
 		attachments: { id: string, name: string }[];
@@ -746,7 +776,8 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
   }[] } = {};
 
   for (const homework of homeworks.ListeTravauxAFaire.V) {
-    const day = dayjs(homework.PourLe.V, "DD-MM-YYYY").day();
+    const date = dayjs(homework.PourLe.V, "DD-MM-YYYY");
+    const day = date.day();
 
     // Initialize the array for the day if doesn't exist.
     if (!output[day]) output[day] = [];
@@ -758,6 +789,7 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
 
       subject_name: homework.Matiere.V.L,
       subject_color: homework.CouleurFond,
+      subject_timetable_item: await getSubjectFromHomework(homework.cours.V.N, getWeekNumber(date)),
 
       attachments: homework.ListePieceJointe.V.map(attachment => ({
         id: attachment.N,
