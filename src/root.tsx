@@ -16,24 +16,29 @@ import {
   ErrorBoundary
 } from "solid-start";
 
-import { Provider as LocalesProvider, context as locale } from "@/locales";
+import {
+  type languages as availableLanguages,
+  Provider as LocalesProvider,
+  context as locale,
+
+  findLanguageBasedOnBrowser,
+  switchLanguage
+} from "@/locales";
 
 import PornoteUpdater from "@/components/modals/PornoteUpdater";
 import { Toaster } from "solid-toast";
 
 export default function Root () {
   const [t] = locale;
+  
+  /** Always default to `fr`. */
+  const language = isServer ? "fr" :
+    localStorage.getItem("lang") as keyof typeof availableLanguages || findLanguageBasedOnBrowser()
 
-  // `window` doesn't exist on the server.
-  const colorSchemeMatchMedia = !isServer ? window.matchMedia("(prefers-color-scheme: dark)") : null;
-  const [isDarkMode, setDarkMode] = createSignal(colorSchemeMatchMedia?.matches);
-  onMount(() => colorSchemeMatchMedia?.addEventListener("change", evt => setDarkMode(evt.matches)));
+  onMount(() => switchLanguage(language));
 
   return (
-    <Html
-      lang="fr"
-      classList={{ dark: isDarkMode() }}
-    >
+    <Html lang={language}>
       <Head>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />

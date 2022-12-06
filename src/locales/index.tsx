@@ -12,7 +12,7 @@ export const fullNameLanguages: {
 } = {
   "English": "en",
   "Français": "fr"
-};
+} as const;
 
 export const languages = {
   en: () => import("./en"),
@@ -37,6 +37,7 @@ export const switchLanguage = async (lang: keyof typeof languages) => {
 
   // When the language is not available, use French.
   if (!languages[lang]) {
+    localStorage.setItem("lang", "fr");
     locale("fr");
     return;
   }
@@ -46,9 +47,27 @@ export const switchLanguage = async (lang: keyof typeof languages) => {
     await languages[lang]()
     : languages[lang];
 
+  // Lazy load the language and switch to it.
   add(lang, dict);
   locale(lang);
+
+  // Persist the language in the localStorage.
+  localStorage.setItem("lang", lang);
 };
+
+export const findLanguageBasedOnBrowser = (): keyof typeof languages => {
+  const browserLanguages = window.navigator.languages || [window.navigator.language].map(str => str.toLowerCase());
+
+  // Try to find a match based on the first part of the available languages (i.e., match "en" for "en-US")
+  for (const language of browserLanguages) {
+    for (let availableLanguage of Object.keys(languages)) {
+      if (language.startsWith(availableLanguage))
+        return availableLanguage as keyof typeof languages;
+    }
+  }
+
+  return "fr";
+}
 
 // Helpers typings.
 type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`

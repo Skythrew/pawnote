@@ -55,7 +55,6 @@ const RootHomePage: Component = () => {
             class="appearance-none rounded-md py-1 px-3 flex items-center gap-2 transition-colors outline-none border-2 bg-brand-dark border-brand-dark dark:(border-brand-white bg-brand-dark text-brand-white) dark:hover:(border-brand-primary bg-brand-primary bg-opacity-40)"
             onChange={(event) => {
               const lang_name = event.currentTarget.value as keyof typeof languages;
-              toast(`Passage en ${Object.keys(fullNameLanguages)[Object.values(fullNameLanguages).findIndex(v => v === lang_name)]}`);
               switchLanguage(lang_name);
             }}
           >
