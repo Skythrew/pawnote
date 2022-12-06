@@ -1,7 +1,7 @@
 import { defineConfig } from "windicss/helpers";
 
 export default defineConfig ({
-  darkMode: "class",
+  darkMode: "media",
   attributify: false,
 
   theme: {
