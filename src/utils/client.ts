@@ -745,7 +745,6 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
 
     subject_name: string;
     subject_color: string;
-    subject_timetable_id: string;
 
     description: string;
 		attachments: { id: string, name: string }[];
@@ -766,7 +765,6 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
 
       subject_name: homework.Matiere.V.L,
       subject_color: homework.CouleurFond,
-      subject_timetable_id: homework.cours.V.N,
 
       attachments: homework.ListePieceJointe.V.map(attachment => ({
         id: attachment.N,
