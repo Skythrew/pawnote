@@ -71,12 +71,14 @@ const fetch_queue: {
   resolve: (value: unknown) => void;
   reject: (error: unknown) => unknown;
   action: () => unknown;
+  code: AppStateCode;
 }[] = [];
 
 const enqueue_fetch = (code: AppStateCode, action: () => unknown) => {
+  console.info("enqueued fetch", code, fetch_queue);
   return new Promise((resolve, reject) => {
     fetch_queue.push({
-      resolve, reject, action: async () => {
+      resolve, reject, code, action: async () => {
         setCurrentState({
           fetching: true, code
         });
@@ -94,10 +96,8 @@ const dequeue_fetch = async () => {
 
   // Clear queue when session is restoring.
   if (current_state.restoring_session) {
-    while (fetch_queue.length > 0) {
-      fetch_queue.shift();
-    }
-
+    console.info("queue cleared (restoring session)", fetch_queue);
+    fetch_queue.splice(0, fetch_queue.length);
     return false;
   }
 
@@ -105,12 +105,14 @@ const dequeue_fetch = async () => {
   if (!item) return false;
 
   try {
+    console.info("run fetch in queue", item);
     const payload = await item.action();
     setStateToIdle();
 
     item.resolve(payload);
   }
   catch (error) {
+    console.info("fetch error in queue", error);
     setStateToIdle();
     item.reject(error);
   }

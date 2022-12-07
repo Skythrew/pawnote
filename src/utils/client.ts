@@ -730,37 +730,12 @@ export const callUserHomeworksAPI = async (week: number, options = { force: fals
   return local_response?.data;
 };
 
-export const getSubjectFromHomework = async (subject_timetable_id: string, week_number: number) => {
-  const user = app.current_user;
-  if (!user.slug) throw new ApiError ({
-    code: ResponseErrorCode.UserUnavailable
-  });
-
-  const endpoint: ApiUserTimetable["path"] = `/user/timetable/${week_number}`;
-  let timetable_data = (await endpoints.get<ApiUserTimetable>(user.slug, endpoint))?.data;
-  
-  if (!timetable_data) {
-    const response = await callAPI<ApiUserTimetable>(endpoint, () => ({
-      ressource: user.endpoints["/user/data"].donnees.ressource,
-      session: user.session
-    }));
-
-    timetable_data = response.received;
-  }
-
-  const subject = timetable_data.donnees.ListeCours.find(
-    item => item.N === subject_timetable_id
-  );
-
-  return subject;
-}
-
 /**
   * Sort the homeworks by the day they need to be done.
   * Returned object keys is from 0 to 6 (where 0 is Sunday and 6 is Saturday
   * Each item is an array containing the homeworks for that day.
   */
-export const parseHomeworks = async (homeworks: PronoteApiUserHomeworks["response"]["donnees"]) => {
+export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["donnees"]) => {
   console.info("[debug][homeworks]: parse");
 
   const output: { [key: number]: {
@@ -768,7 +743,7 @@ export const parseHomeworks = async (homeworks: PronoteApiUserHomeworks["respons
 
     subject_name: string;
     subject_color: string;
-    subject_timetable_item?: PronoteApiUserTimetable["response"]["donnees"]["ListeCours"][number];
+    subject_timetable_id: string;
 
     description: string;
 		attachments: { id: string, name: string }[];
@@ -789,7 +764,7 @@ export const parseHomeworks = async (homeworks: PronoteApiUserHomeworks["respons
 
       subject_name: homework.Matiere.V.L,
       subject_color: homework.CouleurFond,
-      subject_timetable_item: await getSubjectFromHomework(homework.cours.V.N, getWeekNumber(date)),
+      subject_timetable_id: homework.cours.V.N,
 
       attachments: homework.ListePieceJointe.V.map(attachment => ({
         id: attachment.N,

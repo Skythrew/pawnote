@@ -5,6 +5,7 @@ import {
   getDayNameFromDayNumber,
 
   callUserHomeworksAPI,
+  callUserTimetableAPI,
   callUserHomeworkDoneAPI,
 
   parseHomeworks,
@@ -27,15 +28,13 @@ const AppHomeworks: Component = () => {
     onCleanup(() => console.groupEnd());
 
     await callUserHomeworksAPI(week);
+    await callUserTimetableAPI(week);
   }));
 
-  const [homeworks, setHomeworks] = createSignal<Awaited<ReturnType<typeof parseHomeworks>> | null>(null);
-  createEffect(on(endpoint, async (data) => {
-    if (!data) return;
-
-    const homeworks = await parseHomeworks(data.donnees);
-    setHomeworks(homeworks);
-  }));
+  const homeworks = createMemo(() => endpoint()
+    ? parseHomeworks(endpoint()!.donnees)
+    : null
+  );
 
   return (
     <>
@@ -85,8 +84,11 @@ const AppHomeworks: Component = () => {
                           class="relative py-3 pl-4 mx-4 bg-brand-white dark:(bg-brand-dark text-brand-white) border-l-4 flex-col gap-2">
                           <div class="flex justify-between items-center mb-2">
                             <div>
-                            <h3 class="text-md font-medium">{homework.subject_name}</h3>
-                            <p>{homework.subject_timetable_item?.DateDuCours.V}</p>
+                              <h3 class="text-md font-medium">{homework.subject_name}</h3>
+                              <span>Pour {app.current_user.endpoints?.[`/user/timetable/${weekNumber()}`]?.donnees.ListeCours.find(
+                                item => item.N === homework.subject_timetable_id
+                              )?.DateDuCours.V ?? "EDT non récupéré"}
+                              </span>
                             </div>
                             <label class="flex text-xs gap-2 rounded-full border px-3 py-1 items-center"
                               classList={{
@@ -132,7 +134,7 @@ const AppHomeworks: Component = () => {
                           </Show>
 
                           <Show when={homeworks()![day_index].length - 1 !== homework_index()}>
-                            <span class="z-10 h-[2px] absolute -bottom-[1px] left-2 -right-2 bg-brand-dark opacity-20 dark:opacity-100 dark:bg-dark-200" />
+                            <span class="z-10 h-[2px] absolute -bottom-[1px] left-2 right-0 bg-brand-dark opacity-20 dark:(bg-dark-200 opacity-100)" />
                           </Show>
                         </div>
                       )}
