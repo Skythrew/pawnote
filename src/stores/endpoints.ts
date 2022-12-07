@@ -30,16 +30,17 @@ const get = async <Api extends {
     /** When the endpoint was saved in millis. */
     date: number;
   }>(endpoint);
+  if (!data) return null;
 
-  if (data === null) return null;
+  const login_informations = await database(slug).getItem<{ date: number }>("/login/informations");
+  if (!login_informations) return null;
 
-  // Endpoints should be renewed every 4h
-  // (TODO: Make it so the user can choose)
-  const expiration = 4 * (1000 * 60 * 60);
-  const is_expired = Date.now() - data.date >= expiration;
+  const last_session_restore = new Date(login_informations.date);
+  const last_endpoint_cache = new Date(data.date);
+
+  const is_expired = last_endpoint_cache < last_session_restore;
 
   if (user.slug && user.slug === slug) {
-
     batch(() => {
       app.setCurrentUser("endpoints", {
         [endpoint as keyof (typeof user.endpoints)]: data.received

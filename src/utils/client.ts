@@ -983,62 +983,33 @@ export const callUserHomeworkDoneAPI = async (options: {
   const endpoint: ApiUserHomeworkDone["path"] = `/user/homework/${options.homework_id}/done`;
 
   app.enqueue_fetch(AppStateCode.ChangingHomeworkState, async () => {
-    const login_informations = await endpoints.raw_database(user.slug).getItem<{ date: number }>("/login/informations");
-    if (!login_informations) return;
-
     const homeworks_endpoint: ApiUserHomeworks["path"] = `/user/homeworks/${options.week_number}`;
-    const homeworks = await endpoints.raw_database(user.slug).getItem<{ date: number }>(homeworks_endpoint);
-    if (!homeworks) return;
 
-    const last_session_restore = new Date(login_informations.date);
-    const last_homeworks_restore = new Date(homeworks.date);
+    // Call the API to update the homework state.
+    await callAPI<ApiUserHomeworkDone>(endpoint, () => ({
+      session: user.session,
+      done: options.done ?? true
+    }), {
+      prevent_cache: true,
+      prevent_catch_rerun: true
+    });
 
-    // When the homeworks didn't got fetched since last session recovery,
-    // we should refresh the homeworks list before sending the `HomeworkDone`
-    // request to prevent our new session to be automatically expired.
-    if (last_homeworks_restore < last_session_restore) {
-      await callAPI<ApiUserHomeworks>(homeworks_endpoint, () => ({
-        session: user.session
-      }));
-    }
+    // Update local state for the homeworks endpoint.
+    app.setCurrentUser(
+      "endpoints", `/user/homeworks/${options.week_number}`,
+      "donnees", "ListeTravauxAFaire", "V",
+      homework => homework.N === options.homework_id,
+      "TAFFait", options.done ?? true
+    );
 
-    try {
-      // Call the API to update the homework state.
-      await callAPI<ApiUserHomeworkDone>(endpoint, () => ({
-        session: user.session,
-        done: options.done ?? true
-      }), {
-        prevent_cache: true,
-        prevent_catch_rerun: true
-      });
-
-      // Update local state for the homeworks endpoint.
-      app.setCurrentUser(
-        "endpoints", `/user/homeworks/${options.week_number}`,
-        "donnees", "ListeTravauxAFaire", "V",
-        homework => homework.N === options.homework_id,
-        "TAFFait", options.done ?? true
-      );
-
-      // Update cached data for the homeworks endpoint.
-      // We use the raw database and not the `upsert` function because
-      // we already updated the `app.current_user.endpoints` store previously
-      // and using `upsert` would update the store twice.
-      await endpoints.raw_database(user.slug).setItem(homeworks_endpoint, {
-        received: unwrap(app.current_user.endpoints?.[homeworks_endpoint]),
-        date: Date.now()
-      });
-    }
-    catch (error) {
-      if (error instanceof ApiError) {
-        // When the session expires because, we retry
-        // because if a session was restored on the previous `callAPI`,
-        // it wouldn't call the `ApiUserHomeworks` check at the start of this function.
-        if (error.code === ResponseErrorCode.SessionExpired) {
-          return callUserHomeworkDoneAPI(options);
-        }
-      }
-    }
+    // Update cached data for the homeworks endpoint.
+    // We use the raw database and not the `upsert` function because
+    // we already updated the `app.current_user.endpoints` store previously
+    // and using `upsert` would update the store twice.
+    await endpoints.raw_database(user.slug).setItem(homeworks_endpoint, {
+      received: unwrap(app.current_user.endpoints?.[homeworks_endpoint]),
+      date: Date.now()
+    });
   });
 };
 
