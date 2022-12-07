@@ -61,6 +61,7 @@ dayjs.extend(dayjsCustomDuration);
 /** Helper class for easier error handling. */
 export class ApiError extends Error {
   public debug?: ResponseError["debug"];
+  public code: ResponseErrorCode;
   public message: string;
 
   constructor (response: Omit<ResponseError, "success">) {
@@ -74,6 +75,7 @@ export class ApiError extends Error {
 
     this.name = "ApiError";
     this.debug = response.debug;
+    this.code = response.code;
     this.message = message;
   }
 }
