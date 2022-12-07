@@ -188,12 +188,7 @@ const AppHome: Component = () => {
                   {homework => (
                     <div class="bg-brand-white rounded py-2 px-4">
                       <div class="flex justify-between items-center">
-                        <div>
-                          <h5 class="text-md font-medium">{homework.subject_name}</h5>
-                          <span>Pour {app.current_user.endpoints?.[`/user/timetable/${weekNumber()}`]?.donnees.ListeCours.find(
-                            item => item.N === homework.subject_timetable_id
-                          )?.DateDuCours.V}</span>
-                        </div>
+                        <h5 class="text-md font-medium">{homework.subject_name}</h5>
                         <input
                           type="checkbox"
                           checked={homework.done}
