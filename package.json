@@ -29,7 +29,7 @@
     "pako": "^2.1.0",
     "set-cookie-parser": "^2.5.1",
     "solid-headless": "^0.13.0",
-    "solid-js": "^1.6.2",
+    "solid-js": "^1.6.3",
     "solid-start": "^0.2.7",
     "solid-toast": "^0.3.5"
   },
