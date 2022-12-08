@@ -566,7 +566,9 @@ export const callUserTimetableAPI = async (
     return local_response?.data;
   }
 
-  return call();
+  app.setCurrentState({ code: AppStateCode.FetchingTimetable, fetching: true });
+  await call();
+  app.setStateToIdle();
 };
 
 export interface TimetableLesson {
@@ -745,7 +747,9 @@ export const callUserHomeworksAPI = async (
     return local_response?.data;
   }
 
-  return call();
+  app.setCurrentState({ code: AppStateCode.FetchingHomeworks, fetching: true });
+  await call();
+  app.setStateToIdle();
 };
 
 /**
@@ -818,7 +822,9 @@ export const callUserRessourcesAPI = async (
     return local_response?.data;
   }
 
-  return call();
+  app.setCurrentState({ code: AppStateCode.FetchingRessources, fetching: true });
+  await call();
+  app.setStateToIdle();
 };
 
 export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
@@ -902,7 +908,9 @@ export const callUserGradesAPI = async (
     return local_response?.data;
   }
 
-  return call();
+  app.setCurrentState({ code: AppStateCode.FetchingGrades, fetching: true });
+  await call();
+  app.setStateToIdle();
 };
 
 export interface Grade {
