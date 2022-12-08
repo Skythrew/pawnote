@@ -1089,7 +1089,7 @@ export const renewAPIsSync = async () => {
 
   // When a new session is set, we should refresh the homeworks
   // to update the homeworks' ID to make the `UserHomeworkDone` API work.
-  await callUserHomeworksAPI(current_week, { queue: false });
+  await callUserHomeworksAPI(current_week, { force: true, queue: false });
   await callUserRessourcesAPI(current_week, { queue: false });
 
   const periods = () => app.current_user.endpoints?.["/user/data"].donnees.ressource.listeOngletsPourPeriodes.V.find(

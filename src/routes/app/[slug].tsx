@@ -75,11 +75,12 @@ const AppLayout: Component = () => {
     });
 
     console.info("[debug]: defined `app.current_user`");
-    console.groupEnd();
 
     // We fetch all the APIs to cache them and renew them at
     // the same time - it also prevents session errors.
     await renewAPIsSync();
+
+    console.groupEnd();
     setLoading(false);
   }));
 
