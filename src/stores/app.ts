@@ -71,18 +71,14 @@ const fetch_queue: {
   resolve: (value: unknown) => void;
   reject: (error: unknown) => unknown;
   action: () => unknown;
-  code: AppStateCode;
 }[] = [];
 
 const enqueue_fetch = (code: AppStateCode, action: () => unknown) => {
-  console.info("enqueued fetch", code, fetch_queue);
+  console.info("[enqueue_fetch]", code, fetch_queue);
   return new Promise((resolve, reject) => {
     fetch_queue.push({
-      resolve, reject, code, action: async () => {
-        setCurrentState({
-          fetching: true, code
-        });
-
+      resolve, reject, action: async () => {
+        setCurrentState({ fetching: true, code });
         return action();
       }
     });
@@ -96,7 +92,7 @@ const dequeue_fetch = async () => {
 
   // Clear queue when session is restoring.
   if (current_state.restoring_session) {
-    console.info("queue cleared (restoring session)", fetch_queue);
+    console.info("[dequeue_fetch] queue cleared (restoring session)", fetch_queue);
     fetch_queue.splice(0, fetch_queue.length);
     return false;
   }
