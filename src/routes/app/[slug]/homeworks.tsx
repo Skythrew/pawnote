@@ -64,7 +64,7 @@ const AppHomeworks: Component = () => {
             </div>
           }
         >
-          <div class="flex my-8 md:px-4 justify-center">
+          <div class="w-full flex my-8 md:px-4 justify-center">
             <div class="hidden md:block max-w-72 w-full">
               <div class="sticky"
                 classList={{
@@ -75,6 +75,14 @@ const AppHomeworks: Component = () => {
                 }}
               >
                 <h4 class="font-medium w-max text-md bg-brand-light text-brand-primary px-8 py-2 rounded-full dark:(bg-dark-200 text-brand-light)">Filtres</h4>
+
+                <div class="mt-4 flex flex-col gap-2">
+                  <label class="rounded-full px-4 py-1 flex items-center gap-2 w-max text-brand-dark border border-brand-dark dark:(text-brand-white border-brand-white) cursor-pointer">
+                    <input hidden type="checkbox" />
+                    <IconMdiCheck /> Faits
+                  </label>
+                </div>
+
               </div>
             </div>
 
@@ -100,7 +108,7 @@ const AppHomeworks: Component = () => {
                       <For each={homeworks()![day_index]}>
                         {(homework, homework_index) => (
                           <div style={{ "border-color": homework.subject_color }}
-                            class="relative py-3 px-4 md:(ml-8 mr-4 rounded-lg mb-2) bg-brand-dark/2 dark:(bg-dark-300/25 text-brand-white) dark:hover:bg-dark-300/50 transition-colors border-l-4 flex flex-col gap-2">
+                            class="relative py-3 px-4 md:(ml-8 mr-4 rounded-lg mb-2) bg-brand-dark/2 dark:(bg-dark-300/40 text-brand-white) dark:hover:bg-dark-300/50 transition-colors border-l-4 flex flex-col gap-2">
                             <div class="flex justify-between items-center">
                               <h3 class="text-md font-medium dark:font-semibold">{homework.subject_name}</h3>
                               <label class="cursor-pointer flex text-xs gap-2 rounded-full border px-3 py-1 items-center"
