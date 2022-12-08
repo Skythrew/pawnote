@@ -132,10 +132,12 @@ const AppLayout: Component = () => {
         <main class="min-h-screen bg-brand-white dark:bg-brand-dark pt-30">
           <Outlet />
         </main>
+      </Show>
 
+      <Show when={user().slug}>
         <SessionFromScratchModal.Component
-          pronote_url={user().session?.instance.pronote_url as string}
-          ent_url={user().session?.instance.ent_url ?? undefined}
+          pronote_url={user().session!.instance.pronote_url as string}
+          ent_url={user().session!.instance.ent_url ?? undefined}
         />
       </Show>
     </>
