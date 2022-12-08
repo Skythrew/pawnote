@@ -79,10 +79,10 @@ const AppHome: Component = () => {
   const timetable_lessons = () => timetable_lessons_full()?.[timetableDayNumber()];
 
   // Call to renew the APIs when the week has changed.
-  createEffect(on(weekNumber, async (week) => {
-    console.info(`-> Week: ${week}`);
-    await callUserHomeworksAPI(week);
-    await callUserTimetableAPI(week);
+  createEffect(on([weekNumber, () => app.current_user.session], async () => {
+    console.info(`-> Week: ${weekNumber()}`);
+    await callUserHomeworksAPI(weekNumber());
+    await callUserTimetableAPI(weekNumber());
   }));
 
   // TODO: Fix typings safety (mostly ! on gradesCurrentPeriod)
@@ -113,7 +113,7 @@ const AppHome: Component = () => {
   };
 
   // Call to renew the API when the user data has changed.
-  createEffect(on(gradesCurrentPeriod, async () => {
+  createEffect(on([gradesCurrentPeriod, () => app.current_user.session], async () => {
     if (!gradesCurrentPeriod()) return;
 
     console.info(`-> Grades Period: ${gradesCurrentPeriod()!.N}`);

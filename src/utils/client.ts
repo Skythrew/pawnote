@@ -539,7 +539,10 @@ export const getWeekNumber = (date: dayjs.Dayjs): number => {
   return week_number;
 };
 
-export const callUserTimetableAPI = async (week: number, options = { force: false }) => {
+export const callUserTimetableAPI = async (
+  week: number,
+  options: { force?: boolean, queue?: boolean } = { force: false, queue: true }
+) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
     code: ResponseErrorCode.UserUnavailable
@@ -549,16 +552,21 @@ export const callUserTimetableAPI = async (week: number, options = { force: fals
   const local_response = await endpoints.get<ApiUserTimetable>(user.slug, endpoint);
   if (local_response && !local_response.expired && !options.force) return local_response;
 
-  app.enqueue_fetch(AppStateCode.FetchingTimetable, async () => {
+  const call = async () => {
     console.info("[timetable] renew");
 
     await callAPI<ApiUserTimetable>(endpoint, () => ({
       ressource: user.endpoints["/user/data"].donnees.ressource,
       session: user.session
     }));
-  });
+  };
 
-  return local_response?.data;
+  if (options.queue) {
+    app.enqueue_fetch(AppStateCode.FetchingTimetable, call);
+    return local_response?.data;
+  }
+
+  return call();
 };
 
 export interface TimetableLesson {
@@ -711,7 +719,10 @@ export const getTimeFormattedDiff = (
   return duration.format(format);
 };
 
-export const callUserHomeworksAPI = async (week: number, options = { force: false }) => {
+export const callUserHomeworksAPI = async (
+  week: number,
+  options: { force?: boolean, queue?: boolean } = { force: false, queue: true }
+) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
     code: ResponseErrorCode.UserUnavailable
@@ -721,15 +732,20 @@ export const callUserHomeworksAPI = async (week: number, options = { force: fals
   const local_response = await endpoints.get<ApiUserHomeworks>(user.slug, endpoint);
   if (local_response && !local_response.expired && !options.force) return local_response;
 
-  app.enqueue_fetch(AppStateCode.FetchingHomeworks, async () => {
+  const call = async () => {
     console.info("[homeworks] renew");
 
     await callAPI<ApiUserHomeworks>(endpoint, () => ({
       session: user.session
     }));
-  });
+  };
 
-  return local_response?.data;
+  if (options.queue) {
+    app.enqueue_fetch(AppStateCode.FetchingHomeworks, call);
+    return local_response?.data;
+  }
+
+  return call();
 };
 
 /**
@@ -776,7 +792,10 @@ export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["d
   return output;
 };
 
-export const callUserRessourcesAPI = async (week: number) => {
+export const callUserRessourcesAPI = async (
+  week: number,
+  options: { force?: boolean, queue?: boolean } = { force: false, queue: true }
+) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
     code: ResponseErrorCode.UserUnavailable
@@ -784,17 +803,22 @@ export const callUserRessourcesAPI = async (week: number) => {
 
   const endpoint: ApiUserRessources["path"] = `/user/ressources/${week}`;
   const local_response = await endpoints.get<ApiUserRessources>(user.slug, endpoint);
-  if (local_response && !local_response.expired) return local_response;
+  if (local_response && !local_response.expired  && !options.force) return local_response;
 
-  app.enqueue_fetch(AppStateCode.FetchingRessources, async () => {
+  const call = async () => {
     console.info("[ressources]: renew");
 
     await callAPI<ApiUserRessources>(endpoint, () => ({
       session: user.session
     }));
-  });
+  };
 
-  return local_response?.data;
+  if (options.queue) {
+    app.enqueue_fetch(AppStateCode.FetchingRessources, call);
+    return local_response?.data;
+  }
+
+  return call();
 };
 
 export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
@@ -851,7 +875,10 @@ export const getCurrentPeriod = (periods: PronoteApiUserData["response"]["donnee
   return current_period;
 };
 
-export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"]["period"]>, options = { force: false }) => {
+export const callUserGradesAPI = async (
+  period: Accessor<ApiUserGrades["request"]["period"]>,
+  options: { force?: boolean, queue?: boolean } = { force: false, queue: true }
+) => {
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
     code: ResponseErrorCode.UserUnavailable
@@ -861,16 +888,21 @@ export const callUserGradesAPI = async (period: Accessor<ApiUserGrades["request"
   const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint());
   if (local_response && !local_response.expired && !options.force) return local_response;
 
-  app.enqueue_fetch(AppStateCode.FetchingGrades, async () => {
+  const call = async () => {
     console.info("[grades]: renew");
 
     await callAPI<ApiUserGrades>(endpoint, () => ({
       session: user.session,
       period: period()
     }), { prevent_catch_rerun: true });
-  });
+  };
 
-  return local_response?.data;
+  if (options.queue) {
+    app.enqueue_fetch(AppStateCode.FetchingGrades, call);
+    return local_response?.data;
+  }
+
+  return call();
 };
 
 export interface Grade {
@@ -975,6 +1007,10 @@ export const callUserHomeworkDoneAPI = async (options: {
    week_number: number;
    done?: boolean;
 }) => {
+  if (!navigator.onLine) throw new ClientError ({
+    code: ClientErrorCode.Offline
+  });
+
   const user = app.current_user;
   if (!user.slug) throw new ApiError ({
     code: ResponseErrorCode.UserUnavailable
@@ -1034,3 +1070,24 @@ export const createExternalFileURL = (options: { id: string, name: string }) => 
   return result;
 };
 
+/** We assume that the app.current_user store is already populated. */
+export const renewAPIsSync = async () => {
+  const current_week = getCurrentWeekNumber();
+
+  // Call the timetable API first because this request is safe
+  // against session errors.
+  // If the session expired, it will automatically create a new one from this.
+  await callUserTimetableAPI(current_week, { force: true, queue: false });
+
+  // When a new session is set, we should refresh the homeworks
+  // to update the homeworks' ID to make the `UserHomeworkDone` API work.
+  await callUserHomeworksAPI(current_week, { queue: false });
+  await callUserRessourcesAPI(current_week, { queue: false });
+
+  const periods = () => app.current_user.endpoints?.["/user/data"].donnees.ressource.listeOngletsPourPeriodes.V.find(
+    onglet => onglet.G === PronoteApiOnglets.Grades
+  )?.listePeriodes.V;
+  const current_period = () => getCurrentPeriod(periods()!)!;
+
+  await callUserGradesAPI(current_period as unknown as Accessor<ApiUserGrades["request"]["period"]>, { queue: false });
+};

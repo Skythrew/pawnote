@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@fontsource/poppins": "^4.5.10",
+    "@solid-primitives/connectivity": "^0.3.4",
     "@solid-primitives/i18n": "^1.1.2",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.5.1",

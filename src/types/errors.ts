@@ -28,5 +28,6 @@ export enum ResponseErrorCode {
 export enum ClientErrorCode {
   SessionCantRestore = 200,
   NetworkFail = 201,
+  Offline = 202
 }
 

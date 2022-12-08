@@ -4,9 +4,11 @@ import type { ApiLoginInformations, ApiUserData } from "@/types/api";
 import { A } from "solid-start";
 import { useLocale } from "@/locales";
 
+import app, { AppStateCode } from "@/stores/app";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
-import app, { AppStateCode } from "@/stores/app";
+
+import { renewAPIsSync } from "@/utils/client";
 
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
@@ -17,14 +19,19 @@ const AppLayout: Component = () => {
   const params = useParams();
   const slug = () => params.slug;
 
-  createEffect(async () => {
-    console.group(`=> ${slug()}`);
+  const [loading, setLoading] = createSignal(true);
+  createEffect(on(slug, async (slug) => {
+    console.group(`=> ${slug}`);
+    setLoading(true);
 
     onCleanup(() => {
       console.groupCollapsed("cleanup");
 
-      app.cleanCurrentUser();
-      SessionFromScratchModal.show(false);
+      batch(() => {
+        setLoading(false);
+        app.cleanCurrentUser();
+        SessionFromScratchModal.show(false);
+      });
 
       console.info("[debug]: cleaned 'app.current_user' and 'SessionFromScratchModal' state");
       console.groupEnd();
@@ -34,7 +41,7 @@ const AppLayout: Component = () => {
 
     console.groupCollapsed("initialization");
 
-    const session = await sessions.get(slug());
+    const session = await sessions.get(slug);
     if (!session) {
       console.error("[debug] no session found");
       console.groupEnd();
@@ -42,7 +49,7 @@ const AppLayout: Component = () => {
     }
     console.info("[debug]: got session");
 
-    const user_data = await endpoints.get<ApiUserData>(slug(), "/user/data");
+    const user_data = await endpoints.get<ApiUserData>(slug, "/user/data");
     if (!user_data) {
       console.error("[debug] no endpoint '/user/data' found");
       console.groupEnd();
@@ -50,7 +57,7 @@ const AppLayout: Component = () => {
     }
     console.info("[debug]: got '/user/data'");
 
-    const login_informations = await endpoints.get<ApiLoginInformations>(slug(), "/login/informations");
+    const login_informations = await endpoints.get<ApiLoginInformations>(slug, "/login/informations");
     if (!login_informations) {
       console.error("[debug] no endpoint '/login/informations' found");
       console.groupEnd();
@@ -58,20 +65,23 @@ const AppLayout: Component = () => {
     }
     console.info("[debug]: got '/login/informations'");
 
-    batch(() => {
-      app.setCurrentUser({
-        slug: slug(),
-        session,
-        endpoints: {
-          "/login/informations": login_informations.data,
-          "/user/data": user_data.data
-        }
-      });
-
-      console.info("[debug]: defined `app.current_user`");
-      console.groupEnd();
+    app.setCurrentUser({
+      slug,
+      session,
+      endpoints: {
+        "/login/informations": login_informations.data,
+        "/user/data": user_data.data
+      }
     });
-  });
+
+    console.info("[debug]: defined `app.current_user`");
+    console.groupEnd();
+
+    // We fetch all the APIs to cache them and renew them at
+    // the same time - it also prevents session errors.
+    await renewAPIsSync();
+    setLoading(false);
+  }));
 
   // Short-hand.
   const user = () => app.current_user;
@@ -79,10 +89,12 @@ const AppLayout: Component = () => {
   return (
     <>
       <Title>{slug()} - {APP_NAME}</Title>
-      <Show when={user().slug} fallback={
+      <Show when={user().slug && !loading()} fallback={
         <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 px-4 bg-brand-primary dark:bg-brand-dark">
           <h2 class="text-center font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white dark:(bg-brand-primary text-brand-white)">{t("PAGES.APP._.FETCHING")}</h2>
-          <span class="text-brand-light text-sm font-medium dark:(text-brand-white text-opacity-60)">{t("PAGES.APP._.WAIT")}</span>
+          <span class="text-brand-light text-sm font-medium dark:(text-brand-white text-opacity-60)">{
+            app.current_state.code === AppStateCode.Idle ? t("PAGES.APP._.WAIT") : t(`APP_STATE.${app.current_state.code}`)
+          }</span>
         </div>
       }>
         <header class="fixed z-50 top-0 right-0 left-0 flex flex-col shadow dark:shadow-md">

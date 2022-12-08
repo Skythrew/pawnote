@@ -29,7 +29,8 @@ export const API_ERRORS: Language["API_ERRORS"] = {
 
 export const CLIENT_ERRORS: Language["CLIENT_ERRORS"] = {
   [ClientErrorCode.SessionCantRestore]: "Can't restore the session, please enter your credentials again.",
-  [ClientErrorCode.NetworkFail]: "A network error happened, please retry."
+  [ClientErrorCode.NetworkFail]: "A network error happened, please retry.",
+  [ClientErrorCode.Offline]: "You can't do this action because you're offline."
 };
 
 export const APP_STATE: Language["APP_STATE"] = {

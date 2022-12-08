@@ -29,7 +29,8 @@ export const API_ERRORS: Language["API_ERRORS"] = {
 
 export const CLIENT_ERRORS: Language["CLIENT_ERRORS"] = {
   [ClientErrorCode.SessionCantRestore]: "Session non récupérable, entrez à nouveau vos identifants.",
-  [ClientErrorCode.NetworkFail]: "Une erreur réseau est survenue."
+  [ClientErrorCode.NetworkFail]: "Une erreur réseau est survenue.",
+  [ClientErrorCode.Offline]: "Vous ne pouvez pas effectuer cette action car vous êtes hors-ligne."
 };
 
 export const APP_STATE: Language["APP_STATE"] = {
