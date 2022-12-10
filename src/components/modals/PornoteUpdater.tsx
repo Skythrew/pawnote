@@ -31,29 +31,22 @@ const PornoteUpdater: Component = () => {
 
   return (
     <Modal open={needRefresh()} onClose={close}>
-      <div class="mx-0 my-auto p-4 w-full max-w-md bg-brand-white dark:bg-dark-200 text-brand-dark dark:text-brand-white rounded-lg border-2 border-brand-primary">
+      <div class="bg-brand-white border-brand-primary rounded-lg my-auto max-w-md border-2 mx-0 text-brand-dark w-full p-4 dark:bg-dark-200 dark:text-brand-white">
+        <h4 class="font-medium text-md text-center text-brand-primary dark:text-brand-white">Nouvelle version disponible !</h4>
 
-        <h4 class="text-md font-medium text-center text-brand-primary dark:text-brand-white">Nouvelle version disponible !</h4>
-
-        <div class="flex flex-row justify-end gap-4 pt-4">
+        <div class="flex flex-row pt-4 gap-4 justify-end">
           <button
             onClick={() => close()}
-            class="
-            px-6 py-2 rounded outline-none
-            dark:(text-brand-white text-opacity-60)
-            hover:(bg-brand-light text-brand-primary)
-            dark:hover:(bg-dark-100 text-brand-white text-opacity-100)
-            font-medium transition bg-transparent
-          "
+            class="bg-transparent rounded font-medium outline-none py-2 px-6 transition dark:(text-brand-white text-opacity-60) hover:(bg-brand-light text-brand-primary) dark:hover:(bg-dark-100 text-brand-white text-opacity-100) "
           >
-          Plus tard
+            Plus tard
           </button>
 
           <button
-            class="px-6 py-2 transition outline-none bg-brand-primary text-brand-white rounded font-medium"
+            class="bg-brand-primary rounded font-medium outline-none text-brand-white py-2 px-6 transition"
             onClick={() => updateServiceWorker(true)}
           >
-          Actualiser
+            Actualiser
           </button>
         </div>
       </div>

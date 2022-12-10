@@ -122,14 +122,14 @@ const AppHome: Component = () => {
 
   return (
     <>
-      <nav class="flex justify-center items-center gap-2 mt mb-8">
+      <nav class="flex mt mb-8 gap-2 justify-center items-center">
         <button
           class="flex"
           onClick={() => setWeekNumber(prev => sanitizeWeekNumber(--prev))}
         >
           <IconMdiArrowLeft />
         </button>
-        <h2 class="text-lg font-medium">Semaine {weekNumber()}</h2>
+        <h2 class="font-medium text-lg">Semaine {weekNumber()}</h2>
         <button
           class="flex"
           onClick={() => setWeekNumber(prev => sanitizeWeekNumber(++prev))}
@@ -138,13 +138,13 @@ const AppHome: Component = () => {
         </button>
       </nav>
 
-      <div class="flex flex-col items-center md:flex-row-reverse md:justify-end md:items-start gap-4 px-4 pb-8">
+      <div class="flex flex-col px-4 pb-8 gap-4 items-center md:flex-row-reverse md:justify-end md:items-start">
         <Show
           fallback={<A href="homeworks">Les devoirs n'ont pas encore été récupérés.</A>}
           when={app.current_user.slug !== null && homeworks() !== null}
         >
-          <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md text-brand-dark bg-brand-primary py-2">
-            <div class="flex gap-1 justify-between items-center px-6 py-2">
+          <div class="bg-brand-primary rounded-md flex flex-col max-w-md shadow text-brand-dark w-full py-2 md:w-xs">
+            <div class="flex py-2 px-6 gap-1 justify-between items-center">
               <div class="flex flex-col">
                 <A href="homeworks">
                   <h4 class="font-medium text-xl text-brand-white">Devoirs non faits</h4>
@@ -158,29 +158,29 @@ const AppHome: Component = () => {
               <div class="flex gap-1.5">
                 <button
                   onClick={() => setHomeworksDayNumber(prev => sanitizeDayNumber(--prev))}
-                  class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
+                  class="bg-brand-light rounded-full flex text-brand-dark py-1 px-2"
                 >
                   <IconMdiArrowLeft />
                 </button>
                 <button
                   onClick={() => setHomeworksDayNumber(prev => sanitizeDayNumber(++prev))}
-                  class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
+                  class="bg-brand-light rounded-full flex text-brand-dark py-1 px-2"
                 >
                   <IconMdiArrowRight />
                 </button>
               </div>
             </div>
 
-            <div class="flex flex-col gap-2 py-2 px-4">
+            <div class="flex flex-col py-2 px-4 gap-2">
               <Show keyed when={homeworks()} fallback={
-                <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
+                <div class="bg-brand-light rounded flex bg-opacity-20 text-brand-white text-sm p-2 gap-4 justify-center items-center">
                   <IconMdiCheck />
                   <p>Aucun devoir pour ce jour!</p>
                 </div>
               }>
 
                 <For each={homeworks()} fallback={
-                  <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
+                  <div class="bg-brand-light rounded flex bg-opacity-20 text-brand-white text-sm p-2 gap-4 justify-center items-center">
                     <IconMdiCheck />
                     <p>Tous les devoirs ont été faits!</p>
                   </div>
@@ -188,7 +188,7 @@ const AppHome: Component = () => {
                   {homework => (
                     <div class="bg-brand-white rounded py-2 px-4">
                       <div class="flex justify-between items-center">
-                        <h5 class="text-md font-medium">{homework.subject_name}</h5>
+                        <h5 class="font-medium text-md">{homework.subject_name}</h5>
                         <input
                           type="checkbox"
                           checked={homework.done}
@@ -217,8 +217,8 @@ const AppHome: Component = () => {
           when={app.current_user.slug !== null && timetable_lessons()}
         >
           {lessons => (
-            <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md bg-brand-primary text-brand-dark py-2">
-              <div class="flex gap-1 justify-between items-center px-6 py-2">
+            <div class="bg-brand-primary rounded-md flex flex-col max-w-md shadow text-brand-dark w-full py-2 md:w-xs">
+              <div class="flex py-2 px-6 gap-1 justify-between items-center">
                 <div class="flex flex-col">
                   <A href="timetable">
                     <h4 class="font-medium text-xl text-brand-white">EDT</h4>
@@ -232,22 +232,22 @@ const AppHome: Component = () => {
                 <div class="flex gap-1.5">
                   <button
                     onClick={() => setTimetableDayNumber(prev => sanitizeDayNumber(--prev))}
-                    class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
+                    class="bg-brand-light rounded-full flex text-brand-dark py-1 px-2"
                   >
                     <IconMdiArrowLeft />
                   </button>
                   <button
                     onClick={() => setTimetableDayNumber(prev => sanitizeDayNumber(++prev))}
-                    class="py-1 px-2 bg-brand-light text-brand-dark rounded-full flex"
+                    class="bg-brand-light rounded-full flex text-brand-dark py-1 px-2"
                   >
                     <IconMdiArrowRight />
                   </button>
                 </div>
               </div>
 
-              <div class="flex flex-col gap-3 py-2 px-4">
+              <div class="flex flex-col py-2 px-4 gap-3">
                 <For each={lessons} fallback={
-                  <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
+                  <div class="bg-brand-light rounded flex bg-opacity-20 text-brand-white text-sm p-2 gap-4 justify-center items-center">
                     <IconMdiCheck />
                     <p>Aucun cours de la journée!</p>
                   </div>
@@ -260,7 +260,7 @@ const AppHome: Component = () => {
                             <div style={{
                               "height": (32 * (lesson.to - lesson.from)) + "px"
                             }}
-                            class="bg-brand-white bg-opacity-20 border-2 border-brand-white flex items-center justify-center rounded m-2"
+                            class="bg-brand-white border-brand-white rounded flex bg-opacity-20 border-2 m-2 items-center justify-center"
                             >
                               <p class="text-brand-white text-sm text-center">Pause de {getLabelOfPosition(lesson.from)} à {getLabelOfPosition(lesson.to)} ({
                                 getTimeFormattedDiff(
@@ -276,19 +276,19 @@ const AppHome: Component = () => {
                         <Match keyed when={lesson_raw.type === "lesson" && lesson_raw as TimetableLesson}>
                           {lesson => (
                             <>
-                              <span class="absolute -top-2 bg-brand-light px-4 py-0.5 text-sm rounded w-max left-0 -right-2 ml-auto">{getLabelOfPosition(lesson.position)}</span>
+                              <span class="bg-brand-light rounded ml-auto text-sm w-max py-0.5 px-4 -top-2 -right-2 left-0 absolute">{getLabelOfPosition(lesson.position)}</span>
                               <Show when={lesson?.status}>
-                                <span class="absolute py-1 z-10 -top-2.5 border border-brand-light bg-brand-light font-medium px-2 -left-1 rounded text-xs w-max leading-none mr-auto">{lesson.status}</span>
+                                <span class="bg-brand-light border border-brand-light rounded font-medium mr-auto text-xs leading-none w-max py-1 px-2 -top-2.5 -left-1 z-10 absolute">{lesson.status}</span>
                               </Show>
                               <div
                                 style={{
                                   "border-color": lesson.color,
                                   "height": (32 * lesson.duration) + "px"
                                 }}
-                                class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
+                                class="bg-brand-white border-l-brand-primary rounded border-l-4 py-2 px-4"
                               >
-                                <h5 class="truncate font-medium text-lg">{lesson.name}</h5>
-                                <span class="block text-sm">{[lesson.room, lesson.teacher].filter(Boolean).join(" - ")}</span>
+                                <h5 class="font-medium text-lg truncate">{lesson.name}</h5>
+                                <span class="text-sm block">{[lesson.room, lesson.teacher].filter(Boolean).join(" - ")}</span>
                               </div>
                             </>
                           )}
@@ -306,8 +306,8 @@ const AppHome: Component = () => {
           fallback={<A href="grades">Les notes n'ont pas encore été récupérées.</A>}
           when={app.current_user.slug !== null && grades()}
         >
-          <div class="flex flex-col shadow rounded-md w-full md:w-xs max-w-md text-brand-dark bg-brand-primary py-2">
-            <div class="flex gap-1 justify-between items-center px-6 py-2">
+          <div class="bg-brand-primary rounded-md flex flex-col max-w-md shadow text-brand-dark w-full py-2 md:w-xs">
+            <div class="flex py-2 px-6 gap-1 justify-between items-center">
               <div class="flex flex-col">
                 <A href="grades">
                   <h4 class="font-medium text-xl text-brand-white">Dernières notes</h4>
@@ -318,8 +318,8 @@ const AppHome: Component = () => {
                 </span>
               </div>
 
-              <div class="flex flex-col m-0 ml-auto">
-                <h4 class="text-right font-medium text-xl text-brand-white">
+              <div class="flex flex-col ml-auto m-0">
+                <h4 class="font-medium text-right text-xl text-brand-white">
                   {grades()?.moyGenerale.V}
                 </h4>
                 <span class="text-right text-sm text-brand-light">
@@ -328,10 +328,10 @@ const AppHome: Component = () => {
               </div>
             </div>
 
-            <div class="flex flex-col gap-2 py-2 px-4">
+            <div class="flex flex-col py-2 px-4 gap-2">
               <Show when={grades() && grades()!.listeDevoirs.V.length > 0} fallback={
 
-                <div class="flex justify-center items-center gap-4 text-brand-white bg-brand-light text-sm p-2 rounded bg-opacity-20">
+                <div class="bg-brand-light rounded flex bg-opacity-20 text-brand-white text-sm p-2 gap-4 justify-center items-center">
                   <IconMdiCheck />
                   <p>Aucune note !</p>
                 </div>
@@ -339,12 +339,12 @@ const AppHome: Component = () => {
                 <For each={sorted_grades()}>
                   {grade => (
                     <div
-                      class="border-l-4 border-l-brand-primary bg-brand-white rounded py-2 px-4"
+                      class="bg-brand-white border-l-brand-primary rounded border-l-4 py-2 px-4"
                       style={{
                         "border-color": grade.service.V.couleur
                       }}
                     >
-                      <div class="flex justify-between gap-4">
+                      <div class="flex gap-4 justify-between">
                         <h5 class="font-medium break-all">{grade.service.V.L}</h5>
                         <h5 class="font-medium">{grade.note.V}/{grade.bareme.V}</h5>
                       </div>

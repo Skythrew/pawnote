@@ -91,22 +91,22 @@ const AppLayout: Component = () => {
     <>
       <Title>{slug()} - {APP_NAME}</Title>
       <Show when={user().slug && !loading()} fallback={
-        <div class="w-screen h-screen flex flex-col justify-center items-center gap-2 px-4 bg-brand-primary dark:bg-brand-dark">
-          <h2 class="text-center font-medium text-md rounded-full text-brand-primary px-6 py-2 bg-brand-white dark:(bg-brand-primary text-brand-white)">{t("PAGES.APP._.FETCHING")}</h2>
-          <span class="text-brand-light text-sm font-medium dark:(text-brand-white text-opacity-60)">{
+        <div class="bg-brand-primary flex flex-col h-screen w-screen px-4 gap-2 justify-center items-center dark:bg-brand-dark">
+          <h2 class="bg-brand-white rounded-full font-medium text-center text-md text-brand-primary py-2 px-6 dark:(bg-brand-primary text-brand-white) ">{t("PAGES.APP._.FETCHING")}</h2>
+          <span class="font-medium text-brand-light text-sm dark:(text-brand-white text-opacity-60) ">{
             app.current_state.code === AppStateCode.Idle ? t("PAGES.APP._.WAIT") : t(`APP_STATE.${app.current_state.code}`)
           }</span>
         </div>
       }>
-        <header class="fixed z-50 top-0 right-0 left-0 flex flex-col shadow dark:shadow-md">
-          <nav class="flex justify-between items-center px-4 h-18 bg-brand-primary">
+        <header class="flex flex-col shadow top-0 right-0 left-0 z-50 fixed dark:shadow-md">
+          <nav class="bg-brand-primary flex h-18 px-4 justify-between items-center">
             <A href={`/app/${user().slug}`}>
               <div class="flex flex-col">
                 <h1 class="font-semibold text-lg text-brand-white">
                   {user().endpoints?.["/user/data"].donnees.ressource.L}
                 </h1>
-                <div class="flex items-center gap-2">
-                  <span class="text-brand-light text-md font-medium">
+                <div class="flex gap-2 items-center">
+                  <span class="font-medium text-brand-light text-md">
                     {user().endpoints?.["/user/data"].donnees.ressource.Etablissement.V.L}
                   </span>
                   <span class="text-brand-light text-xs">
@@ -116,21 +116,21 @@ const AppLayout: Component = () => {
               </div>
             </A>
 
-            <A class="text-brand-white hover:text-brand-light flex text-2xl" href="/">
+            <A class="flex text-brand-white text-2xl hover:text-brand-light" href="/">
               <IconMdiHome />
             </A>
           </nav>
 
           <Show keyed when={app.current_state.code !== AppStateCode.Idle && app.current_state.code}>
             {code => (
-              <div class="flex items-center justify-center px-2 h-8 bg-brand-white text-brand-dark dark:(bg-brand-light text-brand-primary)">
+              <div class="bg-brand-white flex h-8 text-brand-dark px-2 items-center justify-center dark:(bg-brand-light text-brand-primary) ">
                 <p class="text-center text-sm">{t(`APP_STATE.${code}`)}...</p>
               </div>
             )}
           </Show>
         </header>
 
-        <main class="min-h-screen bg-brand-white dark:bg-brand-dark pt-30">
+        <main class="bg-brand-white min-h-screen pt-30 dark:bg-brand-dark">
           <Outlet />
         </main>
       </Show>

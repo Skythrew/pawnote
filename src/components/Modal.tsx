@@ -20,10 +20,10 @@ const Modal: ParentComponent<{
       >
         <Dialog
           isOpen
-          class="fixed inset-0 z-50 overflow-y-auto"
+          class="inset-0 z-50 fixed overflow-y-auto"
           onClose={() => props.onClose()}
         >
-          <div class="min-h-screen p-4 flex items-center justify-center">
+          <div class="flex min-h-screen p-4 items-center justify-center">
             <TransitionChild
               enter="ease-out duration-300"
               enterFrom="opacity-0"
@@ -32,7 +32,7 @@ const Modal: ParentComponent<{
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <DialogOverlay class="fixed inset-0 bg-brand-dark bg-opacity-60" aria-hidden="true" />
+              <DialogOverlay class="bg-brand-dark bg-opacity-60 inset-0 fixed" aria-hidden="true" />
             </TransitionChild>
 
             <TransitionChild

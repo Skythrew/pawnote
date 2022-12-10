@@ -2,7 +2,6 @@ import type { Component } from "solid-js";
 import type { ApiUserData } from "@/types/api";
 
 import { A } from "solid-start";
-import { toast } from "solid-toast";
 
 import {
   type languages,
@@ -43,16 +42,16 @@ const RootHomePage: Component = () => {
   });
 
   return (
-    <div class="min-h-screen py-4 px-6 flex flex-col justify-between gap-12 bg-brand-primary dark:bg-brand-dark text-brand-white">
-      <header class="w-full flex flex-col items-center justify-start md:justify-between md:flex-row">
+    <div class="bg-brand-primary flex flex-col min-h-screen text-brand-white py-4 px-6 gap-12 justify-between dark:bg-brand-dark">
+      <header class="flex flex-col w-full items-center justify-start md:flex-row md:justify-between">
         <div class="flex flex-col items-center md:items-start">
           <h1 class="font-bold text-3xl">{APP_NAME}</h1>
-          <p class="text-lg text-brand-light mb-4 dark:(text-brand-white text-opacity-60)">{t("PAGES.INDEX.DESCRIPTION")}</p>
+          <p class="text-lg text-brand-light mb-4 dark:(text-brand-white text-opacity-60) ">{t("PAGES.INDEX.DESCRIPTION")}</p>
         </div>
 
         <div class="flex gap-2">
           <select
-            class="appearance-none rounded-md py-1 px-3 flex items-center gap-2 transition-colors outline-none border-2 bg-brand-dark border-brand-dark dark:(border-brand-white bg-brand-dark text-brand-white) dark:hover:(border-brand-primary bg-brand-primary bg-opacity-40)"
+            class="bg-brand-dark border-brand-dark rounded-md flex outline-none border-2 py-1 px-3 transition-colors gap-2 appearance-none items-center dark:(border-brand-white bg-brand-dark text-brand-white) dark:hover:(border-brand-primary bg-brand-primary bg-opacity-40) "
             onChange={(event) => {
               const lang_name = event.currentTarget.value as keyof typeof languages;
               switchLanguage(lang_name);
@@ -65,18 +64,18 @@ const RootHomePage: Component = () => {
         </div>
 
       </header>
-      <section class="w-full flex flex-col gap-4 items-center justify-center px-4 max-w-md mx-auto">
+      <section class="flex flex-col mx-auto max-w-md w-full px-4 gap-4 items-center justify-center">
         <Show keyed
           when={availableSessions()}
           fallback={
-            <p class="bg-brand-white text-brand-primary rounded-full px-4 py-1 dark:bg-brand-primary dark:text-brand-light">{t("PAGES.INDEX.LOADING")}</p>
+            <p class="bg-brand-white rounded-full text-brand-primary py-1 px-4 dark:bg-brand-primary dark:text-brand-light">{t("PAGES.INDEX.LOADING")}</p>
           }
         >
           {sessions => (
             <Show
               when={sessions.length > 0}
               fallback={
-                <A href="/link" class="text-center font-medium px-4 py-2 rounded-full dark:bg-brand-primary dark:bg-opacity-20 dark:border-2 dark:border-brand-primary bg-brand-light text-brand-primary dark:text-brand-light border-2 border-brand-primary">
+                <A href="/link" class="bg-brand-light border-brand-primary rounded-full font-medium border-2 text-center text-brand-primary py-2 px-4 dark:bg-brand-primary dark:border-brand-primary dark:bg-opacity-20 dark:border-2 dark:text-brand-light">
                   {t("PAGES.INDEX.LINK_FIRST")}
                 </A>
               }
@@ -85,7 +84,7 @@ const RootHomePage: Component = () => {
                 {session => (
                   <A class="w-full" href={`/app/${session.slug}`}>
                     <div
-                      class="bg-brand-white rounded-full py-4 px-8 cursor-pointer hover:bg-opacity-80 dark:bg-brand-primary transition-colors hover:shadow-sm"
+                      class="bg-brand-white rounded-full cursor-pointer py-4 px-8 transition-colors dark:bg-brand-primary hover:bg-opacity-80 hover:shadow-sm"
                     >
                       <h2 class="font-semibold text-md text-brand-primary dark:text-brand-white">
                         {session.user_name}
@@ -105,11 +104,11 @@ const RootHomePage: Component = () => {
         </Show>
       </section>
 
-      <footer class="w-full flex text-sm items-center justify-between">
-        <span class="block opacity-40">Pornote v{APP_VERSION} (BETA)</span>
+      <footer class="flex text-sm w-full items-center justify-between">
+        <span class="opacity-40 block">Pornote v{APP_VERSION} (BETA)</span>
         <div class="flex gap-4">
           <a
-            class="font-medium text-brand-light dark:text-brand-white text-opacity-60 hover:text-opacity-80 dark:text-opacity-40 dark:hover:text-opacity-60 transition-colors"
+            class="font-medium text-brand-light transition-colors text-opacity-60 dark:text-brand-white dark:text-opacity-40 hover:text-opacity-80 dark:hover:text-opacity-60"
             href="https://discord.gg/qwJu57chBE"
             rel="noopener noreferrer"
             target="_blank"
@@ -117,7 +116,7 @@ const RootHomePage: Component = () => {
             Discord
           </a>
           <a
-            class="font-medium text-brand-light dark:text-brand-white text-opacity-60 hover:text-opacity-80 dark:text-opacity-40 dark:hover:text-opacity-60 transition-colors"
+            class="font-medium text-brand-light transition-colors text-opacity-60 dark:text-brand-white dark:text-opacity-40 hover:text-opacity-80 dark:hover:text-opacity-60"
             href="https://github.com/Vexcited/pornote"
             rel="noopener noreferrer"
             target="_blank"

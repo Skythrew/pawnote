@@ -37,18 +37,18 @@ const AppHomeworks: Component = () => {
   return (
     <>
       <Title>{app.current_user.slug} - Devoirs - {APP_NAME}</Title>
-      <div class="flex flex-col items-center gap-2">
+      <div class="flex flex-col gap-2 items-center">
         <h2 class="font-medium text-xl">Devoirs de la semaine {weekNumber()}</h2>
 
         <div class="flex gap-2 justify-center items-center">
           <button
-            class="px-4 py-1 rounded-full bg-brand-light dark:bg-brand-primary flex"
+            class="bg-brand-light rounded-full flex py-1 px-4 dark:bg-brand-primary"
             onClick={() => setWeekNumber(prev => prev - 1)}
           >
             <IconMdiArrowLeft />
           </button>
           <button
-            class="px-4 py-1 rounded-full bg-brand-light dark:bg-brand-primary flex"
+            class="bg-brand-light rounded-full flex py-1 px-4 dark:bg-brand-primary"
             onClick={() => setWeekNumber(prev => prev + 1)}
           >
             <IconMdiArrowRight />
@@ -64,8 +64,8 @@ const AppHomeworks: Component = () => {
             </div>
           }
         >
-          <div class="w-full flex my-8 md:px-4 justify-center">
-            <div class="hidden md:block max-w-72 w-full">
+          <div class="flex my-8 w-full justify-center md:px-4">
+            <div class="w-full max-w-72 hidden md:block">
               <div class="sticky"
                 classList={{
                   // Header is `h-18` and app state banner is `h-8`.
@@ -74,10 +74,10 @@ const AppHomeworks: Component = () => {
                   "top-26 md:top-28": app.current_state.code !== AppStateCode.Idle
                 }}
               >
-                <h4 class="font-medium w-max text-md bg-brand-light text-brand-primary px-8 py-2 rounded-full dark:(bg-dark-200 text-brand-light)">Filtres</h4>
+                <h4 class="bg-brand-light rounded-full font-medium text-md text-brand-primary w-max py-2 px-8 dark:(bg-dark-200 text-brand-light) ">Filtres</h4>
 
-                <div class="mt-4 flex flex-col gap-2">
-                  <label class="rounded-full px-4 py-1 flex items-center gap-2 w-max text-brand-dark border border-brand-dark dark:(text-brand-white border-brand-white) cursor-pointer">
+                <div class="flex flex-col mt-4 gap-2">
+                  <label class="border border-brand-dark rounded-full cursor-pointer flex text-brand-dark w-max py-1 px-4 gap-2 items-center dark:(text-brand-white border-brand-white) ">
                     <input hidden type="checkbox" />
                     <IconMdiCheck /> Faits
                   </label>
@@ -86,10 +86,10 @@ const AppHomeworks: Component = () => {
               </div>
             </div>
 
-            <div class="w-full md:max-w-4xl flex flex-col">
+            <div class="flex flex-col w-full md:max-w-4xl">
               <For each={Object.keys(homeworks()!).map(Number)}
                 fallback={
-                  <div class="mx-auto w-max border-2 border-brand-primary px-4 py-2 rounded-md">
+                  <div class="border-brand-primary rounded-md mx-auto border-2 w-max py-2 px-4">
                     <p class="text-center">Aucun devoirs cette semaine !</p>
                   </div>
                 }
@@ -97,7 +97,7 @@ const AppHomeworks: Component = () => {
                 {day_index => (
                   <Show when={homeworks()![day_index].length > 0}>
                     <div class="rounded-md flex flex-col relative">
-                      <h2 class="z-20 sticky shadow-lg shadow-brand-white dark:shadow-brand-dark md:mb-4 dark:(bg-dark-200 text-brand-light) md:rounded-full py-2 bg-brand-light text-md font-medium text-brand-primary pl-6"
+                      <h2 class="bg-brand-light font-medium shadow-lg shadow-brand-white text-md text-brand-primary py-2 pl-6 z-20 sticky md:rounded-full md:mb-4 dark:(bg-dark-200 text-brand-light) dark:shadow-brand-dark "
                         classList={{
                           // Header is `h-18` and app state banner is `h-8`.
                           // We add `+2` padding on `md`.
@@ -108,10 +108,10 @@ const AppHomeworks: Component = () => {
                       <For each={homeworks()![day_index]}>
                         {(homework, homework_index) => (
                           <div style={{ "border-color": homework.subject_color }}
-                            class="relative py-3 px-4 md:(ml-8 mr-4 rounded-lg mb-2) bg-brand-dark/2 dark:(bg-dark-300/40 text-brand-white) dark:hover:bg-dark-300/50 transition-colors border-l-4 flex flex-col gap-2">
+                            class="flex flex-col bg-brand-dark/2 border-l-4 py-3 px-4 transition-colors gap-2 relative md:(ml-8 mr-4 rounded-lg mb-2) dark:(bg-dark-300/40 text-brand-white) dark:hover:bg-dark-300/50 ">
                             <div class="flex justify-between items-center">
-                              <h3 class="text-md font-medium dark:font-semibold">{homework.subject_name}</h3>
-                              <label class="cursor-pointer flex text-xs gap-2 rounded-full border px-3 py-1 items-center"
+                              <h3 class="font-medium text-md dark:font-semibold">{homework.subject_name}</h3>
+                              <label class="border rounded-full cursor-pointer flex text-xs py-1 px-3 gap-2 items-center"
                                 classList={{
                                   "border-brand-primary bg-brand-light text-brand-primary dark:(bg-dark-200 text-brand-light border-transparent)": homework.done,
                                   "border-brand-dark dark:border-brand-white": !homework.done
@@ -139,11 +139,11 @@ const AppHomeworks: Component = () => {
                             <div class="text-sm break-words" innerHTML={homework.description} />
 
                             <Show when={homework.attachments.length > 0}>
-                              <div class="mt-2 flex flex-wrap gap-2">
+                              <div class="flex flex-wrap mt-2 gap-2">
                                 <For each={homework.attachments}>
                                   {attachment => (
                                     <a
-                                      class="text-xs px-2 py-1 bg-brand-light text-brand-dark rounded-md dark:(border border-brand-light bg-dark-300 text-brand-light)"
+                                      class="bg-brand-light rounded-md text-xs text-brand-dark py-1 px-2 dark:(border border-brand-light bg-dark-300 text-brand-light) "
                                       href={createExternalFileURL(attachment)}
                                       target="_blank"
                                     >
@@ -155,7 +155,7 @@ const AppHomeworks: Component = () => {
                             </Show>
 
                             <Show when={homeworks()![day_index].length - 1 !== homework_index()}>
-                              <span class="md:hidden z-10 h-[2px] absolute -bottom-[1px] left-0 right-0 bg-brand-dark opacity-5 dark:(bg-dark-200 opacity-100)" />
+                              <span class="bg-brand-dark h-[2px] opacity-5 right-0 -bottom-[1px] left-0 z-10 absolute md:hidden dark:(bg-dark-200 opacity-100) " />
                             </Show>
                           </div>
                         )}

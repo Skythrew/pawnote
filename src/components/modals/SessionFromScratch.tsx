@@ -161,10 +161,10 @@ const SessionFromScratchModal: Component<{
   return (
     <>
       <Modal open={visibility()} onClose={() => setModalVisibility(false)}>
-        <div class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
+        <div class="bg-brand-white border-brand-primary rounded-md max-w-md border-2 shadow-xl my-8 text-left w-full p-6 inline-block overflow-hidden align-middle">
           <DialogTitle
             as="h3"
-            class="text-center text-lg font-medium leading-6 text-brand-dark"
+            class="font-medium text-center text-lg text-brand-dark leading-6"
           >
             {app.current_user.slug
               ? "Connexion perdue!"
@@ -189,12 +189,12 @@ const SessionFromScratchModal: Component<{
           </DialogDescription>
 
           <form
-            class="flex flex-col gap-3 mt-6 w-full"
+            class="flex flex-col mt-6 w-full gap-3"
             onSubmit={processUserAuthentication}
           >
             <Show when={props.ent_url}>
               <label
-                class="inline mx-auto rounded-full px-3 py-1 border flex items-center justify-center gap-1 transition mb-2"
+                class="border rounded-full flex mx-auto mb-2 py-1 px-3 transition gap-1 inline items-center justify-center"
                 classList={{
                   "bg-brand-light border-brand-primary text-brand-primary": credentials.use_ent,
                   "text-brand-dark border-brand-dark": !credentials.use_ent
@@ -213,7 +213,7 @@ const SessionFromScratchModal: Component<{
             <Show when={!credentials.use_ent && !app.current_user.slug}>
               <label class="text-brand-dark">Espace à utiliser
                 <select
-                  class="appearance-none outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
+                  class="bg-brand-white border border-brand-dark rounded-md outline-none text-brand-dark w-full py-1 px-2 appearance-none focus:(border-brand-primary bg-brand-light) "
                   onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}
                 >
                   <For each={props.available_accounts}>
@@ -228,7 +228,7 @@ const SessionFromScratchModal: Component<{
             <label class="text-brand-dark">
               Nom d'utilisateur
               <input
-                class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
+                class="bg-brand-white border border-brand-dark rounded-md outline-none text-brand-dark w-full py-1 px-2 focus:(border-brand-primary bg-brand-light) "
                 type="text"
                 value={credentials.username}
                 onChange={event => setCredentials("username", event.currentTarget.value)}
@@ -238,7 +238,7 @@ const SessionFromScratchModal: Component<{
             <label class="text-brand-dark">
               Mot de passe
               <input
-                class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
+                class="bg-brand-white border border-brand-dark rounded-md outline-none text-brand-dark w-full py-1 px-2 focus:(border-brand-primary bg-brand-light) "
                 type="password"
                 value={credentials.password}
                 onChange={event => setCredentials("password", event.currentTarget.value)}
@@ -247,7 +247,7 @@ const SessionFromScratchModal: Component<{
             </label>
 
             <label
-              class="rounded-full border inline mx-auto px-3 py-1 my-2 transition"
+              class="border rounded-full mx-auto my-2 py-1 px-3 transition inline"
               classList={{
                 "bg-brand-light text-brand-primary border-brand-primary": credentials.save,
                 "border-brand-dark text-brand-dark":!credentials.save
@@ -264,7 +264,7 @@ const SessionFromScratchModal: Component<{
 
             <button
               disabled={loading()}
-              class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2 disabled:opacity-40"
+              class="bg-brand-primary rounded-md mt-2 text-brand-light w-full p-2 disabled:opacity-40"
               type="submit"
             >
               {loading() ? "Connexion en cours..." : "Connexion !"}
@@ -281,10 +281,10 @@ const SessionFromScratchModal: Component<{
           app.setCurrentState({ restoring_session: false });
         })}
       >
-        <div class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle border-2 border-brand-primary bg-brand-white shadow-xl rounded-md">
+        <div class="bg-brand-white border-brand-primary rounded-md max-w-md border-2 shadow-xl my-8 text-left w-full p-6 inline-block overflow-hidden align-middle">
           <DialogTitle
             as="h3"
-            class="text-center text-lg font-medium leading-6 text-brand-dark"
+            class="font-medium text-center text-lg text-brand-dark leading-6"
           >
             Connexion établie !
           </DialogTitle>
@@ -300,7 +300,7 @@ const SessionFromScratchModal: Component<{
           <form onSubmit={processSlugSave}>
             <input
               type="text"
-              class="outline-none px-2 py-1 rounded-md border border-brand-dark w-full text-brand-dark bg-brand-white focus:(border-brand-primary bg-brand-light)"
+              class="bg-brand-white border border-brand-dark rounded-md outline-none text-brand-dark w-full py-1 px-2 focus:(border-brand-primary bg-brand-light) "
               value={credentials.slug}
               onInput={event => {
                 const cleanedValue = event.currentTarget.value
@@ -312,7 +312,7 @@ const SessionFromScratchModal: Component<{
             <button
               type="submit"
               disabled={loading()}
-              class="w-full bg-brand-primary rounded-md text-brand-light p-2 mt-2 disabled:opacity-40"
+              class="bg-brand-primary rounded-md mt-2 text-brand-light w-full p-2 disabled:opacity-40"
             >
               {loading() ? "Sauvegarde..." : "Sauvegarder la session"}
             </button>

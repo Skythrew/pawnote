@@ -26,17 +26,17 @@ const AppRessources: Component = () => {
   const ressources = () => endpoint() ? endpoint()!.donnees : null;
 
   return (
-    <div class="flex flex-col items-center gap-2">
+    <div class="flex flex-col gap-2 items-center">
       <h2>Ressources de la semaine {weekNumber()}</h2>
       <div class="flex gap-2 justify-center items-center">
         <button
-          class="px-4 py-1 rounded-full bg-brand-light flex"
+          class="bg-brand-light rounded-full flex py-1 px-4"
           onClick={() => setWeekNumber(prev => prev - 1)}
         >
           <IconMdiArrowLeft />
         </button>
         <button
-          class="px-4 py-1 rounded-full bg-brand-light flex"
+          class="bg-brand-light rounded-full flex py-1 px-4"
           onClick={() => setWeekNumber(prev => prev + 1)}
         >
           <IconMdiArrowRight />
