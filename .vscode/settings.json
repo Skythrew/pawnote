@@ -7,5 +7,15 @@
   // ESLint
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
+  },
+
+  // WindiCSS
+  "windicss.sortOnSave": true,
+  "windicss.enableAttrVariantCompletion": false,
+  "windicss.enableAttrUtilityCompletion": false,
+
+  // Autocomplete
+  "editor.quickSuggestions": {
+    "strings": true
   }
 }
