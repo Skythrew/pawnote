@@ -60,14 +60,14 @@ export const findLanguageBasedOnBrowser = (): keyof typeof languages => {
 
   // Try to find a match based on the first part of the available languages (i.e., match "en" for "en-US")
   for (const language of browserLanguages) {
-    for (let availableLanguage of Object.keys(languages)) {
+    for (const availableLanguage of Object.keys(languages)) {
       if (language.startsWith(availableLanguage))
         return availableLanguage as keyof typeof languages;
     }
   }
 
   return "fr";
-}
+};
 
 // Helpers typings.
 type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`
