@@ -105,12 +105,18 @@ export const readFloatFromString = (value: string) => parseFloat(value.replace("
 
 /** TODO: Use an enum and also give translation for the strings. */
 export const readGradeValue = (value: string) => {
-  if (value === "|1") return "Absent";
-  else if (value === "|5") return "N. Rendu";
-
-  const result = readFloatFromString(value);
-
-  return Number.isNaN(result) ? "?" : result;
+  switch (value) {
+  case "|1":
+    return "Absent";
+  case "|3":
+    return "N. Noté";
+  case "|5":
+    return "N. Rendu";
+  default: {
+    const result = readFloatFromString(value);
+    return Number.isNaN(result) ? "?" : result;
+  }
+  }
 };
 
 export const callAPI = async <Api extends {
