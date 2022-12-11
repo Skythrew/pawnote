@@ -109,7 +109,6 @@ const SessionFromScratchModal: Component<{
     catch (err) {
       setLoading(false);
       console.error(err);
-      alert("Une erreur s'est produite lors de la connexion au compte.");
     }
   };
 
