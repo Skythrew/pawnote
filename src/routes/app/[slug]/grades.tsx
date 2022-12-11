@@ -25,7 +25,7 @@ const AppGrades: Component = () => {
   const endpoint = () => app.current_user.endpoints?.[`/user/grades/${currentPeriod().N}`];
 
   /** Renew the grades when needed. */
-  createEffect(on(currentPeriod, async () => {
+  createEffect(on([currentPeriod, () => app.current_user.session], async () => {
     console.groupCollapsed(`Period ${currentPeriod().L} (${currentPeriod().N})`);
     onCleanup(() => console.groupEnd());
 

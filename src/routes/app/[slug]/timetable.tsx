@@ -48,7 +48,7 @@ const AppTimetable: Component = () => {
   const endpoint = () => app.current_user.endpoints?.[`/user/timetable/${weekNumber()}`];
 
   /** Renew the timetable data when needed. */
-  createEffect(on(weekNumber, async (week) => {
+  createEffect(on([weekNumber, () => app.current_user.session], async ([week]) => {
     console.groupCollapsed(`Week ${week}`);
     onCleanup(() => console.groupEnd());
 
