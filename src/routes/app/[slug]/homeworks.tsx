@@ -98,13 +98,13 @@ const AppHomeworks: Component = () => {
         "bg-brand-light/40 opacity-100 dark:bg-dark-300/80": props.active,
         "bg-brand-light/40 opacity-50 dark:bg-dark-300/40": !props.active
       }}
-      class="cursor-pointer flex text-brand-dark w-full py-3 px-4 transition gap-2 truncate items-center md:(py-1 !rounded-full) dark:text-brand-white first:rounded-t-md last:rounded-b-md "
+      class="cursor-pointer flex w-full py-3 px-4 transition gap-2 items-center md:(py-1 !rounded-full) first:rounded-t-md last:rounded-b-md "
     >
       <input type="checkbox"
         checked={props.active}
         onChange={evt => props.action(evt.currentTarget.checked)}
       />
-      {props.label}
+      <span class="text-brand-dark truncate dark:text-brand-white">{props.label}</span>
     </label>
   );
 
