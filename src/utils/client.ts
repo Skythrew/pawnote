@@ -758,6 +758,17 @@ export const callUserHomeworksAPI = async (
   app.setStateToIdle();
 };
 
+export interface Homework {
+  id: string;
+
+  subject_name: string;
+  subject_color: string;
+
+  description: string;
+  attachments: { id: string, name: string }[];
+  done: boolean;
+}
+
 /**
   * Sort the homeworks by the day they need to be done.
   * Returned object keys is from 0 to 6 (where 0 is Sunday and 6 is Saturday
@@ -766,16 +777,7 @@ export const callUserHomeworksAPI = async (
 export const parseHomeworks = (homeworks: PronoteApiUserHomeworks["response"]["donnees"]) => {
   console.info("[debug][homeworks]: parse");
 
-  const output: { [key: number]: {
-    id: string;
-
-    subject_name: string;
-    subject_color: string;
-
-    description: string;
-		attachments: { id: string, name: string }[];
-    done: boolean;
-  }[] } = {};
+  const output: { [key: number]: Homework[] } = {};
 
   for (const homework of homeworks.ListeTravauxAFaire.V) {
     const date = dayjs(homework.PourLe.V, "DD-MM-YYYY");
