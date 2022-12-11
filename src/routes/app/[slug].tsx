@@ -11,6 +11,7 @@ import sessions from "@/stores/sessions";
 import { renewAPIsSync } from "@/utils/client";
 
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
+import { PronoteApiAccountId } from "@/types/pronote";
 
 const AppLayout: Component = () => {
   const [t] = useLocale();
@@ -48,6 +49,12 @@ const AppLayout: Component = () => {
       return navigate("/link");
     }
     console.info("[debug]: got session");
+
+    if (session.instance.account_type_id !== PronoteApiAccountId.Eleve) {
+      alert("Seul le compte élève est disponible actuellement.");
+      console.groupEnd();
+      return navigate("/");
+    }
 
     const user_data = await endpoints.get<ApiUserData>(slug, "/user/data");
     if (!user_data) {

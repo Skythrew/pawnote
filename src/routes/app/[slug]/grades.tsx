@@ -5,7 +5,7 @@ import {
   getDefaultPeriodOnglet,
   callUserGradesAPI,
 
-  parseGrades
+  parseGradesIntoSubjects
 } from "@/utils/client";
 
 import app from "@/stores/app";
@@ -33,7 +33,7 @@ const AppGrades: Component = () => {
   }));
 
   const grades = createMemo(() => endpoint()
-    ? parseGrades(endpoint()!.donnees)
+    ? parseGradesIntoSubjects(endpoint()!.donnees)
     : null
   );
 

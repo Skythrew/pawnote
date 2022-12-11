@@ -936,6 +936,10 @@ export interface Grade {
   user_max: number | string;
   /** Minimum grade obtained by an user. */
   user_min: number | string;
+
+  subject_id: string;
+  subject_color: string;
+  subject_name: string;
 }
 
 export interface GradeSubject {
@@ -951,7 +955,36 @@ export interface GradeSubject {
   grades: Grade[];
 }
 
-export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) => {
+export const parseGrade = (grade: PronoteApiUserGrades["response"]["donnees"]["listeDevoirs"]["V"][number]): Grade => ({
+  description: grade.commentaire,
+  date: dayjs(grade.date.V, "DD-MM-YYYY"),
+
+  maximum: readFloatFromString(grade.bareme.V),
+  average: readGradeValue(grade.moyenne.V),
+  optional: grade.estFacultatif,
+  ratio: grade.coefficient,
+
+  user: readGradeValue(grade.note.V),
+  user_max: readGradeValue(grade.noteMax.V),
+  user_min: readGradeValue(grade.noteMin.V),
+
+  subject_id: grade.service.V.N,
+  subject_color: grade.service.V.couleur,
+  subject_name: grade.service.V.L
+});
+
+export const parseGrades = (raw_grades: PronoteApiUserGrades["response"]["donnees"]["listeDevoirs"]["V"]) => {
+  const grades: Grade[] = [];
+
+  // Add grades to the `subjects` object.
+  for (const raw_grade of raw_grades) {
+    grades.push(parseGrade(raw_grade));
+  }
+
+  return grades;
+};
+
+export const parseGradesIntoSubjects = (data: PronoteApiUserGrades["response"]["donnees"]) => {
   const subjects: { [subject_id: string]: GradeSubject } = {};
 
   // Store every subjects in the object.
@@ -970,21 +1003,11 @@ export const parseGrades = (data: PronoteApiUserGrades["response"]["donnees"]) =
     };
   }
 
+  const grades = parseGrades(data.listeDevoirs.V);
+
   // Add grades to the `subjects` object.
-  for (const grade of data.listeDevoirs.V) {
-    subjects[grade.service.V.N].grades.push({
-      description: grade.commentaire,
-      date: dayjs(grade.date.V, "DD-MM-YYYY"),
-
-      maximum: readFloatFromString(grade.bareme.V),
-      average: readGradeValue(grade.moyenne.V),
-      optional: grade.estFacultatif,
-      ratio: grade.coefficient,
-
-      user: readGradeValue(grade.note.V),
-      user_max: readGradeValue(grade.noteMax.V),
-      user_min: readGradeValue(grade.noteMin.V)
-    });
+  for (const grade of grades) {
+    subjects[grade.subject_id].grades.push(grade);
   }
 
   // Sort the grades with the latest first.

@@ -1,31 +1,26 @@
 import type { Accessor, Component } from "solid-js";
+import { A } from "@solidjs/router";
+
 import type { ApiUserGrades } from "@/types/api";
-
-import {
-  type TimetableLesson,
-
-  getTimeFormattedDiff,
-  getCurrentPeriod,
-
-  callUserGradesAPI,
-  callUserHomeworkDoneAPI
-} from "@/utils/client";
-
 import { PronoteApiOnglets } from "@/types/pronote";
 
 import app from "@/stores/app";
 
-import { unwrap } from "solid-js/store";
-import { A } from "@solidjs/router";
-
 import {
-  getCurrentWeekNumber,
-  getDayNameFromDayNumber,
-  getLabelOfPosition,
+  type TimetableLesson,
 
+  getDayNameFromDayNumber,
+  getCurrentWeekNumber,
+  getTimeFormattedDiff,
+  getLabelOfPosition,
+  getCurrentPeriod,
+
+  callUserGradesAPI,
   callUserHomeworksAPI,
   callUserTimetableAPI,
+  callUserHomeworkDoneAPI,
 
+  parseGrades,
   parseHomeworks,
   parseTimetableLessons
 } from "@/utils/client";
@@ -92,23 +87,24 @@ const AppHome: Component = () => {
   const gradesCurrentPeriod = () => getCurrentPeriod(gradesPeriods()!);
 
   const grades_endpoint = () => app.current_user.endpoints?.[`/user/grades/${gradesCurrentPeriod()?.N}`];
-  const grades = () => grades_endpoint()
-    ? grades_endpoint()!.donnees
-    : null;
+  const grades = createMemo(() => grades_endpoint()
+    ? parseGrades(grades_endpoint()!.donnees.listeDevoirs.V)
+    : null
+  );
 
   const sorted_grades = () => {
+    if (!grades()) return null;
+
     console.info("[debug] sort grades");
-    const current_grades = [...unwrap(grades()!.listeDevoirs.V)];
+    const current_grades = [...grades()!];
 
     // Sort the grades by the date.
     current_grades.sort(
-      (a, b) => dayjs(a.date.V, "DD-MM-YYYY").isBefore(dayjs(b.date.V, "DD-MM-YYYY")) ? 1 : -1
+      (a, b) => a.date.isBefore(b.date) ? 1 : -1
     );
 
-    // Keep the 5 latest grades.
     // TODO: Make this customizable?
     current_grades.splice(5);
-
     return current_grades;
   };
 
@@ -141,7 +137,7 @@ const AppHome: Component = () => {
       <div class="flex flex-col px-4 pb-8 gap-4 items-center md:flex-row-reverse md:justify-end md:items-start">
         <Show
           fallback={<A href="homeworks">Les devoirs n'ont pas encore été récupérés.</A>}
-          when={app.current_user.slug !== null && homeworks() !== null}
+          when={app.current_user.slug !== null && homeworks_full() !== null}
         >
           <div class="bg-brand-primary rounded-md flex flex-col max-w-md shadow text-brand-dark w-full py-2 md:w-xs">
             <div class="flex py-2 px-6 gap-1 justify-between items-center">
@@ -320,16 +316,16 @@ const AppHome: Component = () => {
 
               <div class="flex flex-col ml-auto m-0">
                 <h4 class="font-medium text-right text-xl text-brand-white">
-                  {grades()?.moyGenerale.V}
+                  {grades_endpoint()!.donnees?.moyGenerale.V}
                 </h4>
                 <span class="text-right text-sm text-brand-light">
-                Classe: {grades()?.moyGeneraleClasse.V}
+                Classe: {grades_endpoint()!.donnees?.moyGeneraleClasse.V}
                 </span>
               </div>
             </div>
 
             <div class="flex flex-col py-2 px-4 gap-2">
-              <Show when={grades() && grades()!.listeDevoirs.V.length > 0} fallback={
+              <Show when={grades() && grades_endpoint()!.donnees.listeDevoirs.V.length > 0} fallback={
 
                 <div class="bg-brand-light rounded flex bg-opacity-20 text-brand-white text-sm p-2 gap-4 justify-center items-center">
                   <IconMdiCheck />
@@ -341,14 +337,17 @@ const AppHome: Component = () => {
                     <div
                       class="bg-brand-white border-l-brand-primary rounded border-l-4 py-2 px-4"
                       style={{
-                        "border-color": grade.service.V.couleur
+                        "border-color": grade.subject_color
                       }}
                     >
                       <div class="flex gap-4 justify-between">
-                        <h5 class="font-medium break-all">{grade.service.V.L}</h5>
-                        <h5 class="font-medium">{grade.note.V}/{grade.bareme.V}</h5>
+                        <h5 class="font-medium break-all">{grade.subject_name}</h5>
+                        <h5 class="font-medium">{typeof grade.user === "string"
+                          ? grade.user
+                          : <>{grade.user}/{grade.maximum}</>
+                        }</h5>
                       </div>
-                      <p class="text-xs opacity-80">Coef. {grade.coefficient} / Classe: {grade.moyenne.V}</p>
+                      <p class="text-xs opacity-80">Coef. {grade.ratio} / Classe: {grade.average}</p>
                     </div>
                   )}
                 </For>
