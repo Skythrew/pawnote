@@ -207,7 +207,7 @@ const AppHomeworks: Component = () => {
                   leaveFrom="opacity-100 translate-y-0"
                   leaveTo="opacity-0 translate-y-4"
                 >
-                  <div class="bg-brand-white rounded-t-md flex flex-col w-full p-8 gap-4 md:p-0 dark:bg-dark-500 dark:md:bg-brand-dark"
+                  <div class="bg-brand-white rounded-t-md flex flex-col w-full p-8 gap-4 md:(p-0 pr-2) dark:bg-dark-500 dark:md:bg-brand-dark "
                     classList={{ "hidden md:flex": !showFiltersMenu() }}
                   >
                     <div class="flex flex-col md:(flex-row gap-2) ">
