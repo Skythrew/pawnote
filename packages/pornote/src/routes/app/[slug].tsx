@@ -85,7 +85,9 @@ const AppLayout: Component = () => {
 
     // We fetch all the APIs to cache them and renew them at
     // the same time - it also prevents session errors.
-    await renewAPIsSync();
+    if (navigator.onLine) {
+      await renewAPIsSync();
+    }
 
     console.groupEnd();
     setLoading(false);
