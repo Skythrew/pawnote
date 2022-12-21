@@ -11,7 +11,6 @@ export enum PronoteApiAccountId {
 }
 
 export enum PronoteApiFunctions {
-  Instance = "FonctionParametres",
   Informations = "FonctionParametres",
   Identify = "Identification",
   Authenticate = "Authentification",
@@ -91,98 +90,12 @@ export interface PronoteApiInstance {
   request: Record<string, never>;
 
   response: {
-		nom: PronoteApiFunctions.Instance;
-
-		_Signature_: {
-			ModeExclusif: boolean;
-		}
-
-		donnees: {
-			identifiantNav: string;
-
-			/** Array of available fonts. */
-			listePolices: {
-				_T: 24;
-				V: {
-					L: string;
-				}[];
-			};
-
-			avecMembre: boolean;
-			pourNouvelleCaledonie: boolean;
-			genreImageConnexion: number;
-			urlImageConnexion: string;
-			logoProduitCss: string;
-
-			Theme: number;
-
-			mentionsPagesPubliques: {
-				lien: {
-					_T: 21;
-					V: string;
-				}
-			}
-
-			NomEtablissement: string;
-			NomEtablissementConnexion: string;
-
-			logo: {
-				_T: 25;
-				V: number;
-			};
-
-			/** Current school year. */
-			anneeScolaire: string;
-
-			urlSiteIndexEducation: {
-				_T: 23;
-				V: string;
-			};
-
-			urlSiteInfosHebergement: {
-				_T: 23;
-				V: string;
-			};
-
-			/** Complete version with name of the app.  */
-			version: string;
-			/** Pronote version. */
-			versionPN: string;
-
-			/** Year of the version. */
-			millesime: string;
-
-			/** Current language. */
-			langue: string;
-			/** Current language ID. */
-			langID: number;
-
-			/** List of available languages. */
-			listeLangues: {
-				_T: 24;
-				V: {
-          langID: number;
-          description: string;
-				}[];
-			};
-
-			/** Path to the informations page. */
-			lienMentions: string;
-
-			/** Available account types. */
-			espaces: {
-				_T: 24;
-				V: {
-					/** Acount type ID. */
-					G: number;
-					/** Acount type name. */
-					L: string;
-					/** Account type path. */
-					url: string;
-				}[];
-			}
-		}
-  }
+    version: number[];
+    date: string;
+    CAS: { actif: boolean, casURL: string };
+    espaces: { nom: string, URL: string }[];
+    nomEtab: string;
+  };
 }
 
 export interface PronoteApiLoginInformations {

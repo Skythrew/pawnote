@@ -25,9 +25,9 @@ const SessionFromScratchModal: Component<{
    * Only used for first connection, when user needs to select their account type.
    * That's only needed for not-ENT users though.
    */
-  available_accounts?: ApiInstance["response"]["received"]["donnees"]["espaces"]["V"];
+  available_accounts?: ApiInstance["response"]["accounts"];
 }> = (props) => {
-  const first_account_type = () => props?.available_accounts?.[0].G as number;
+  const first_account_type = () => props?.available_accounts?.[0].id as number;
   const navigate = useNavigate();
 
   const [slugModalData, setSlugModalData] = createSignal<
@@ -217,7 +217,7 @@ const SessionFromScratchModal: Component<{
                 >
                   <For each={props.available_accounts}>
                     {espace => (
-                      <option value={espace.G}>{espace.L}</option>
+                      <option value={espace.id}>{espace.name}</option>
                     )}
                   </For>
                 </select>

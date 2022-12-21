@@ -1,5 +1,4 @@
 import type {
-  PronoteApiInstance,
   PronoteApiAccountId,
   PronoteApiLoginInformations,
   PronoteApiLoginIdentify,
@@ -56,7 +55,13 @@ export interface ApiInstance {
   }
 
   response: {
-    received: PronoteApiInstance["response"];
+    school_name: string;
+
+    accounts: {
+      name: string;
+      id: PronoteApiAccountId;
+    }[];
+
     pronote_url: string;
     ent_url?: string;
   }
@@ -80,11 +85,12 @@ export interface ApiLoginEntCookies {
 export interface ApiLoginEntTicket {
   request: {
     ent_url: string;
+    pronote_url: string;
     ent_cookies: string[];
   }
 
   response: {
-    /** URL with "identifiant" search parameter. */
+    /** New URL with "?identifiant=XXXX" parameter. */
     pronote_url: string;
   }
 

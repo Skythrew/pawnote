@@ -7,11 +7,10 @@ import {
   extractPronoteSessionFromBody,
   downloadPronotePage,
   handleServerRequest,
-  cleanPronoteUrl,
   callPronoteAPI
 } from "@/utils/server";
 
-import { objectHasProperty } from "@/utils/globals";
+import { objectHasProperty, cleanPronoteUrl } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 
 import Session from "@/utils/session";

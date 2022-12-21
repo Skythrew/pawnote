@@ -354,6 +354,7 @@ export const connectToPronote = async (options: {
   if (options.use_ent) {
     const ent_ticket_response = await callAPI<ApiLoginEntTicket>("/login/ent_ticket", () => ({
       ent_url: options.ent_url,
+      pronote_url,
       ent_cookies
     }), { prevent_cache : true });
 

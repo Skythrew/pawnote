@@ -295,7 +295,7 @@ const LinkPronoteAccount: Component = () => {
                 </Listbox>
                 <button
                   type="button"
-                  class="bg-brand-light rounded-lg rounded-l-none flex text-brand-dark p-2 px-4 dark:(bg-brand-primary text-brand-light) "
+                  class="bg-brand-light rounded-lg rounded-l-none flex text-brand-dark text-brand-light p-2 px-4 dark:(bg-brand-primary "
                   onClick={() => setState("show_geolocation_data", false)}
                 >
                   <IconMdiPencil />
@@ -310,7 +310,7 @@ const LinkPronoteAccount: Component = () => {
                   onChange={event => setState("pronote_url", event.currentTarget.value)}
                 />
 
-                <button disabled={state.loading_geolocation} class="bg-brand-light rounded-lg rounded-l-none flex text-brand-dark py-2 px-4 dark:(bg-brand-primary text-brand-light) disabled:opacity-60 " type="button" onClick={handleGeolocation}>
+                <button disabled={state.loading_geolocation} class="bg-brand-light rounded-lg rounded-l-none flex text-brand-dark py-2 px-4 dark:(bg-brand-primary text-brand-light) disabled:opacity-60" type="button" onClick={handleGeolocation}>
                   {state.loading_geolocation
                     ? <IconMdiDotsHorizontal />
                     : <IconMdiMapMarkerRadius />
@@ -326,7 +326,7 @@ const LinkPronoteAccount: Component = () => {
 
           <Show when={state.instance_data} keyed>
             {instance => <SessionFromScratchModal.Component
-              available_accounts={instance.received.donnees.espaces.V}
+              available_accounts={instance.accounts}
               pronote_url={instance.pronote_url}
               ent_url={instance.ent_url}
             />}

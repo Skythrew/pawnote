@@ -170,6 +170,10 @@ class Session {
       return ResponseErrorCode.PronoteBannedIP;
     }
 
+    if (response_body.includes("La page demandée n'existe pas")) {
+      return ResponseErrorCode.PronoteClosedInstance;
+    }
+
     this.instance.order++;
     const response = JSON.parse(response_body) as PronoteApiFunctionPayload<Res>;
 

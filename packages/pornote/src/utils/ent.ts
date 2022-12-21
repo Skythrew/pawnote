@@ -1,10 +1,11 @@
 import got, { MaxRedirectsError } from "got";
+import { cleanPronoteUrl } from "./globals";
 
 interface AvailableENT {
   hostnames: string[];
   methods: (url: URL) => {
     authenticate: (options: { username: string, password: string}) => Promise<string[] | null>;
-    process_ticket: (options: { ent_cookies: string[] }) => Promise<string | null>;
+    process_ticket: (options: { ent_cookies: string[], pronote_url: string }) => Promise<string | null>;
   }
 }
 
@@ -40,13 +41,17 @@ const OpenENT: AvailableENT = {
       }
     },
 
-    async process_ticket ({ ent_cookies }) {
+    async process_ticket ({ ent_cookies, pronote_url }) {
       try {
         const { headers } = await got.get(`${url.protocol}//${url.hostname}/cas/login`, {
           maxRedirects: 1,
           followRedirect: true,
-          searchParams: url.searchParams,
-          headers: { "Cookie": ent_cookies.join("; ") }
+          searchParams: new URLSearchParams({
+            service: cleanPronoteUrl(pronote_url) + "/" // Add trailing slash.
+          }),
+          headers: {
+            "Cookie": ent_cookies.join("; ")
+          }
         });
 
         return headers["location"] as string;
