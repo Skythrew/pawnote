@@ -10,7 +10,6 @@
   },
 
   // WindiCSS
-  "windicss.sortOnSave": true,
   "windicss.enableAttrVariantCompletion": false,
   "windicss.enableAttrUtilityCompletion": false,
 
