@@ -29,7 +29,7 @@ export const POST = handleServerRequest<ApiInstance>(async (req, res) => {
     const data = await response.json() as PronoteApiInstance["response"];
 
     const accounts = data.espaces.map((account) => ({
-      name: account.nom,
+      name: account.nom.replace("Espace", "").trim(),
       id: parseInt(Object.entries(PRONOTE_ACCOUNT_TYPES).find(
         ([, val]) => val.path === account.URL.replace("mobile.", "")
       )?.[0] as unknown as string) as PronoteApiAccountId
