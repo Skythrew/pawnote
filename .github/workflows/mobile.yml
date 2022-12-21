@@ -20,20 +20,41 @@ jobs:
         with:
           distribution: "zulu"
           java-version: "17"
-      - uses: pnpm/action-setup@v2
-      - name: Set-up Node
+
+      - name: Set-up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: "pnpm"
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Set-up pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
+
       - name: Build JS
         run: pnpm --filter pornote-mobile run build
 
       - name: Build APK bundle
-        run: cd android && gradle bundle
+        run: cd packages/mobile/android && gradle bundle
 
       - name: Upload APK bundle
         uses: actions/upload-artifact@v3
