@@ -21,6 +21,9 @@ jobs:
           distribution: "zulu"
           java-version: "17"
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
       - name: Set-up Node.js
         uses: actions/setup-node@v3
         with:
@@ -54,7 +57,7 @@ jobs:
         run: pnpm --filter pornote-mobile run build
 
       - name: Build APK bundle
-        run: cd packages/mobile/android && gradle bundle
+        run: cd packages/mobile/android && ./gradlew bundle
 
       - name: Upload APK bundle
         uses: actions/upload-artifact@v3
