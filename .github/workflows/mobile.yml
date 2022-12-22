@@ -57,11 +57,11 @@ jobs:
         run: pnpm --filter pornote-mobile run build
 
       - name: Build APK bundle
-        run: cd packages/mobile/android && ./gradlew bundle
+        run: cd packages/mobile/android && ./gradlew assembleRelease
 
       - name: Upload APK bundle
         uses: actions/upload-artifact@v3
         with:
           name: app-release
-          path: android/app/build/outputs/bundle/release/app-release-signed.aab
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
           retention-days: 60
