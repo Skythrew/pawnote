@@ -2,7 +2,7 @@
 
 import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
 import type { SessionInstance } from "@/types/session";
-import type { ResponseError } from "@/types/api";
+import type { ResponseError, Response as ApiResponse } from "@/types/api";
 
 import rate_limiter, { type RateLimiter } from "lambda-rate-limiter";
 import { type APIEvent, json } from "solid-start/api";
@@ -32,7 +32,8 @@ export const handleServerRequest = <T extends {
   req: { body: T["request"], user_agent: string, params: APIEvent["params"] },
   res: {
     error: (params: Omit<ResponseError, "success">, options?: ResponseInit) => ReturnType<typeof json>,
-    success: (data: T["response"], options?: ResponseInit) => ReturnType<typeof json>
+    success: (data: T["response"], options?: ResponseInit) => ReturnType<typeof json>,
+    from: (data: { response: ApiResponse<T["response"]>, status: number }) => ReturnType<typeof json>
   }
 ) => Promise<unknown>) => {
   return async (evt: APIEvent) => {
@@ -103,7 +104,8 @@ export const handleServerRequest = <T extends {
         success: (
           data,
           options = { status: 200 }
-        ) => json({ success: true, data }, options)
+        ) => json({ success: true, data }, options),
+        from: (data) => json(data.response, { status: data.status })
       })
     );
   };
