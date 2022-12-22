@@ -58,11 +58,11 @@ jobs:
 
       - name: Build APK bundle
         working-directory: packages/mobile/android
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleDebug
 
       - name: Upload APK bundle
         uses: actions/upload-artifact@v3
         with:
           name: app-release
-          path: packages/mobile/android/app/build/outputs/apk/release/*.apk
+          path: packages/mobile/android/app/build/outputs/apk/debug/*.apk
           retention-days: 60
