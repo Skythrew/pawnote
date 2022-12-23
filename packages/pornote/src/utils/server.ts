@@ -2,13 +2,13 @@
 
 import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
 import type { SessionInstance } from "@/types/session";
-import type { ResponseError, Response as ApiResponse } from "@/types/api";
+
+import type { HttpCallFunction, ResponseError, Response as ApiResponse } from "@pornote/api";
+import { ResponseErrorCode } from "@pornote/api";
 
 import rate_limiter, { type RateLimiter } from "lambda-rate-limiter";
 import { type APIEvent, json } from "solid-start/api";
 import set_cookie from "set-cookie-parser";
-
-import { ResponseErrorCode } from "@/types/errors";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -25,11 +25,33 @@ const searchParamsToObject = (entries: IterableIterator<[string, string]>) => {
   return result;
 };
 
+export const createFetcher: (user_agent: string) => HttpCallFunction = (user_agent) => async (url, options) => {
+  const response = await fetch(url, {
+    method: options.method,
+    body: options.body as BodyInit | undefined,
+    headers: {
+      "User-Agent": user_agent,
+      ...options.headers
+    }
+  });
+
+  return ({
+    headers: response.headers,
+    json: <T>() => response.json() as T,
+    text: () => response.text()
+  });
+};
+
 export const handleServerRequest = <T extends {
   request: unknown;
   response: unknown;
 }>(callback: (
-  req: { body: T["request"], user_agent: string, params: APIEvent["params"] },
+  req: {
+    body: T["request"],
+    user_agent: string,
+    params: APIEvent["params"],
+    fetcher: HttpCallFunction
+  },
   res: {
     error: (params: Omit<ResponseError, "success">, options?: ResponseInit) => ReturnType<typeof json>,
     success: (data: T["response"], options?: ResponseInit) => ReturnType<typeof json>,
@@ -79,19 +101,22 @@ export const handleServerRequest = <T extends {
       body = {} as T["request"]
     );
 
-    const user_agent = evt.request.headers.get("user-agent");
+    let user_agent = evt.request.headers.get("user-agent");
     if (!user_agent) return json({
       success: false,
       code: ResponseErrorCode.IncorrectParameters,
       debug: { user_agent }
     });
 
+    // We prevent Pronote to recognize that the device is a mobile device.
+    user_agent = user_agent.replace(/(iPhone|iPhone;|Mobile;|Mobile\/?(.*)) |Mobile/gi, "");
+
     return callback(
       {
         body,
-        // We prevent Pronote to recognize that the device is a mobile device.
-        user_agent: user_agent.replace(/(iPhone|iPhone;|Mobile;|Mobile\/?(.*)) |Mobile/gi, ""),
-        params: evt.params
+        user_agent,
+        params: evt.params,
+        fetcher: createFetcher(user_agent)
       }, ({
         error: (
           params,
