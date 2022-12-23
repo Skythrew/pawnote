@@ -295,7 +295,7 @@ const LinkPronoteAccount: Component = () => {
                 </Listbox>
                 <button
                   type="button"
-                  class="bg-brand-light rounded-lg rounded-l-none flex text-brand-dark text-brand-light p-2 px-4 dark:(bg-brand-primary "
+                  class="bg-brand-light rounded-lg rounded-l-none flex text-brand-dark p-2 px-4 dark:(bg-brand-primary text-brand-light)"
                   onClick={() => setState("show_geolocation_data", false)}
                 >
                   <IconMdiPencil />
@@ -319,7 +319,7 @@ const LinkPronoteAccount: Component = () => {
               </Show>
             </div>
 
-            <button disabled={!state.pronote_url || state.loading_instance} class="bg-brand-light rounded-lg w-full py-2 px-4 dark:(bg-brand-primary text-brand-light) disabled:opacity-40 " type="submit">
+            <button disabled={!state.pronote_url || state.loading_instance} class="bg-brand-light rounded-lg w-full py-2 px-4 dark:(bg-brand-primary text-brand-light) disabled:opacity-40" type="submit">
               {state.loading_instance ? "Connexion..." : "Etablir une connexion"}
             </button>
           </form>
