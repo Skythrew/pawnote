@@ -10,6 +10,12 @@ export enum PronoteApiAccountId {
   Academie = 5
 }
 
+export interface PronoteApiAccountType {
+  id: PronoteApiAccountId;
+  name: string;
+  path: string;
+}
+
 export enum PronoteApiFunctions {
   Informations = "FonctionParametres",
   Identify = "Identification",
