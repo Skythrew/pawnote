@@ -5,11 +5,11 @@ export type HttpCallFunction = (url: string, options: {
   headers?: Record<string, string>;
   /** Body of the request of type given in the "Content-Type" header. */
   body?: unknown;
-}) => {
-  headers: Record<string, string>;
+}) => Promise<{
+  headers: Record<string, string> | Headers;
   text: () => Promise<string>;
   json: <T>() => Promise<T>;
-};
+}>;
 
 export interface ResponseError {
   success: false;
