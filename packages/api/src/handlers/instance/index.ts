@@ -16,9 +16,11 @@ export default createApiFunction<ApiInstance>(async (req, res) => {
   
     const response = await req.fetch(informations_url, {
       method: "GET"
-    }).json<PronoteApiInstance["response"]>();
+    })
+    
+    const data = await response.json<PronoteApiInstance["response"]>();
   
-    const accounts = response.espaces.map(
+    const accounts = data.espaces.map(
       account => PRONOTE_ACCOUNT_TYPES.find(
         account_type => account_type.path === account.URL.replace("mobile.", "")
       )
@@ -27,8 +29,8 @@ export default createApiFunction<ApiInstance>(async (req, res) => {
     return res.success({
       accounts,
       pronote_url,
-      school_name: response.nomEtab,
-      ent_url: response.CAS.actif ? response.CAS.casURL : undefined
+      school_name: data.nomEtab,
+      ent_url: data.CAS.actif ? data.CAS.casURL : undefined
     });
   }
   catch (error) {

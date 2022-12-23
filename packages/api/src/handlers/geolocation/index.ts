@@ -16,18 +16,19 @@ export default createApiFunction<ApiGeolocation>(async (req, res) => {
       long: req.body.longitude.toString()
     };
 
-    let response = await req.fetch(PRONOTE_GEOLOCATION_URL, {
+    const response = await req.fetch(PRONOTE_GEOLOCATION_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       },
       body: `data=${JSON.stringify(request_body)}`
-    }).json<PronoteApiGeolocation["response"]>();
-
-    response = Array.isArray(response) ? response : [];
+    })
+    
+    let data = await response.json<PronoteApiGeolocation["response"]>();
+    data = Array.isArray(data) ? data : [];
 
     // Restructure the results to be more readable.
-    const results: ApiGeolocation["response"] = response.map(result => ({
+    const results: ApiGeolocation["response"] = data.map(result => ({
       url: result.url,
       name: decode(result.nomEtab) // Use UTF8 instead of HTML entities encoding.
         .replace("COLLEGE", "COLLÈGE")
