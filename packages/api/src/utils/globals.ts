@@ -1,5 +1,4 @@
-import { HttpCallFunction, ResponseError, ResponseSuccess, Response } from "@/types/internals";
-import { PronoteApiAccountId } from "@/types/pronote_api";
+import type { HttpCallFunction, ResponseError, ResponseSuccess, Response } from "@/types/internals";
 
 export const cleanPronoteUrl = (url: string) => {
   let pronote_url = new URL(url);
@@ -21,60 +20,7 @@ export const cleanPronoteUrl = (url: string) => {
     pronote_url.href;
 };
 
-export interface PronoteAccountType {
-  id: PronoteApiAccountId;
-  name: string;
-  path: string;
-}
-
-export const PRONOTE_ACCOUNT_TYPES: PronoteAccountType[] = [
-  {
-    id: PronoteApiAccountId.Commun,
-    name: "Commun",
-    path: "" // No path since the "Commun" account is on root path.
-  },
-  {
-    id: PronoteApiAccountId.Eleve,
-    name: "Élève",
-    path: "eleve.html"
-  },
-  {
-    id: PronoteApiAccountId.Parent,
-    name: "Parent",
-    path: "parent.html"
-  },
-  {
-    id: PronoteApiAccountId.Professeur,
-    name: "Professeur",
-    path: "professeur.html"
-  },
-  {
-    id: PronoteApiAccountId.Accompagnant,
-    name: "Accompagnant",
-    path: "accompagnant.html"
-  },
-  {
-    id: PronoteApiAccountId.Entreprise,
-    name: "Entreprise",
-    path: "entreprise.html"
-  },
-  {
-    id: PronoteApiAccountId.VieScolaire,
-    name: "Vie Scolaire",
-    path: "viescolaire.html"
-  },
-  {
-    id: PronoteApiAccountId.Direction,
-    name: "Direction",
-    path: "direction.html"
-  },
-  {
-    id: PronoteApiAccountId.Academie,
-    name: "Académie",
-    path: "academie.html"
-  }
-];
-
+/** Helper to create handlers more easily with built-in support for typings. */
 export const createApiFunction = <T extends {
   request: unknown;
   response: unknown;
@@ -89,7 +35,20 @@ export const createApiFunction = <T extends {
     fetch: fetcher,
     body
   }, {
-    success: (data) => ({ response: { success: true, data }, status: 200 }),
-    error: (data, options) => ({ response: { success: false, code: data.code, debug: data.debug }, status: options?.status ?? 500 })
+    success: (data) => ({
+      status: 200,
+      response: {
+        success: true,
+        data
+      }
+    }),
+    error: (data, options) => ({
+      status: options?.status ?? 500,
+      response: {
+        success: false,
+        code: data.code,
+        debug: data.debug
+      }
+    })
   })
 };
