@@ -9,4 +9,5 @@ export type { HttpCallFunction, Response, ResponseError, ResponseSuccess } from 
 
 // Utilities that can be used outside.
 export { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
+export { ResponseErrorCode } from "@/types/internals";
 export { cleanPronoteUrl } from "@/utils/globals";
