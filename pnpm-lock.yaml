@@ -39,15 +39,16 @@ importers:
       '@capacitor/android': ^4.6.1
       '@capacitor/cli': ^4.6.1
       '@capacitor/core': ^4.6.1
+      '@capacitor/geolocation': ^4.1.0
       '@capacitor/ios': ^4.6.1
       '@fontsource/poppins': ^4.5.10
+      '@pornote/api': workspace:*
       '@solidjs/router': ^0.6.0
       '@typescript-eslint/eslint-plugin': ^5.47.0
       '@typescript-eslint/parser': ^5.47.0
       dayjs: ^1.11.7
       eslint: ^8.29.0
       eslint-plugin-solid: ^0.9.1
-      haversine-distance: ^1.2.1
       html-entities: ^2.3.3
       pako: ^2.1.0
       release-it: ^15.5.1
@@ -62,11 +63,12 @@ importers:
     dependencies:
       '@capacitor/android': 4.6.1_@capacitor+core@4.6.1
       '@capacitor/core': 4.6.1
+      '@capacitor/geolocation': 4.1.0_@capacitor+core@4.6.1
       '@capacitor/ios': 4.6.1_@capacitor+core@4.6.1
       '@fontsource/poppins': 4.5.10
+      '@pornote/api': link:../api
       '@solidjs/router': 0.6.0_solid-js@1.6.6
       dayjs: 1.11.7
-      haversine-distance: 1.2.1
       html-entities: 2.3.3
       pako: 2.1.0
       solid-headless: 0.13.0_solid-js@1.6.6
@@ -1330,6 +1332,14 @@ packages:
     resolution: {integrity: sha512-7A2IV9E8umgu9u0fChUTjQJq+Jp25GJZMmWxoQN/nVx/1rcpFJ4m1xo3NPBoIRs+aV7FR+BM17mPrnkKlA8N2g==}
     dependencies:
       tslib: 2.4.1
+    dev: false
+
+  /@capacitor/geolocation/4.1.0_@capacitor+core@4.6.1:
+    resolution: {integrity: sha512-hfI4MUcu1zcJPTvm0g6V3telTGwq9sCU8EnY4hFJpLedbIQeWPthCOSbFtNHAU5mVaAP1Zls3x6TsXL8TX08EA==}
+    peerDependencies:
+      '@capacitor/core': ^4.0.0
+    dependencies:
+      '@capacitor/core': 4.6.1
     dev: false
 
   /@capacitor/ios/4.6.1_@capacitor+core@4.6.1:

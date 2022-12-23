@@ -27,11 +27,12 @@
   "dependencies": {
     "@capacitor/android": "^4.6.1",
     "@capacitor/core": "^4.6.1",
+    "@capacitor/geolocation": "^4.1.0",
     "@capacitor/ios": "^4.6.1",
     "@fontsource/poppins": "^4.5.10",
+    "@pornote/api": "workspace:*",
     "@solidjs/router": "^0.6.0",
     "dayjs": "^1.11.7",
-    "haversine-distance": "^1.2.1",
     "html-entities": "^2.3.3",
     "pako": "^2.1.0",
     "solid-headless": "^0.13.0",

@@ -53,14 +53,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build @pornote/api
+        run: pnpm --filter api run build
+
       - name: Build JS
         run: pnpm --filter pornote-mobile run build
 
-      - name: Build APK bundle
+      - name: Build APK
         working-directory: packages/mobile/android
         run: ./gradlew assembleDebug
 
-      - name: Upload APK bundle
+      - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: app-release
