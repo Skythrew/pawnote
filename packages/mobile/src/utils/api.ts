@@ -14,7 +14,7 @@ const fetcher: HttpCallFunction = async (url, options) => {
 
   return ({
     headers: response.headers as Record<string, string>,
-    json: <T>() => JSON.parse(response.data) as T,
+    json: async <T>() => JSON.parse(await response.data) as T,
     text: () => response.data
   });
 };
