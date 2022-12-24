@@ -1,8 +1,5 @@
 // @refresh reload
-import "@fontsource/poppins/latin-300.css";
-import "@fontsource/poppins/latin-400.css";
-import "@fontsource/poppins/latin-500.css";
-import "virtual:windi.css";
+import "@pornote/ui/dist/style.css";
 
 import { render } from 'solid-js/web';
 

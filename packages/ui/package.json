@@ -1,0 +1,41 @@
+{
+  "name": "@pornote/ui",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Internal components for Pornote.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build && tsc"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.11.17",
+    "rollup": "^3.8.0",
+    "rollup-preset-solid": "^2.0.1",
+    "solid-js": "^1.6.6",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.3",
+    "vite-plugin-solid": "^2.5.0",
+    "vite-plugin-windicss": "^1.8.10",
+    "windicss": "^3.5.6"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.6"
+  },
+  "dependencies": {
+    "@fontsource/poppins": "^4.5.10"
+  }
+}

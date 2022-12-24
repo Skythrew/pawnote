@@ -2,6 +2,7 @@ import type { Component } from 'solid-js';
 import { createSignal } from 'solid-js';
 
 import { callGeolocationAPI } from "./utils/api";
+import { HelloWorld } from "@pornote/ui";
 
 const App: Component = () => {
   const [data, setData] = createSignal<Record<string, unknown>>({});
@@ -23,6 +24,8 @@ const App: Component = () => {
       >
         call geolocation api
       </button>
+
+      <HelloWorld />
 
       <pre>
         {JSON.stringify(data())}
