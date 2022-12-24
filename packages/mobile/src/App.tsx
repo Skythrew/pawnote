@@ -17,8 +17,8 @@ const App: Component = () => {
       </button>
       <button
         onClick={async () => {
-          const data = await callGeolocationAPI();
-          setData(data);
+          const api = await callGeolocationAPI();
+          setData(api);
         }}
       >
         call geolocation api

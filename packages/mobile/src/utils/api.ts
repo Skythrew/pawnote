@@ -5,11 +5,18 @@ import { CapacitorHttp } from "@capacitor/core";
 import { Geolocation } from '@capacitor/geolocation';
 
 const fetcher: HttpCallFunction = async (url, options) => {
+  let data = options.body;
+
+  // Small workaround until this PR <https://github.com/ionic-team/capacitor/pull/6165> is merged.
+  if (data instanceof URLSearchParams) {
+    data = Object.fromEntries(data);
+  }
+
   const response = await CapacitorHttp.request({
     url,
     method: options.method,
     headers: options.headers,
-    data: options.body
+    data
   });
 
   return ({
