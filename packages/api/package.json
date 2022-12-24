@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "haversine-distance": "^1.2.1",
-    "html-entities": "^2.3.3"
+    "html-entities": "^2.3.3",
+    "serialize-error": "^11.0.0"
   }
 }

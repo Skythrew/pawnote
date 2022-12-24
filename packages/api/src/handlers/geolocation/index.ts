@@ -4,6 +4,7 @@ import { ResponseErrorCode } from "@/types/internals";
 import { createApiFunction } from "@/utils/globals";
 import { PRONOTE_GEOLOCATION_URL } from "@/utils/constants";
 
+import {serializeError} from 'serialize-error';
 import haversine from "haversine-distance";
 import { decode } from "html-entities";
 
@@ -16,14 +17,17 @@ export default createApiFunction<ApiGeolocation>(async (req, res) => {
       long: req.body.longitude.toString()
     };
 
+    const body = new URLSearchParams();
+    body.set("data", JSON.stringify(request_body));
+
     const response = await req.fetch(PRONOTE_GEOLOCATION_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       },
-      body: `data=${JSON.stringify(request_body)}`
-    })
-    
+      body
+    });
+
     let data = await response.json<PronoteApiGeolocation["response"]>();
     data = Array.isArray(data) ? data : [];
 
@@ -60,9 +64,10 @@ export default createApiFunction<ApiGeolocation>(async (req, res) => {
 
     return res.success(results);
   }
-  catch {
+  catch (err) {
     return res.error({
-      code: ResponseErrorCode.NetworkFail
-    });
+      code: ResponseErrorCode.NetworkFail,
+      debug: { error: serializeError(err) }
+     });
   }
 });
