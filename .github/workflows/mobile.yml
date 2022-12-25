@@ -56,6 +56,9 @@ jobs:
       - name: Build @pornote/api
         run: pnpm --filter api run build
 
+      - name: Build @pornote/UI
+        run: pnpm --filter ui run build
+
       - name: Build JS
         run: pnpm --filter pornote-mobile run build
 
