@@ -1,1 +1,2 @@
-module.exports = require("./dist/components");
+export * from "./dist/components.js";
+

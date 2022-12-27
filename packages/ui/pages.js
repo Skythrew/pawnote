@@ -1,2 +1,2 @@
-module.exports = require("./dist/pages");
+export * from "./dist/pages.js";
 
