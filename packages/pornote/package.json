@@ -17,6 +17,7 @@
   "dependencies": {
     "@fontsource/poppins": "^4.5.10",
     "@pornote/api": "workspace:^1.0.0",
+    "@pornote/ui": "workspace:^1.0.0",
     "@solid-primitives/connectivity": "^0.3.4",
     "@solid-primitives/i18n": "^1.1.2",
     "@solidjs/meta": "^0.28.2",

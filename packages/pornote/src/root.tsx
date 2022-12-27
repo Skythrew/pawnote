@@ -2,7 +2,7 @@
 import "@fontsource/poppins/latin-300.css";
 import "@fontsource/poppins/latin-400.css";
 import "@fontsource/poppins/latin-500.css";
-import "virtual:windi.css";
+import "@pornote/ui/style.css";
 
 import {
   Html,
