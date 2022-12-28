@@ -40,6 +40,7 @@ tasks such as doing a quizz, upload a file and things like that.
 ## Alternatives
 
 - [Pronote+ / Papillon](https://github.com/PapillonApp/Papillon)
+- [yNotes (Deprecated)](https://github.com/EduWireApps/ynotes)
 
 ## Ressources
 
