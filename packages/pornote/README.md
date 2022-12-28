@@ -37,6 +37,10 @@ like watching your timetable, homeworks, etc...
 Just don't **currently** use this client for very specific
 tasks such as doing a quizz, upload a file and things like that.
 
+## Alternatives
+
+- [Pronote+ / Papillon](https://github.com/PapillonApp/Papillon)
+
 ## Ressources
 
 Without these very useful ressources, I wouldn't be able to write this whole client by myself.

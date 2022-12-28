@@ -10,3 +10,5 @@ Inside Pornote (Web/Mobile), I use internal packages that will be re-used across
 - [`mobile`](./mobile/): Contains code for the mobile app that is written using [Ionic Capacitor](https://capacitorjs.com/).
 - [`ui`](./ui/): Contains components and each pages used in Pornote. This is where the UI is built to be re-used across `mobile` and `pornote`.
 - [`api`](./api/): Contains code to call Pronote's API. Here, we export functions that will be re-used across `mobile` and `pornote`. I don't reuse the web API that I expose in `mobile` to prevent server usage.
+- [`client`](./client/): Contains core code for Pornote. Here you can find stores, API parsing and every client-side related functions.
+- [`i18n`](./i18n/): Contains locales for Pornote. Everyone can help in the translations, just make a Pull Request !

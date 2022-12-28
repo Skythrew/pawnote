@@ -1,7 +1,7 @@
 {
   "name": "@pornote/api",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Internal functions to provide helpers to call Pronote's API.",
   "type": "module",
   "main": "./dist/index.js",

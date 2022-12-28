@@ -1,7 +1,7 @@
 {
   "name": "@pornote/ui",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Internal components for Pornote.",
   "type": "module",
   "exports": {
@@ -31,8 +31,6 @@
     "@solidjs/router": "^0.6.0",
     "@types/node": "^18.11.17",
     "rimraf": "^3.0.2",
-    "rollup": "^3.8.0",
-    "rollup-preset-solid": "^2.0.1",
     "solid-js": "^1.6.6",
     "typescript": "^4.9.4",
     "vite": "^4.0.3",
