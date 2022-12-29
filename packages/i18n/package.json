@@ -1,0 +1,30 @@
+{
+  "name": "@pornote/i18n",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Locales for Pornote.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "vite build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.11.17",
+    "rimraf": "^3.0.2",
+    "solid-js": "^1.6.6",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.3",
+    "vite-plugin-dts": "^1.7.1",
+    "vite-plugin-solid": "^2.5.0"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.6"
+  },
+  "dependencies": {
+    "@pornote/api": "workspace:^0.0.0",
+    "@solid-primitives/i18n": "^1.1.2"
+  }
+}
