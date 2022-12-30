@@ -1,1 +1,0 @@
-./packages/pornote/README.md

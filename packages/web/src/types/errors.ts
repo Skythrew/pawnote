@@ -25,9 +25,5 @@ export enum ResponseErrorCode {
 }
 
 /** Client error codes. Starting from 200. */
-export enum ClientErrorCode {
-  SessionCantRestore = 200,
-  NetworkFail = 201,
-  Offline = 202
-}
+
 

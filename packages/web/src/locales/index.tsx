@@ -110,7 +110,7 @@ export interface Language {
 export const useLocale: () => [
   template: (key: DotNestedKeys<Language>, params?: Record<string, string>, defaultValue?: string) => string,
   actions: {
-    add(lang: string, table: Language): void;
+    add: (lang: string, table: Language) => void;
     locale: (lang?: string) => string;
     dict: (lang: string) => Record<string, Record<string, unknown>>;
   }
