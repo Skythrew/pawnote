@@ -31,7 +31,7 @@
     "@capacitor/ios": "^4.6.1",
     "@fontsource/poppins": "^4.5.10",
     "@pornote/api": "workspace:*",
-    "@pornote/ui": "workspace:^1.0.0",
+    "@pornote/ui": "workspace:*",
     "@solidjs/router": "^0.6.0",
     "dayjs": "^1.11.7",
     "html-entities": "^2.3.3",
