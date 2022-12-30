@@ -47,3 +47,7 @@ Without these very useful ressources, I wouldn't be able to write this whole cli
 - [`pronote-api`](https://github.com/dorian-eydoux/pronote-api/tree/master/src)'s (forked/archived) source code.
 - [`pronotepy`](https://github.com/bain3/pronotepy)'s source code.
 
+## Contributing
+
+- [`/packages`](./packages) is a good starting point if you want to navigate through Pornote's source code. You'll find a README that explains what each folder does.
+- [`/docs`](./docs) is where I write all the documentation about the API and, later, stuff about how the app works and should be used. There's still a lot of work in progress in here.
