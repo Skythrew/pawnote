@@ -12,10 +12,19 @@ import icons from "unplugin-icons/vite";
 import auto from "unplugin-auto-import/vite";
 import icons_resolver from "unplugin-icons/resolver";
 
-const pkg = JSON.parse(fs.readFileSync(
-  path.resolve(__dirname, "package.json"),
-  { encoding: "utf-8" }
-));
+const workspace_pkg = JSON.parse(
+  fs.readFileSync(
+    path.resolve(__dirname, "../../package.json"),
+    { encoding: "utf-8" }
+  )
+);
+
+const pkg = JSON.parse(
+  fs.readFileSync(
+    path.resolve(__dirname, "package.json"),
+    { encoding: "utf-8" }
+  )
+);
 
 export default defineConfig ({
   plugins: [
@@ -104,7 +113,8 @@ export default defineConfig ({
 
   define: {
     APP_NAME: JSON.stringify("Pornote"),
-    APP_VERSION: JSON.stringify(pkg.version)
+    APP_VERSION: JSON.stringify(workspace_pkg.version),
+    BETA_GITHUB_SHA: JSON.stringify(process.env.GITHUB_SHA || "")
   },
 
   server: {

@@ -1,11 +1,42 @@
 {
-  "name": "pornote-monorepo",
-  "version": "0.0.0",
+  "name": "pornote",
+  "version": "0.0.7",
+  "description": "Unofficial client for Pronote.",
   "author": "Mikkel RINGAUD <mikkel@milescode.dev> (https://github.com/Vexcited)",
   "repository": "github:Vexcited/pornote",
+  "homepage": "https://www.pornote.ml",
   "license": "MIT",
   "private": true,
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "release": "release-it"
+  },
+  "devDependencies": {
+    "release-it": "^15.5.1"
+  },
+  "release-it": {
+    "hooks": {
+      "before:init": [
+        "pnpm run --filter @pornote/web lint"
+      ]
+    },
+    "git": {
+      "commitMessage": "chore: release v${version}",
+      "tagAnnotation": "Release v${version}",
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": false
+    },
+    "npm": {
+      "publish": false,
+      "skipChecks": true,
+      "versionArgs": [
+        "--allow-same-version",
+        "--workspaces-update=false"
+      ]
+    }
+  }
 }

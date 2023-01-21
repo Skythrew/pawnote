@@ -3,8 +3,7 @@
   "public": false,
 
   "github": {
-    "enabled": false,
-    "silent": true
+    "enabled": false
   },
 
   "headers": [
