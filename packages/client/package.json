@@ -1,0 +1,10 @@
+{
+  "name": "@pornote/client",
+  "version": "0.0.0",
+  "description": "",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "build": ""
+  }
+}
