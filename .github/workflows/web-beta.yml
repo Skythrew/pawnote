@@ -1,13 +1,19 @@
-name: Release everything
+name: Web - Deploy beta
 
-on:  
+on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
+    paths:
+      - packages/**
+      - !packages/**/.*
+      - !packages/mobile/**
+      - !packages/README.md
+      - !packages/**/README.md
 
 jobs:
-  web-deploy:
-    name: Deploy @pornote/web to Vercel
+  vercel-deploy:
+    name: Deploy to Vercel
     runs-on: ubuntu-latest
 
     steps:
@@ -57,14 +63,17 @@ jobs:
 
       - name: Build @pornote/web
         run: pnpm --filter @pornote/web run build
+        env:
+          GITHUB_SHA: ${{ github.sha }}
 
       - uses: amondnet/vercel-action@v25.1.0
         with:
-          working-directory: packages/web
+          working-directory: packages/pornote
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }} 
-          github-comment: false
-          vercel-args: "--prod"
+          github-comment: true
+          alias-domains: |
+            beta.pornote.ml
 
