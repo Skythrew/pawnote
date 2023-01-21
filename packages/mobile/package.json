@@ -1,16 +1,15 @@
 {
-  "name": "pornote-mobile",
-  "description": "Client mobile non-officiel Pronote",
-  "author": "Mikkel RINGAUD <mikkel@milescode.dev> (https://github.com/Vexcited)",
-  "repository": "github:Vexcited/pornote",
+  "name": "@pornote/mobile",
+  "description": "Unofficial mobile client for Pronote",
   "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
   "scripts": {
     "cap": "cap",
     "dev": "vite",
     "build": "vite build && cap sync",
     "serve": "vite preview"
   },
-  "license": "MIT",
   "devDependencies": {
     "@capacitor/cli": "^4.6.1",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
