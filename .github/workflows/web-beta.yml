@@ -5,11 +5,11 @@ on:
     branches:
       - main
     paths:
-      - packages/**
-      - !packages/**/.*
-      - !packages/mobile/**
-      - !packages/README.md
-      - !packages/**/README.md
+      - 'packages/**'
+      - '!packages/**/.*'
+      - '!packages/mobile/**'
+      - '!packages/README.md'
+      - '!packages/**/README.md'
 
 jobs:
   vercel-deploy:
