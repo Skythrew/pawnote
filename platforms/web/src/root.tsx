@@ -1,4 +1,5 @@
 // @refresh reload
+import "virtual:uno.css";
 import "@fontsource/poppins/latin-300.css";
 import "@fontsource/poppins/latin-400.css";
 import "@fontsource/poppins/latin-500.css";
@@ -57,14 +58,14 @@ export default function Root () {
 
           <Suspense fallback={
             <div class="bg-brand-primary flex flex-col h-screen w-screen gap-2 justify-center items-center dark:bg-brand-dark">
-              <h2 class="bg-brand-white rounded-full font-medium text-md text-brand-primary py-2 px-6 dark:(bg-brand-primary text-brand-white) ">{t("PAGES._.LOADING")}</h2>
-              <span class="font-medium text-brand-light text-sm dark:(text-brand-white text-opacity-60) ">v{APP_VERSION} - BETA</span>
+              <h2 class="bg-brand-white rounded-full font-medium text-md text-brand-primary py-2 px-6 dark:bg-brand-primary dark:text-brand-white">{t("PAGES._.LOADING")}</h2>
+              <span class="font-medium text-brand-light text-sm dark:text-brand-white dark:text-opacity-60">v{APP_VERSION} - BETA</span>
             </div>
           }>
             <ErrorBoundary fallback={(error, reset) => (
               <div class="bg-brand-primary flex flex-col h-screen w-screen px-4 gap-2 justify-center items-center dark:bg-brand-dark">
                 <h2 class="font-medium text-xl text-brand-white">{t("PAGES._.ERROR")}</h2>
-                <button class="bg-brand-white rounded-full font-medium text-md text-brand-primary py-1 px-4 dark:(bg-brand-primary text-brand-white) " onClick={reset}>
+                <button class="bg-brand-white rounded-full font-medium text-md text-brand-primary py-1 px-4 dark:bg-brand-primary dark:text-brand-white" onClick={reset}>
                   {t("PAGES._.RESTART")}
                 </button>
                 <pre class="text-sm opacity-60">{error}</pre>

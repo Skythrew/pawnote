@@ -5,16 +5,9 @@
   "editor.insertSpaces": true,
 
   // ESLint
+  "prettier.enable": false,
+  "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
-  },
-
-  // WindiCSS
-  "windicss.enableAttrVariantCompletion": false,
-  "windicss.enableAttrUtilityCompletion": false,
-
-  // Autocomplete
-  "editor.quickSuggestions": {
-    "strings": true
   }
 }
