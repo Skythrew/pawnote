@@ -3,11 +3,12 @@
   "version": "0.0.7",
   "description": "Unofficial client for Pronote.",
   "author": "Mikkel RINGAUD <mikkel@milescode.dev> (https://github.com/Vexcited)",
-  "repository": "github:catto-labs/Pawnote",
+  "repository": "github:catto-labs/pawnote",
   "homepage": "https://pawnote.vercel.app",
   "license": "MIT",
   "private": true,
   "workspaces": [
+    "configs/*",
     "packages/*",
     "platforms/*"
   ],

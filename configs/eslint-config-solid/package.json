@@ -1,0 +1,20 @@
+{
+  "name": "@pawnote/eslint-config-solid",
+  "description": "ESLint configuration for the whole Pawnote codebase.",
+  "version": "0.0.0",
+  "type": "commonjs",
+  "main": "./index.js",
+  "keywords": [
+    "eslint",
+    "configuration"
+  ],
+  "author": "Mikkel RINGAUD <mikkel@milescode.dev> (https://github.com/Vexcited)",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@pawnote/eslint-config": "workspace:*",
+    "@typescript-eslint/utils": "^5.57.1",
+    "eslint": "^8.38.0",
+    "eslint-plugin-solid": "^0.12.0"
+  }
+}
