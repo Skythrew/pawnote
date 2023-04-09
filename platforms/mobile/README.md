@@ -6,7 +6,9 @@
 
 <hr />
 
-<video align="center" src="https://media.tenor.com/6hVEKMxmQLUAAAPo/cat-laptop.mp4"></video>
-
-
+<p align="center">
+<img align="center" src="https://media.tenor.com/6hVEKMxmQLUAAAAC/cat-laptop.gif" />
+</p>
+<p align="center">
 We're currently working on this, please come back later !
+</p>
