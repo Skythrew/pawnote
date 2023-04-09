@@ -6,11 +6,11 @@ export enum ClientErrorCode {
 
 export enum ClientAppStateCode {
   Idle = "IDLE",
-  
+
   FetchingTimetable = "FETCHING_TIMETABLE",
   FetchingHomeworks = "FETCHING_HOMEWORKS",
   FetchingRessources = "FETCHING_RESSOURCES",
   FetchingGrades = "FETCHING_GRADES",
-  
+
   UpdatingHomeworkState = "UPDATING_HOMEWORK_STATE"
 }

@@ -4,7 +4,7 @@ import { ResponseErrorCode } from "@/types/internals";
 import { createApiFunction } from "@/utils/globals";
 import { PRONOTE_GEOLOCATION_URL } from "@/utils/constants";
 
-import {serializeError} from 'serialize-error';
+import {serializeError} from "serialize-error";
 import haversine from "haversine-distance";
 import { decode } from "html-entities";
 
@@ -68,6 +68,6 @@ export default createApiFunction<ApiGeolocation>(async (req, res) => {
     return res.error({
       code: ResponseErrorCode.NetworkFail,
       debug: { error: serializeError(err) }
-     });
+    });
   }
 });

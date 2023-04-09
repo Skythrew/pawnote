@@ -29,7 +29,7 @@
     "@capacitor/geolocation": "^4.1.0",
     "@capacitor/ios": "^4.6.1",
     "@fontsource/poppins": "^4.5.10",
-    "@pornote/api": "workspace:*",
+    "@pawnote/api": "workspace:*",
     "@solidjs/router": "^0.6.0",
     "dayjs": "^1.11.7",
     "html-entities": "^2.3.3",

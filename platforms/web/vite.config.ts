@@ -5,7 +5,7 @@ import fs from "node:fs";
 import solid from "solid-start/vite";
 import vercel from "solid-start-vercel";
 
-import windi from "vite-plugin-windicss";
+import unocss from "unocss/vite";
 import { VitePWA as pwa } from "vite-plugin-pwa";
 import icons from "unplugin-icons/vite";
 
@@ -107,7 +107,7 @@ export default defineConfig ({
       }
     }),
 
-    windi(),
+    unocss(),
     icons({ compiler: "solid" })
   ],
 

@@ -1,8 +1,8 @@
-import dts from 'rollup-plugin-dts'
-import esbuild from 'rollup-plugin-esbuild'
-import tsConfigPaths from "rollup-plugin-tsconfig-paths"
-import resolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs';
+import dts from "rollup-plugin-dts";
+import esbuild from "rollup-plugin-esbuild";
+import tsConfigPaths from "rollup-plugin-tsconfig-paths";
+import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
 
 export default [
   {
@@ -19,7 +19,7 @@ export default [
     plugins: [resolve(), tsConfigPaths(), dts()],
     output: {
       file: "dist/index.d.ts",
-      format: 'es',
-    },
+      format: "es"
+    }
   }
 ];

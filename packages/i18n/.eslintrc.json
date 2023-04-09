@@ -1,0 +1,6 @@
+{
+  "root": true,
+  "extends": [
+    "@pawnote/eslint-config-solid"
+  ]
+}

@@ -50,5 +50,5 @@ export const createApiFunction = <T extends {
         debug: data.debug
       }
     })
-  })
+  });
 };

@@ -9,9 +9,9 @@ type DotNestedKeys<T> = (T extends object ?
 
 /**
  * Modified `useI18n` from `@solid-primitives/i18n` that includes typings and auto-completion.
- * 
+ *
  * @example
- * import { useLocale } from "@pornote/i18n"; 
+ * import { useLocale } from "@pornote/i18n";
  * const [t, { add, locale, dict }] = useLocale();
  */
 const useLocale: () => [
@@ -22,7 +22,7 @@ const useLocale: () => [
      * @example
      * // Get current locale.
      * const current_locale = locale();
-     * 
+     *
      * // Set current locale.
      * locale("fr") // Sets locale to `fr`.
      */
