@@ -1,5 +1,5 @@
 {
-  "name": "@pornote/api",
+  "name": "@pawnote/api",
   "private": true,
   "version": "0.0.0",
   "description": "Internal functions to provide helpers to call Pronote's API.",

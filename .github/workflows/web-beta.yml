@@ -1,4 +1,4 @@
-name: Web - Deploy beta
+name: Deploy Web (beta)
 
 on:
   push:
@@ -6,13 +6,16 @@ on:
       - main
     paths:
       - 'packages/**'
+      - 'platforms/web/**'
       - '!packages/**/.*'
-      - '!packages/mobile/**'
       - '!packages/README.md'
       - '!packages/**/README.md'
+      - '!platforms/web/README.md'
 
 jobs:
   vercel-deploy:
+    if: ${{ false }}  # Disable since @pawnote/web is not ready.
+
     name: Deploy to Vercel
     runs-on: ubuntu-latest
 
@@ -49,31 +52,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build @pornote/api
-        run: pnpm --filter @pornote/api run build
+      - name: Build @pawnote/api
+        run: pnpm --filter @pawnote/api run build
 
-      - name: Build @pornote/i18n
-        run: pnpm --filter @pornote/i18n run build
+      - name: Build @pawnote/i18n
+        run: pnpm --filter @pawnote/i18n run build
 
-      - name: Build @pornote/client
-        run: pnpm --filter @pornote/client run build
+      - name: Build @pawnote/client
+        run: pnpm --filter @pawnote/client run build
 
-      - name: Build @pornote/ui
-        run: pnpm --filter @pornote/ui run build
-
-      - name: Build @pornote/web
-        run: pnpm --filter @pornote/web run build
+      - name: Build @pawnote/web
+        run: pnpm --filter @pawnote/web run build
         env:
           GITHUB_SHA: ${{ github.sha }}
 
       - uses: amondnet/vercel-action@v25.1.0
         with:
-          working-directory: packages/pornote
+          working-directory: platforms/web
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }} 
           github-comment: true
           alias-domains: |
-            beta.pornote.ml
+            beta.pawnote.vercel.app
 

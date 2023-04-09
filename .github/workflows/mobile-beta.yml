@@ -1,4 +1,4 @@
-name: Build Android
+name: Build Android (beta)
 
 on:
   workflow_dispatch:
@@ -6,11 +6,16 @@ on:
     branches:
       - main
     paths:
-      - packages/mobile/**
+      - 'packages/**'
+      - 'platforms/mobile/**'
+      - '!packages/**/.*'
+      - '!packages/README.md'
+      - '!packages/**/README.md'
+      - '!platforms/mobile/README.md'
 
 jobs:
   build:
-    if: ${{ false }}  # Disable since @pornote/mobile is not ready.
+    if: ${{ false }}  # Disable since @pawnote/mobile is not ready.
 
     name: Build APK
     runs-on: ubuntu-latest
@@ -52,20 +57,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build @pornote/api
-        run: pnpm --filter @pornote/api run build
+      - name: Build @pawnote/api
+        run: pnpm --filter @pawnote/api run build
 
-      - name: Build @pornote/i18n
-        run: pnpm --filter @pornote/i18n run build
+      - name: Build @pawnote/i18n
+        run: pnpm --filter @pawnote/i18n run build
 
-      - name: Build @pornote/client
-        run: pnpm --filter @pornote/client run build
+      - name: Build @pawnote/client
+        run: pnpm --filter @pawnote/client run build
 
-      - name: Build @pornote/ui
-        run: pnpm --filter @pornote/ui run build
-
-      - name: Build @pornote/mobile
-        run: pnpm --filter @pornote/mobile run build
+      - name: Build @pawnote/mobile
+        run: pnpm --filter @pawnote/mobile run build
 
       - name: Build APK
         working-directory: packages/mobile/android

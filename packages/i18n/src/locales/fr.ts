@@ -1,5 +1,5 @@
 import type { Language } from "@/types/locale";
-import { ResponseErrorCode } from "@pornote/api";
+import { ResponseErrorCode } from "@pawnote/api";
 import { ClientAppStateCode, ClientErrorCode } from "@/types/client";
 
 const API_ERRORS: Language["API_ERRORS"] = {
@@ -42,7 +42,7 @@ const APP_STATE: Language["APP_STATE"] = {
 
 const PAGES: Language["PAGES"] = {
   _: {
-    LOADING: "Chargement de Pornote...",
+    LOADING: "Chargement de Pawnote...",
     ERROR: "Une erreur critique est survenue !",
     RESTART: "Redémarrer"
   },

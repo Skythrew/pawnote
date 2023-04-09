@@ -7,7 +7,7 @@ on:
 
 jobs:
   web-deploy:
-    name: Deploy @pornote/web to Vercel
+    name: Deploy @pawnote/web to Vercel
     runs-on: ubuntu-latest
 
     steps:
@@ -43,20 +43,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build @pornote/api
-        run: pnpm --filter @pornote/api run build
+      - name: Build @pawnote/api
+        run: pnpm --filter @pawnote/api run build
 
-      - name: Build @pornote/i18n
-        run: pnpm --filter @pornote/i18n run build
+      - name: Build @pawnote/i18n
+        run: pnpm --filter @pawnote/i18n run build
 
-      - name: Build @pornote/client
-        run: pnpm --filter @pornote/client run build
+      - name: Build @pawnote/client
+        run: pnpm --filter @pawnote/client run build
 
-      - name: Build @pornote/ui
-        run: pnpm --filter @pornote/ui run build
-
-      - name: Build @pornote/web
-        run: pnpm --filter @pornote/web run build
+      - name: Build @pawnote/web
+        run: pnpm --filter @pawnote/web run build
 
       - uses: amondnet/vercel-action@v25.1.0
         with:

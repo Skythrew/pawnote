@@ -1,14 +1,15 @@
 {
-  "name": "pornote",
+  "name": "pawnote",
   "version": "0.0.7",
   "description": "Unofficial client for Pronote.",
   "author": "Mikkel RINGAUD <mikkel@milescode.dev> (https://github.com/Vexcited)",
-  "repository": "github:Vexcited/pornote",
-  "homepage": "https://www.pornote.ml",
+  "repository": "github:catto-labs/Pawnote",
+  "homepage": "https://pawnote.vercel.app",
   "license": "MIT",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "platforms/*"
   ],
   "scripts": {
     "release": "release-it"
