@@ -40,6 +40,6 @@ Without these very useful ressources, I wouldn't be able to write this whole cli
 
 ## Contributing
 
-- [`/packages`](./packages) is a good starting point if you want to navigate through Pawnore's internal source code. You'll find a README that explains what each package does.
+- [`/packages`](./packages) is a good starting point if you want to navigate through Pawnote's internal source code. You'll find a README that explains what each package does.
 - [`/platforms`](./platforms) is where we build the interfaces for each platforms. You may want to look at it if you want to make some UI changes.
 - [`/docs`](./docs) is where I write all the documentation about the API and, later, stuff about how the app works and should be used. There's still a lot of work in progress in here.
