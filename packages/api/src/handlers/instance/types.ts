@@ -25,7 +25,9 @@ export interface ApiInstance {
       id: PronoteApiAccountId;
     }[];
 
+    /** Base URL of the instance. */
     pronote_url: string;
+    /** When available, ENT to use will use that URL to check which ENT to use/propose. */
     ent_url?: string;
   }
 

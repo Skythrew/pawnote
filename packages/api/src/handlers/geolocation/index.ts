@@ -4,11 +4,17 @@ import { ResponseErrorCode } from "@/types/internals";
 import { createApiFunction } from "@/utils/globals";
 import { PRONOTE_GEOLOCATION_URL } from "@/utils/constants";
 
-import {serializeError} from "serialize-error";
+import { serializeError } from "serialize-error";
 import haversine from "haversine-distance";
 import { decode } from "html-entities";
 
-export default createApiFunction<ApiGeolocation>(async (req, res) => {
+/**
+ * Request to the `https://www.index-education.com/swie/geoloc.php` endpoint.
+ * Takes a `longitude` and a `latitude` as parameters and returns a parsed and more verboose version of the endpoint response.
+ *
+ * Gives every Pronote instance in a 20km radius of the given `longitude` and `latitude`.
+ */
+const geolocation = createApiFunction<ApiGeolocation>(async (req, res) => {
   try {
     // Build the request we're gonna send to Pronote.
     const request_body: PronoteApiGeolocation["request"] = {
@@ -61,7 +67,6 @@ export default createApiFunction<ApiGeolocation>(async (req, res) => {
               : 0
       );
 
-
     return res.success(results);
   }
   catch (err) {
@@ -71,3 +76,5 @@ export default createApiFunction<ApiGeolocation>(async (req, res) => {
     });
   }
 });
+
+export default geolocation;

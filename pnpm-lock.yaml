@@ -69,7 +69,7 @@ importers:
         version: 11.0.0
     devDependencies:
       '@pawnote/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../configs/eslint-config
       '@rollup/plugin-commonjs':
         specifier: ^24.0.0
@@ -7918,7 +7918,7 @@ packages:
       vite: '>=2.9.0'
     dependencies:
       '@microsoft/api-extractor': 7.33.7
-      '@rollup/pluginutils': 5.0.2(rollup@2.79.1)
+      '@rollup/pluginutils': 5.0.2(rollup@3.8.0)
       '@rushstack/node-core-library': 3.53.3
       debug: 4.3.4
       fast-glob: 3.2.12

@@ -5,11 +5,21 @@ import { ResponseErrorCode } from "@/types/internals";
 import { createApiFunction, cleanPronoteUrl } from "@/utils/globals";
 import { PRONOTE_ACCOUNT_TYPES, PRONOTE_INSTANCE_MOBILE_INFOS_PATH } from "@/utils/constants";
 
+/**
+ * Filter function to prevent TS issues.
+ * Allows to check that every item is defined and make them typed to `PronoteApiAccountType`.
+ */
 const isPronoteApiAccountType = (item: PronoteApiAccountType | undefined): item is PronoteApiAccountType => {
   return !!item;
 };
 
-export default createApiFunction<ApiInstance>(async (req, res) => {
+/**
+ * Takes an instance URL and return informations about it such as...
+ * - available account types ;
+ * - instance name ;
+ * - base URL and potential ENT URL
+ */
+const instance = createApiFunction<ApiInstance>(async (req, res) => {
   try {
     const pronote_url = cleanPronoteUrl(req.body.pronote_url);
     const informations_url = `${pronote_url}/${PRONOTE_INSTANCE_MOBILE_INFOS_PATH}`;
@@ -39,3 +49,5 @@ export default createApiFunction<ApiInstance>(async (req, res) => {
     });
   }
 });
+
+export default instance;
