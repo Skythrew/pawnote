@@ -61,13 +61,14 @@ jobs:
         env:
           GITHUB_SHA: ${{ github.sha }}
 
-      - uses: amondnet/vercel-action@v25.1.0
+      - uses: amondnet/vercel-action@v25
         with:
           working-directory: platforms/web
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }} 
+          vercel-args: "--prebuilt"
           github-comment: true
           alias-domains: |
             beta.pawnote.vercel.app
