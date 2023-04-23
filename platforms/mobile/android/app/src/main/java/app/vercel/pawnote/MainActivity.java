@@ -1,4 +1,4 @@
-package com.pornote.app;
+package app.vercel.pawnote;
 
 import com.getcapacitor.BridgeActivity;
 

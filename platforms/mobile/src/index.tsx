@@ -1,10 +1,22 @@
-// @refresh reload
-import "@fontsource/poppins/latin-300.css";
-import "@fontsource/poppins/latin-400.css";
-import "@fontsource/poppins/latin-500.css";
-
+/* @refresh reload */
+import "framework7/css/bundle"
+import { SplashScreen } from '@capacitor/splash-screen';
 import { render } from 'solid-js/web';
 
-import App from './App';
+import Framework7 from "framework7";
+import Framework7Solid from "@/framework7/lib/plugin";
+Framework7.use(Framework7Solid);
 
-render(() => <App />, document.getElementById('root') as HTMLElement);
+import App from "@/framework7/components/App";
+
+const root = document.getElementById('root') as HTMLDivElement;
+
+render(() => {
+  SplashScreen.hide();
+  
+  return (
+    <App theme="auto" name="Pawnote">
+      <div>Hello World</div>
+    </App>
+  )
+}, root);

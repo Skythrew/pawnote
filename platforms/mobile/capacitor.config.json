@@ -1,0 +1,11 @@
+{
+  "appId": "app.vercel.pawnote",
+  "appName": "Pawnote",
+  "bundledWebRuntime": false,
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
