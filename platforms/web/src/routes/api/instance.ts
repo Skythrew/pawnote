@@ -1,4 +1,4 @@
-import { type ApiInstance, ResponseErrorCode, handlers } from "@pornote/api";
+import { type ApiInstance, ResponseErrorCode, handlers } from "@pawnote/api";
 
 import { handleServerRequest } from "@/utils/server";
 import { objectHasProperty } from "@/utils/globals";

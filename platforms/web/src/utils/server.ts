@@ -3,8 +3,8 @@
 import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
 import type { SessionInstance } from "@/types/session";
 
-import type { HttpCallFunction, ResponseError, Response as ApiResponse } from "@pornote/api";
-import { ResponseErrorCode } from "@pornote/api";
+import type { HttpCallFunction, ResponseError, Response as ApiResponse } from "@pawnote/api";
+import { ResponseErrorCode } from "@pawnote/api";
 
 import rate_limiter, { type RateLimiter } from "lambda-rate-limiter";
 import { type APIEvent, json } from "solid-start/api";

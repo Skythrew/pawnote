@@ -17,5 +17,8 @@
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+
+  "include": ["src"],
+  "exclude": ["node_module/**", "dist/**"]
 }

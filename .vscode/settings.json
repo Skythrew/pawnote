@@ -9,5 +9,12 @@
   "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
+  },
+
+  // UnoCSS
+  "unocss.root": "platforms/web",
+
+  "emmet.includeLanguages": {
+    "typescriptreact": "html"
   }
 }

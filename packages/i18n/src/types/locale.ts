@@ -1,5 +1,5 @@
 import type { ClientAppStateCode, ClientErrorCode } from "./client";
-import type { ResponseErrorCode } from "@pornote/api";
+import type { ResponseErrorCode } from "@pawnote/api";
 
 export interface Language {
   API_ERRORS: Record<ResponseErrorCode, string>;

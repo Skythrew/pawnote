@@ -6,8 +6,8 @@ import solid from "solid-start/vite";
 import vercel from "solid-start-vercel";
 
 import unocss from "unocss/vite";
-import { VitePWA as pwa } from "vite-plugin-pwa";
 import icons from "unplugin-icons/vite";
+import { VitePWA as pwa } from "vite-plugin-pwa";
 
 import auto from "unplugin-auto-import/vite";
 import icons_resolver from "unplugin-icons/resolver";
@@ -19,18 +19,11 @@ const workspace_pkg = JSON.parse(
   )
 );
 
-const pkg = JSON.parse(
-  fs.readFileSync(
-    path.resolve(__dirname, "package.json"),
-    { encoding: "utf-8" }
-  )
-);
-
 export default defineConfig ({
   plugins: [
     solid ({
       ssr: false,
-      adapter: vercel()
+      adapter: vercel({})
     }),
 
     auto ({
@@ -68,7 +61,7 @@ export default defineConfig ({
       manifest: {
         name: "Pawnote",
         short_name: "Pawnote",
-        description: pkg.description,
+        description: "Un client mia-gnifique pour Pronote.",
 
         categories: [
           "productivity"

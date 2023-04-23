@@ -140,20 +140,20 @@ const LinkPronoteAccount: Component = () => {
   return (
     <>
       <Title>Connexion - {APP_NAME}</Title>
-      <div class="bg-brand-primary min-h-screen dark:bg-brand-dark">
+      <div class="bg-brand-primary dark:bg-brand-dark min-h-screen">
         <header class="p-4 pb-8">
-          <A class="flex text-xl text-brand-light w-max p-2" href="/">
+          <A class="text-brand-light w-max flex p-2 text-xl" href="/">
             <IconMdiArrowLeft />
           </A>
         </header>
 
-        <main class="flex flex-col mx-auto max-w-md px-8">
-          <div class="text-center mb-12">
-            <h1 class="font-bold text-xl text-brand-white">
+        <main class="mx-auto max-w-md flex flex-col px-8">
+          <div class="mb-12 text-center">
+            <h1 class="text-brand-white text-xl font-bold">
             Connexion à Pronote
             </h1>
             <button
-              class="border-brand-light border-b-2 text-brand-light dark:border-brand-primary dark:text-brand-primary"
+              class="text-brand-light dark:border-brand-primary border-brand-light dark:text-brand-primary border-b-2"
               onClick={() => setState("info_dialog_open", true)}
             >
             Comment faire ?
@@ -167,10 +167,10 @@ const LinkPronoteAccount: Component = () => {
             >
               <Dialog
                 isOpen
-                class="inset-0 z-10 fixed overflow-y-auto"
+                class="fixed inset-0 z-10 overflow-y-auto"
                 onClose={() => setState("info_dialog_open", false)}
               >
-                <div class="flex min-h-screen px-4 items-center justify-center">
+                <div class="min-h-screen flex items-center justify-center px-4">
                   <TransitionChild
                     enter="ease-out duration-200"
                     enterFrom="opacity-0"
@@ -179,12 +179,12 @@ const LinkPronoteAccount: Component = () => {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                   >
-                    <DialogOverlay class="bg-brand-dark bg-opacity-50 inset-0 fixed" />
+                    <DialogOverlay class="bg-brand-dark fixed inset-0 bg-opacity-50" />
                   </TransitionChild>
 
                   {/* This element is to trick the browser into centering the modal contents. */}
                   <span
-                    class="h-screen inline-block align-middle"
+                    class="inline-block h-screen align-middle"
                     aria-hidden="true"
                   >
                   &#8203;
@@ -198,14 +198,14 @@ const LinkPronoteAccount: Component = () => {
                     leaveFrom="opacity-100 scale-100"
                     leaveTo="opacity-0 scale-95"
                   >
-                    <DialogPanel class="bg-brand-white border-brand-primary rounded-md max-w-md border-2 shadow-xl my-8 text-left w-full p-6 inline-block overflow-hidden align-middle dark:bg-brand-dark">
+                    <DialogPanel class="bg-brand-white border-brand-primary dark:bg-brand-dark my-8 inline-block max-w-md w-full overflow-hidden border-2 rounded-md p-6 text-left align-middle shadow-xl">
                       <DialogTitle
                         as="h3"
-                        class="font-semibold text-lg text-brand-primary text-center"
+                        class="text-brand-primary text-center text-lg font-semibold"
                       >
                       Comment se connecter?
                       </DialogTitle>
-                      <div class="flex flex-col mt-2 text-brand-dark gap-2 dark:text-brand-white">
+                      <div class="text-brand-dark dark:text-brand-white mt-2 flex flex-col gap-2">
                         <p class="font-medium">Pour effectuer la première étape de votre connexion, vous allez devoir choisir une instance Pronote.</p>
                         <p>Pour cela, vous devez coller <b>l'URL de l'instance Pronote</b> dans la boite de texte.</p>
                         <p>Autrement, vous pouvez cliquer sur le bouton de <b>Géolocalisation</b> pour trouver les instances Pronote proche de votre localisation et directement les utiliser.</p>
@@ -213,7 +213,7 @@ const LinkPronoteAccount: Component = () => {
 
                       <div class="mt-4">
                         <button
-                          class="bg-brand-primary rounded-md text-brand-light w-full py-1 px-2"
+                          class="bg-brand-primary text-brand-light w-full rounded-md px-2 py-1"
                           type="button"
                           onClick={() => setState("info_dialog_open", false)}
                         >
@@ -231,10 +231,10 @@ const LinkPronoteAccount: Component = () => {
             <div class="flex">
               <Show when={state.show_geolocation_data}>
                 <Listbox defaultOpen value={state.pronote_url} onSelectChange={instanceSelectChange}>
-                  <div class="w-full min-w-0 relative">
-                    <ListboxButton type="button" class="bg-brand-white rounded-lg rounded-r-none cursor-default h-full text-left text-brand-dark w-full py-2 pr-10 pl-4 relative sm:text-sm focus:outline-none focus-visible:border-brand-primary focus-visible:ring-white focus-visible:ring-offset-brand-primary focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-offset-2">
-                      <span class="text-sm block truncate">{checkMatchPronoteUrl()?.name || state.pronote_url}</span>
-                      <span class="flex pr-2 inset-y-0 right-0 absolute items-center pointer-events-none">
+                  <div class="relative min-w-0 w-full">
+                    <ListboxButton type="button" class="bg-brand-white text-brand-dark focus-visible:border-brand-primary focus-visible:ring-offset-brand-primary relative h-full w-full cursor-default rounded-lg rounded-r-none py-2 pl-4 pr-10 text-left sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                      <span class="block truncate text-sm">{checkMatchPronoteUrl()?.name || state.pronote_url}</span>
+                      <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                         <IconMdiChevronRight
                           class="h-5 w-5"
                           aria-hidden="true"
@@ -253,7 +253,7 @@ const LinkPronoteAccount: Component = () => {
                           leaveTo="opacity-0"
                         >
                           <ListboxOptions
-                            class="bg-white rounded-md list-none h-[35vh] shadow-lg ring-black mt-1 text-base text-sm p-0 py-1 ring-1 ring-opacity-5 absolute overflow-auto md:text-base focus:outline-none"
+                            class="absolute mt-1 h-[35vh] list-none overflow-auto rounded-md bg-white p-0 py-1 text-base text-sm shadow-lg ring-1 ring-black ring-opacity-5 md:text-base focus:outline-none"
                           >
                             <For each={state.geolocation_data}>
                               {instance => (
@@ -264,7 +264,7 @@ const LinkPronoteAccount: Component = () => {
                                         "text-brand-white bg-brand-primary": isSelected(),
                                         "group-hover:(text-brand-primary bg-brand-light)": !isSelected()
                                       }}
-                                      class="cursor-default py-2 pr-4 pl-10 select-none relative transitions"
+                                      class="transitions relative cursor-default select-none py-2 pl-10 pr-4"
                                     >
                                       <span
                                         class="block"
@@ -277,7 +277,7 @@ const LinkPronoteAccount: Component = () => {
                                       </span>
                                       <Show when={isSelected()}>
                                         <span
-                                          class="flex text-brand-white pl-3 inset-y-0 left-0 absolute items-center"
+                                          class="text-brand-white absolute inset-y-0 left-0 flex items-center pl-3"
                                         >
                                           <IconMdiCheck class="h-5 w-5" aria-hidden="true" />
                                         </span>
@@ -295,7 +295,7 @@ const LinkPronoteAccount: Component = () => {
                 </Listbox>
                 <button
                   type="button"
-                  class="bg-brand-light rounded-lg rounded-l-none flex text-brand-dark p-2 px-4 dark:(bg-brand-primary text-brand-light)"
+                  class="bg-brand-light text-brand-dark dark:bg-brand-primary dark:text-brand-light flex rounded-lg rounded-l-none p-2 px-4"
                   onClick={() => setState("show_geolocation_data", false)}
                 >
                   <IconMdiPencil />
@@ -303,14 +303,14 @@ const LinkPronoteAccount: Component = () => {
               </Show>
 
               <Show when={!state.show_geolocation_data}>
-                <input class="bg-brand-white rounded-lg rounded-r-none outline-none text-sm text-brand-dark w-full px-4"
+                <input class="bg-brand-white text-brand-dark w-full rounded-lg rounded-r-none px-4 text-sm outline-none"
                   type="url"
                   placeholder="URL Pronote"
                   value={state.pronote_url}
                   onChange={event => setState("pronote_url", event.currentTarget.value)}
                 />
 
-                <button disabled={state.loading_geolocation} class="bg-brand-light rounded-lg rounded-l-none flex text-brand-dark py-2 px-4 dark:(bg-brand-primary text-brand-light) disabled:opacity-60" type="button" onClick={handleGeolocation}>
+                <button disabled={state.loading_geolocation} class="bg-brand-light text-brand-dark dark:bg-brand-primary dark:text-brand-light flex rounded-lg rounded-l-none px-4 py-2 disabled:opacity-60" type="button" onClick={handleGeolocation}>
                   {state.loading_geolocation
                     ? <IconMdiDotsHorizontal />
                     : <IconMdiMapMarkerRadius />
@@ -319,7 +319,7 @@ const LinkPronoteAccount: Component = () => {
               </Show>
             </div>
 
-            <button disabled={!state.pronote_url || state.loading_instance} class="bg-brand-light rounded-lg w-full py-2 px-4 dark:(bg-brand-primary text-brand-light) disabled:opacity-40" type="submit">
+            <button disabled={!state.pronote_url || state.loading_instance} class="bg-brand-light dark:bg-brand-primary dark:text-brand-light w-full rounded-lg px-4 py-2 disabled:opacity-40" type="submit">
               {state.loading_instance ? "Connexion..." : "Etablir une connexion"}
             </button>
           </form>

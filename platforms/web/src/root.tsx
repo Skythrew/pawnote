@@ -1,8 +1,10 @@
 // @refresh reload
+import "@fontsource/comfortaa/300.css";
+import "@fontsource/comfortaa/400.css";
+import "@fontsource/comfortaa/500.css";
+import "@fontsource/comfortaa/600.css";
+import "@unocss/reset/tailwind.css";
 import "virtual:uno.css";
-import "@fontsource/poppins/latin-300.css";
-import "@fontsource/poppins/latin-400.css";
-import "@fontsource/poppins/latin-500.css";
 
 import {
   Html,
@@ -17,15 +19,15 @@ import {
 } from "solid-start";
 
 import {
-  type languages as availableLanguages,
-  Provider as LocalesProvider,
-  context as locale,
+  type LANGUAGES,
+  LocaleProvider,
+  locale,
 
   findLanguageBasedOnBrowser,
   switchLanguage
-} from "@/locales";
+} from "@pawnote/i18n";
 
-import PornoteUpdater from "@/components/modals/PornoteUpdater";
+import PawnoteUpdater from "@/components/modals/PawnoteUpdater";
 import { Toaster } from "solid-toast";
 
 export default function Root () {
@@ -33,7 +35,7 @@ export default function Root () {
 
   /** Always default to `fr`. */
   const language = isServer ? "fr" :
-    localStorage.getItem("lang") as keyof typeof availableLanguages || findLanguageBasedOnBrowser();
+    localStorage.getItem("lang") as keyof typeof LANGUAGES || findLanguageBasedOnBrowser();
 
   onMount(() => switchLanguage(language));
 
@@ -49,23 +51,23 @@ export default function Root () {
         <Meta name="color-scheme" content="dark light" />
         <Meta name="theme-color" content="#17AA67" />
       </Head>
-      <Body>
-        <LocalesProvider>
-          <PornoteUpdater />
+      <Body class="font-sans bg-latteBase text-latteText dark:bg-frappeBase dark:text-frappeText">
+        <LocaleProvider>
+          <PawnoteUpdater />
           <Toaster position="bottom-right" toastOptions={{
             className: "!bg-brand-white !text-brand-dark !dark:bg-dark-200 !dark:text-brand-white !border-2 !border-brand-primary"
           }} />
 
           <Suspense fallback={
-            <div class="bg-brand-primary flex flex-col h-screen w-screen gap-2 justify-center items-center dark:bg-brand-dark">
-              <h2 class="bg-brand-white rounded-full font-medium text-md text-brand-primary py-2 px-6 dark:bg-brand-primary dark:text-brand-white">{t("PAGES._.LOADING")}</h2>
-              <span class="font-medium text-brand-light text-sm dark:text-brand-white dark:text-opacity-60">v{APP_VERSION} - BETA</span>
+            <div class="bg-brand-primary dark:bg-brand-dark h-screen w-screen flex flex-col items-center justify-center gap-2">
+              <h2 class="bg-brand-white text-md text-brand-primary dark:text-brand-white dark:bg-brand-primary rounded-full px-6 py-2 font-medium">{t("PAGES._.LOADING")}</h2>
+              <span class="text-brand-light dark:text-brand-white text-sm font-medium dark:text-opacity-60">v{APP_VERSION} - BETA</span>
             </div>
           }>
             <ErrorBoundary fallback={(error, reset) => (
-              <div class="bg-brand-primary flex flex-col h-screen w-screen px-4 gap-2 justify-center items-center dark:bg-brand-dark">
-                <h2 class="font-medium text-xl text-brand-white">{t("PAGES._.ERROR")}</h2>
-                <button class="bg-brand-white rounded-full font-medium text-md text-brand-primary py-1 px-4 dark:bg-brand-primary dark:text-brand-white" onClick={reset}>
+              <div class="bg-brand-primary dark:bg-brand-dark h-screen w-screen flex flex-col items-center justify-center gap-2 px-4">
+                <h2 class="text-brand-white text-xl font-medium">{t("PAGES._.ERROR")}</h2>
+                <button class="bg-brand-white text-md text-brand-primary dark:bg-brand-primary dark:text-brand-white rounded-full px-4 py-1 font-medium" onClick={reset}>
                   {t("PAGES._.RESTART")}
                 </button>
                 <pre class="text-sm opacity-60">{error}</pre>
@@ -76,7 +78,7 @@ export default function Root () {
               </Routes>
             </ErrorBoundary>
           </Suspense>
-        </LocalesProvider>
+        </LocaleProvider>
 
         <Scripts />
       </Body>

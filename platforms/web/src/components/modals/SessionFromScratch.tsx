@@ -160,10 +160,10 @@ const SessionFromScratchModal: Component<{
   return (
     <>
       <Modal open={visibility()} onClose={() => setModalVisibility(false)}>
-        <div class="bg-brand-white border-brand-primary rounded-md max-w-md border-2 shadow-xl my-8 text-left w-full p-6 inline-block overflow-hidden align-middle">
+        <div class="bg-brand-white border-brand-primary my-8 inline-block max-w-md w-full overflow-hidden border-2 rounded-md p-6 text-left align-middle shadow-xl">
           <DialogTitle
             as="h3"
-            class="font-medium text-center text-lg text-brand-dark leading-6"
+            class="text-brand-dark text-center text-lg font-medium leading-6"
           >
             {app.current_user.slug
               ? "Connexion perdue!"
@@ -172,7 +172,7 @@ const SessionFromScratchModal: Component<{
           </DialogTitle>
           <DialogDescription
             as="p"
-            class="text-sm text-brand-dark text-opacity-80"
+            class="text-brand-dark text-sm text-opacity-80"
           >
             {app.current_user.slug
               ? `
@@ -188,12 +188,12 @@ const SessionFromScratchModal: Component<{
           </DialogDescription>
 
           <form
-            class="flex flex-col mt-6 w-full gap-3"
+            class="mt-6 w-full flex flex-col gap-3"
             onSubmit={processUserAuthentication}
           >
             <Show when={props.ent_url}>
               <label
-                class="border rounded-full flex mx-auto mb-2 py-1 px-3 transition gap-1 inline items-center justify-center"
+                class="mx-auto mb-2 inline flex items-center justify-center gap-1 border rounded-full px-3 py-1 transition"
                 classList={{
                   "bg-brand-light border-brand-primary text-brand-primary": credentials.use_ent,
                   "text-brand-dark border-brand-dark": !credentials.use_ent
@@ -212,7 +212,7 @@ const SessionFromScratchModal: Component<{
             <Show when={!credentials.use_ent && !app.current_user.slug}>
               <label class="text-brand-dark">Espace à utiliser
                 <select
-                  class="bg-brand-white border border-brand-dark rounded-md outline-none text-brand-dark w-full py-1 px-2 appearance-none focus:(border-brand-primary bg-brand-light) "
+                  class="bg-brand-white text-brand-dark border-brand-dark focus:border-brand-primary focus:bg-brand-light w-full appearance-none border rounded-md px-2 py-1 outline-none"
                   onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}
                 >
                   <For each={props.available_accounts}>
@@ -227,7 +227,7 @@ const SessionFromScratchModal: Component<{
             <label class="text-brand-dark">
               Nom d'utilisateur
               <input
-                class="bg-brand-white border border-brand-dark rounded-md outline-none text-brand-dark w-full py-1 px-2 focus:(border-brand-primary bg-brand-light) "
+                class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
                 type="text"
                 value={credentials.username}
                 onChange={event => setCredentials("username", event.currentTarget.value)}
@@ -237,7 +237,7 @@ const SessionFromScratchModal: Component<{
             <label class="text-brand-dark">
               Mot de passe
               <input
-                class="bg-brand-white border border-brand-dark rounded-md outline-none text-brand-dark w-full py-1 px-2 focus:(border-brand-primary bg-brand-light) "
+                class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
                 type="password"
                 value={credentials.password}
                 onChange={event => setCredentials("password", event.currentTarget.value)}
@@ -246,7 +246,7 @@ const SessionFromScratchModal: Component<{
             </label>
 
             <label
-              class="border rounded-full mx-auto my-2 py-1 px-3 transition inline"
+              class="mx-auto my-2 inline border rounded-full px-3 py-1 transition"
               classList={{
                 "bg-brand-light text-brand-primary border-brand-primary": credentials.save,
                 "border-brand-dark text-brand-dark":!credentials.save
@@ -263,7 +263,7 @@ const SessionFromScratchModal: Component<{
 
             <button
               disabled={loading()}
-              class="bg-brand-primary rounded-md mt-2 text-brand-light w-full p-2 disabled:opacity-40"
+              class="bg-brand-primary text-brand-light mt-2 w-full rounded-md p-2 disabled:opacity-40"
               type="submit"
             >
               {loading() ? "Connexion en cours..." : "Connexion !"}
@@ -280,26 +280,26 @@ const SessionFromScratchModal: Component<{
           app.setCurrentState({ restoring_session: false });
         })}
       >
-        <div class="bg-brand-white border-brand-primary rounded-md max-w-md border-2 shadow-xl my-8 text-left w-full p-6 inline-block overflow-hidden align-middle">
+        <div class="bg-brand-white border-brand-primary my-8 inline-block max-w-md w-full overflow-hidden border-2 rounded-md p-6 text-left align-middle shadow-xl">
           <DialogTitle
             as="h3"
-            class="font-medium text-center text-lg text-brand-dark leading-6"
+            class="text-brand-dark text-center text-lg font-medium leading-6"
           >
             Connexion établie !
           </DialogTitle>
           <DialogDescription
             as="p"
-            class="text-sm text-brand-dark text-opacity-80"
+            class="text-brand-dark text-sm text-opacity-80"
           >
             Vous êtes connecté en tant que {slugModalData()?.endpoints["/user/data"].donnees.ressource.L} à l'instance {slugModalData()?.endpoints["/user/data"].donnees.ressource.Etablissement.V.L.trim()}.
           </DialogDescription>
 
-          <p class="my-4 text-brand-dark">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
+          <p class="text-brand-dark my-4">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
 
           <form onSubmit={processSlugSave}>
             <input
               type="text"
-              class="bg-brand-white border border-brand-dark rounded-md outline-none text-brand-dark w-full py-1 px-2 focus:(border-brand-primary bg-brand-light) "
+              class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
               value={credentials.slug}
               onInput={event => {
                 const cleanedValue = event.currentTarget.value
@@ -311,7 +311,7 @@ const SessionFromScratchModal: Component<{
             <button
               type="submit"
               disabled={loading()}
-              class="bg-brand-primary rounded-md mt-2 text-brand-light w-full p-2 disabled:opacity-40"
+              class="bg-brand-primary text-brand-light mt-2 w-full rounded-md p-2 disabled:opacity-40"
             >
               {loading() ? "Sauvegarde..." : "Sauvegarder la session"}
             </button>

@@ -15,43 +15,43 @@ const GradeInfoModal: Component = () => {
 
   return (
     <Modal open={visibility() && informations() !== null} onClose={() => setVisibility(false)}>
-      <div class="bg-brand-light rounded-lg flex flex-col text-brand-dark mb-4 p-4 dark:(bg-dark-200 text-brand-white) ">
-        <h4 class="font-medium text-center text-2xl">{subject()?.name}</h4>
+      <div class="bg-brand-light text-brand-dark dark:text-brand-white mb-4 flex flex-col rounded-lg p-4 dark:(bg-dark-200)">
+        <h4 class="text-center text-2xl font-medium">{subject()?.name}</h4>
         <Show keyed when={grade()?.description}>
           {description => (
-            <p class="text-center text-md mb-2 opacity-80">{description}</p>
+            <p class="text-md mb-2 text-center opacity-80">{description}</p>
           )}
         </Show>
-        <span class="text-center text-sm opacity-60 block">Le {grade()?.date.toDate().toLocaleDateString()}</span>
+        <span class="block text-center text-sm opacity-60">Le {grade()?.date.toDate().toLocaleDateString()}</span>
       </div>
 
-      <div class="bg-brand-white rounded-lg flex flex-col shadow p-4 gap-4 dark:bg-dark-100">
-        <div class="rounded-md text-brand-dark p-2 dark:text-brand-white">
-          <h4 class="font-medium text-center text-2xl">{typeof grade()?.user === "string"
+      <div class="bg-brand-white flex flex-col gap-4 rounded-lg p-4 shadow dark:bg-dark-100">
+        <div class="text-brand-dark dark:text-brand-white rounded-md p-2">
+          <h4 class="text-center text-2xl font-medium">{typeof grade()?.user === "string"
             ? grade()?.user
             : <>{grade()?.user}/{grade()?.maximum}</>
           }</h4>
-          <span class="text-center text-sm opacity-80 block">Coef. {grade()?.ratio}</span>
+          <span class="block text-center text-sm opacity-80">Coef. {grade()?.ratio}</span>
         </div>
 
-        <div class="flex gap-2 items-center justify-center">
-          <div class="bg-brand-light rounded-md bg-opacity-60 text-brand-dark py-2 px-4 dark:(text-brand-white bg-dark-300) ">
-            <span class="text-center text-xs mb-1 opacity-80 block">Min.</span>
-            <h4 class="font-medium text-center text-md">{typeof grade()?.user_min === "string"
+        <div class="flex items-center justify-center gap-2">
+          <div class="bg-brand-light text-brand-dark dark:text-brand-white rounded-md bg-opacity-60 px-4 py-2 dark:(bg-dark-300)">
+            <span class="mb-1 block text-center text-xs opacity-80">Min.</span>
+            <h4 class="text-md text-center font-medium">{typeof grade()?.user_min === "string"
               ? grade()?.user_min
               : <>{grade()?.user_min}/{grade()?.maximum}</>
             }</h4>
           </div>
-          <div class="bg-brand-light border-brand-primary rounded-md border-2 text-brand-dark py-4 px-4 dark:(text-brand-white bg-dark-100) ">
-            <span class="text-center text-xs mb-1 opacity-80 block">Moy. Classe</span>
-            <h4 class="font-medium text-center text-xl">{typeof grade()?.average === "string"
+          <div class="bg-brand-light text-brand-dark dark:text-brand-white border-brand-primary border-2 rounded-md px-4 py-4 dark:(bg-dark-100)">
+            <span class="mb-1 block text-center text-xs opacity-80">Moy. Classe</span>
+            <h4 class="text-center text-xl font-medium">{typeof grade()?.average === "string"
               ? grade()?.average
               : <>{grade()?.average}/{grade()?.maximum}</>
             }</h4>
           </div>
-          <div class="bg-brand-light rounded-md bg-opacity-60 text-brand-dark py-2 px-4 dark:(text-brand-white bg-dark-50) ">
-            <span class="text-center text-xs mb-1 opacity-80 block">Max.</span>
-            <h4 class="font-medium text-center text-xl">{typeof grade()?.user_max === "string"
+          <div class="bg-brand-light text-brand-dark dark:text-brand-white rounded-md bg-opacity-60 px-4 py-2 dark:(bg-dark-50)">
+            <span class="mb-1 block text-center text-xs opacity-80">Max.</span>
+            <h4 class="text-center text-xl font-medium">{typeof grade()?.user_max === "string"
               ? grade()?.user_max
               : <>{grade()?.user_max}/{grade()?.maximum}</>
             }</h4>
@@ -59,8 +59,8 @@ const GradeInfoModal: Component = () => {
         </div>
 
         <Show when={grade()?.optional}>
-          <div class="bg-brand-primary rounded-md py-2 px-4 dark:bg-dark-200">
-            <p class="font-medium text-sm text-center text-brand-white">Cette note est facultative.</p>
+          <div class="bg-brand-primary rounded-md px-4 py-2 dark:bg-dark-200">
+            <p class="text-brand-white text-center text-sm font-medium">Cette note est facultative.</p>
           </div>
         </Show>
       </div>

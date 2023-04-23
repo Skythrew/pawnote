@@ -8,22 +8,22 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "rimraf dist && rollup -c",
+    "build": "pnpm lint && rimraf dist && rollup -c",
     "lint": "eslint . --ext .ts,.js"
   },
   "license": "MIT",
   "devDependencies": {
     "@pawnote/eslint-config": "workspace:*",
-    "@rollup/plugin-commonjs": "^24.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "esbuild": "^0.16.10",
-    "eslint": "^8.38.0",
+    "@rollup/plugin-commonjs": "^24.1.0",
+    "@rollup/plugin-node-resolve": "^15.0.2",
+    "esbuild": "^0.17.18",
+    "eslint": "^8.39.0",
     "rimraf": "^3.0.2",
-    "rollup": "^3.8.0",
-    "rollup-plugin-dts": "^5.0.0",
+    "rollup": "^3.21.0",
+    "rollup-plugin-dts": "^5.3.0",
     "rollup-plugin-esbuild": "^5.0.0",
-    "rollup-plugin-tsconfig-paths": "^1.4.0",
-    "typescript": "^4.9.4"
+    "rollup-plugin-tsconfig-paths": "^1.5.0",
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "haversine-distance": "^1.2.1",

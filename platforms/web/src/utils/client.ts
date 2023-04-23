@@ -31,10 +31,8 @@ import {
   PronoteApiUserGrades
 } from "@/types/pronote";
 
-import {
-  ResponseErrorCode,
-  ClientErrorCode
-} from "@/types/errors";
+import { ResponseErrorCode } from "@pawnote/api";
+import { ClientErrorCode } from "@pawnote/i18n";
 
 import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
@@ -43,7 +41,7 @@ import credentials from "@/stores/credentials";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
 
-import { context as locale } from "@/locales";
+import { locale } from "@pawnote/i18n";
 
 import { decode as html_entities_decode } from "html-entities";
 import { unwrap } from "solid-js/store";

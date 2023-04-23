@@ -71,5 +71,6 @@ export const switchLanguage = async (lang: keyof typeof LANGUAGES) => {
   localStorage.setItem("lang", lang);
 };
 
+export { context as locale };
 export { default as useLocale } from "@/hooks/useLocale";
 export { ClientErrorCode, ClientAppStateCode } from "@/types/client";
