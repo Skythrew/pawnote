@@ -1,7 +1,7 @@
 {
-  "name": "@pornote/web",
-  "description": "Unofficial web client for Pronote.",
-  "homepage": "https://app.pornote.ml",
+  "name": "@pawnote/web",
+  "description": "A purrfect web client for Pronote..",
+  "homepage": "https://pawnote.vercel.app",
   "version": "0.0.0",
   "license": "MIT",
   "type": "module",
