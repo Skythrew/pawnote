@@ -14,8 +14,6 @@ on:
 
 jobs:
   vercel-deploy:
-    if: ${{ false }}  # Disable since @pawnote/web is not ready.
-
     name: Deploy to Vercel
     runs-on: ubuntu-latest
 
@@ -57,9 +55,6 @@ jobs:
 
       - name: Build @pawnote/i18n
         run: pnpm --filter @pawnote/i18n run build
-
-      - name: Build @pawnote/client
-        run: pnpm --filter @pawnote/client run build
 
       - name: Build @pawnote/web
         run: pnpm --filter @pawnote/web run build
