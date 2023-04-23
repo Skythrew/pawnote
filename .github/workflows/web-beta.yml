@@ -71,5 +71,5 @@ jobs:
           vercel-args: "--prebuilt"
           github-comment: true
           alias-domains: |
-            beta.pawnote.vercel.app
+            beta-pawnote.vercel.app
 
