@@ -4,6 +4,13 @@
   "editor.detectIndentation": false,
   "editor.insertSpaces": true,
 
+  // ESLint Configuration
+  "eslint.packageManager": "pnpm",
+  "eslint.workingDirectories": [
+    "platforms/web",
+    "packages/*"
+  ],
+
   // ESLint
   "prettier.enable": false,
   "editor.formatOnSave": false,
