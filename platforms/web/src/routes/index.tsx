@@ -1,8 +1,9 @@
 import type { Component } from "solid-js";
+import { A } from "solid-start";
 
 import LogoLatte from "@/assets/logo-latte.png";
 
-const CatTopHomePage: Component = () => (
+const CatTopPage: Component = () => (
   <svg width="219" height="145" viewBox="0 0 219 145" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g opacity="0.75">
       <path d="M180.371 69.7561C179.168 69.7561 178.114 70.6077 177.896 71.846C177.663 73.2161 178.583 74.5043 179.936 74.7377L182.094 75.1101L216.06 80.972C217.415 81.2054 218.72 80.286 218.953 78.9337C219.187 77.5635 218.267 76.2754 216.914 76.042L183.397 70.2577L180.79 69.8077C180.64 69.7917 180.506 69.7738 180.355 69.7738L180.371 69.7561Z" fill="#5C5F77"/>
@@ -18,12 +19,12 @@ const CatTopHomePage: Component = () => (
   </svg>
 );
 
-const HomePage: Component = () => {
+const Page: Component = () => {
   return (
     <div class="h-full min-h-screen">
       <section class="relative h-screen flex items-center justify-center p-4">
         <div class="absolute top-0 -left-4 sm:left-10 -z-10">
-          <CatTopHomePage />
+          <CatTopPage />
         </div>
 
         <div class="max-w-[806px] w-full flex flex-col gap-6">
@@ -44,11 +45,12 @@ const HomePage: Component = () => {
             >
               À propos
             </button>
-            <button type="button"
+            <A
+              href="/app"
               class="flex items-center gap-[10px] rounded-[16px] bg-lattePink px-[32px] py-[12px] text-(center [18px] latteBase) font-medium sm:text-[24px]"
             >
               Connexion
-            </button>
+            </A>
           </div>
         </div>
       </section>
@@ -56,4 +58,4 @@ const HomePage: Component = () => {
   );
 };
 
-export default HomePage;
+export default Page;

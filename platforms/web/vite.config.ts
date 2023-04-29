@@ -38,9 +38,8 @@ export default defineConfig ({
 
       imports: [
         "solid-js",
-        "@solidjs/router",
         {
-          "@solidjs/meta": [
+          "solid-start": [
             "Title"
           ]
         }

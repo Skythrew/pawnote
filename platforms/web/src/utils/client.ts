@@ -273,7 +273,7 @@ export const getGeolocationPosition = (options?: PositionOptions): Promise<Geolo
   );
 };
 
-/** Helper for classes with TailwindCSS. */
+/** Helper for classes. */
 export const classNames = (...classes: (string | boolean | undefined)[]): string =>
   classes.filter(Boolean).join(" ");
 

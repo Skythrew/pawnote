@@ -1,7 +1,7 @@
 import type { Component } from "solid-js";
 import type { ApiLoginInformations, ApiUserData } from "@/types/api";
 
-import { A } from "solid-start";
+import { A, useNavigate, useParams } from "solid-start";
 import { useLocale } from "@pawnote/i18n";
 
 import app, { AppStateCode } from "@/stores/app";
