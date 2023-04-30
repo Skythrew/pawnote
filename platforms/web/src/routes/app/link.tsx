@@ -73,19 +73,12 @@ const LinkPronoteAccount: Component = () => {
     }
   };
 
-  const instanceSelectChange = (url?: string) => {
-    if (!url) return;
-    setState("pronote_url", url);
-  };
-
-  const processInformations: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (evt) => {
-    evt.preventDefault();
-
+  const handleInstance = async (url?: string) => {
     try {
       setState("loading_instance", true);
 
       const response = await callAPI<ApiInstance>("/instance", () => ({
-        pronote_url: state.pronote_url
+        pronote_url: url ?? state.pronote_url
       }));
 
       batch(() =>  {
@@ -127,7 +120,12 @@ const LinkPronoteAccount: Component = () => {
 
       <main class="flex flex-col items-center gap-6 px-4">
 
-        <div class="max-w-lg w-full flex">
+        <form class="max-w-lg w-full flex"
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleInstance();
+          }}
+        >
           <div class="relative w-full">
             <input type="url" id="_pronote_url" class="peer block w-full appearance-none border-2 border-r-0 border-gray-300 rounded-lg rounded-r-none bg-transparent px-2.5 pb-2.5 pt-4 text-sm text-latteText focus:border-latteRosewater focus:outline-none focus:ring-0" placeholder=" "
               value={state.pronote_url}
@@ -144,7 +142,7 @@ const LinkPronoteAccount: Component = () => {
           >
             <IconMdiLoginVariant />
           </button>
-        </div>
+        </form>
 
         <div class="max-w-[1280px] w-full flex items-center justify-between gap-4">
           <p class="px-2 font-semibold">proche de chez vous.</p>
@@ -161,7 +159,9 @@ const LinkPronoteAccount: Component = () => {
             {instances => (
               <For each={instances()}>
                 {instance => (
-                  <button type="button" class="w-full flex flex-col border border-gray-300 rounded-lg px-4 py-2 text-left transition-colors duration-150 md:max-w-[364px] hover:(border-latteRosewater text-latteRosewater)">
+                  <button type="button" class="w-full flex flex-col border border-gray-300 rounded-lg px-4 py-2 text-left outline-none transition-colors duration-150 md:max-w-[364px] focus:(border-latteRosewater text-latteRosewater) hover:(border-latteRosewater text-latteRosewater)"
+                    onClick={() => handleInstance(instance.url)}
+                  >
                     <h3 class="w-full truncate text-sm font-bold md:text-lg">
                       {instance.name}
                     </h3>
@@ -177,7 +177,6 @@ const LinkPronoteAccount: Component = () => {
             )}
           </Show>
         </div>
-
 
         {/* <div class="mb-12 text-center"> */}
         {/* <button
