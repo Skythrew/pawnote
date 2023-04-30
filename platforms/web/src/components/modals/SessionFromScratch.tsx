@@ -3,8 +3,10 @@ import type { Component, JSX } from "solid-js";
 import type { PronoteApiAccountId } from "@/types/pronote";
 import type { ApiInstance, ApiLoginInformations, ApiUserData } from "@/types/api";
 
-import Modal from "@/components/Modal";
 import { DialogDescription, DialogTitle } from "solid-headless";
+import { useNavigate } from "solid-start";
+
+import Modal from "@/components/Modal";
 
 import { connectToPronote } from "@/utils/client";
 import { objectHasProperty } from "@/utils/globals";
