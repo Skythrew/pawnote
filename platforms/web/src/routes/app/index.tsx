@@ -15,6 +15,7 @@ import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
 
 import { classNames } from "@/utils/client";
+import version from "@/utils/version";
 
 interface AvailableSession {
   slug: string;
@@ -50,13 +51,6 @@ const Page: Component = () => {
 
     setAvailableSessions([...available_sessions]);
   });
-
-  const getVersion = (): string => {
-    if (import.meta.env.DEV) return `DEV (basé sur la v${APP_VERSION})`;
-    else if (BETA_GITHUB_SHA) return `#${BETA_GITHUB_SHA} (basé sur la v${APP_VERSION})`;
-
-    return `v${APP_VERSION}`;
-  };
 
   return (
     <div class="h-full min-h-screen flex flex-col justify-between gap-12 p-12">
@@ -125,7 +119,7 @@ const Page: Component = () => {
 
       <footer class="w-full flex items-center justify-between text-sm">
         <span class="block opacity-40">
-          {APP_NAME} {getVersion()}
+          {APP_NAME} {version()}
         </span>
         <div class="flex gap-4">
           <a

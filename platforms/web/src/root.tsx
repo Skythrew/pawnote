@@ -3,6 +3,7 @@ import "@fontsource/comfortaa/300.css";
 import "@fontsource/comfortaa/400.css";
 import "@fontsource/comfortaa/500.css";
 import "@fontsource/comfortaa/600.css";
+import "@fontsource/comfortaa/700.css";
 import "@unocss/reset/tailwind.css";
 import "virtual:uno.css";
 
@@ -29,6 +30,7 @@ import {
 
 import PawnoteUpdater from "@/components/modals/PawnoteUpdater";
 import { Toaster } from "solid-toast";
+import version from "./utils/version";
 
 export default function Root () {
   const [t] = locale;
@@ -51,7 +53,7 @@ export default function Root () {
         <Meta name="color-scheme" content="dark light" />
         <Meta name="theme-color" content="#17AA67" />
       </Head>
-      <Body class="font-sans bg-latteBase text-latteText dark:bg-frappeBase dark:text-frappeText">
+      <Body class="bg-latteBase font-sans text-latteText dark:bg-frappeBase dark:text-frappeText">
         <LocaleProvider>
           <PawnoteUpdater />
           <Toaster position="bottom-right" toastOptions={{
@@ -61,7 +63,7 @@ export default function Root () {
           <Suspense fallback={
             <div class="bg-brand-primary dark:bg-brand-dark h-screen w-screen flex flex-col items-center justify-center gap-2">
               <h2 class="bg-brand-white text-md text-brand-primary dark:text-brand-white dark:bg-brand-primary rounded-full px-6 py-2 font-medium">{t("PAGES._.LOADING")}</h2>
-              <span class="text-brand-light dark:text-brand-white text-sm font-medium dark:text-opacity-60">{BETA_GITHUB_SHA ? BETA_GITHUB_SHA : `v${APP_VERSION}`}</span>
+              <span class="text-brand-light dark:text-brand-white text-sm font-medium dark:text-opacity-60">{version()}</span>
             </div>
           }>
             <ErrorBoundary fallback={(error, reset) => (
