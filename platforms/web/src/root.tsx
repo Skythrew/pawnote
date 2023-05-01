@@ -28,9 +28,9 @@ import {
   switchLanguage
 } from "@pawnote/i18n";
 
-import PawnoteUpdater from "@/components/modals/PawnoteUpdater";
+import { PawnoteUpdater } from "@/components/molecules/modals";
 import { Toaster } from "solid-toast";
-import version from "./utils/version";
+import version from "@/utils/version";
 
 export default function Root () {
   const [t] = locale;
