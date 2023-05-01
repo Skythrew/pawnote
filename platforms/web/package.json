@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fontsource/comfortaa": "^4.5.11",
+    "@kobalte/core": "^0.9.4",
     "@pawnote/api": "workspace:*",
     "@pawnote/i18n": "workspace:*",
     "@solid-primitives/connectivity": "^0.3.12",
@@ -50,6 +51,7 @@
     "typescript": "5.0.4",
     "unocss": "^0.51.8",
     "unocss-catppuccin-colours": "^0.1.0",
+    "unocss-preset-primitives": "0.0.1-beta.5",
     "unplugin-auto-import": "^0.11.5",
     "unplugin-icons": "^0.14.15",
     "vite": "^4.3.2",
