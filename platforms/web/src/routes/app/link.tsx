@@ -1,21 +1,10 @@
-import type { Component, JSX } from "solid-js";
+import type { Component } from "solid-js";
 import type { ApiGeolocation, ApiInstance } from "@/types/api";
 
 import { A } from "solid-start";
 
-import {
-  HeadlessDisclosureChild,
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-  DialogOverlay
-} from "solid-headless";
+import { createModal } from "@/primitives/modal";
+import { AuthenticateSessionModal } from "@/components/molecules/modals";
 
 import {
   callAPI,
@@ -23,8 +12,6 @@ import {
 
   ApiError
 } from "@/utils/client";
-
-import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
 
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
@@ -40,6 +27,18 @@ const LinkPronoteAccount: Component = () => {
     instance_data: null,
     geolocation_data: null
   });
+
+  const [showInstanceModal] = createModal(() => (
+    <Show when={state.instance_data}>
+      {instance => (
+        <AuthenticateSessionModal
+          ent_url={instance().ent_url}
+          pronote_url={instance().pronote_url}
+          available_accounts={instance().accounts}
+        />
+      )}
+    </Show>
+  ));
 
   /**
    * Calls `/api/geolocation`.
@@ -87,7 +86,7 @@ const LinkPronoteAccount: Component = () => {
           instance_data: response
         });
 
-        SessionFromScratchModal.show();
+        showInstanceModal();
       });
     }
     catch (err) {
@@ -101,9 +100,6 @@ const LinkPronoteAccount: Component = () => {
   };
 
   onMount(() => handleGeolocation());
-
-  // When the page is closed, we force remove the modal just in case.
-  onCleanup(() => SessionFromScratchModal.show(false));
 
   return (
     <>
@@ -127,18 +123,18 @@ const LinkPronoteAccount: Component = () => {
           }}
         >
           <div class="relative w-full">
-            <input type="url" id="_pronote_url" class="peer block w-full appearance-none border-2 border-r-0 border-gray-300 rounded-lg rounded-r-none bg-transparent px-2.5 pb-2.5 pt-4 text-sm text-latteText focus:border-latteRosewater focus:outline-none focus:ring-0" placeholder=" "
+            <input type="url" id="_pronote_url" class="peer block w-full appearance-none border-2 border-r-0 border-gray-300 rounded-lg rounded-r-none bg-transparent px-2.5 pb-2.5 pt-4 text-sm text-latteText focus:border-latte-rosewater focus:outline-none focus:ring-0" placeholder=" "
               value={state.pronote_url}
               onChange={event => setState("pronote_url", event.currentTarget.value)}
             />
-            <label for="_pronote_url" class="text-latteSubtext0 pointer-events-none absolute left-2 top-2 z-[1] origin-[0] scale-75 transform rounded-md bg-latteBase px-2 text-sm duration-150 peer-focus:top-2 peer-placeholder-shown:top-1/2 -translate-y-4 peer-focus:scale-75 peer-placeholder-shown:scale-100 peer-focus:bg-latteRosewater peer-focus:px-2 peer-focus:text-latteBase peer-focus:-translate-y-4 peer-placeholder-shown:-translate-y-1/2">
+            <label for="_pronote_url" class="text-latte-subtext0 pointer-events-none absolute left-2 top-2 z-[1] origin-[0] scale-75 transform rounded-md bg-latte-base px-2 text-sm duration-150 peer-focus:top-2 peer-placeholder-shown:top-1/2 -translate-y-4 peer-focus:scale-75 peer-placeholder-shown:scale-100 peer-focus:bg-latte-rosewater peer-focus:px-2 peer-focus:text-latteBase peer-focus:-translate-y-4 peer-placeholder-shown:-translate-y-1/2">
               URL Pronote
             </label>
           </div>
 
           <button
             type="submit"
-            class="rounded-r-lg from-latteRosewater to-lattePink bg-gradient-to-r px-3 py-2 text-xl text-latteBase outline-none"
+            class="rounded-r-lg from-latte-rosewater to-lattePink bg-gradient-to-r px-3 py-2 text-xl text-latteBase outline-none"
           >
             <IconMdiLoginVariant />
           </button>
@@ -159,7 +155,7 @@ const LinkPronoteAccount: Component = () => {
             {instances => (
               <For each={instances()}>
                 {instance => (
-                  <button type="button" class="w-full flex flex-col border border-gray-300 rounded-lg px-4 py-2 text-left outline-none transition-colors duration-150 md:max-w-[364px] focus:(border-latteRosewater text-latteRosewater) hover:(border-latteRosewater text-latteRosewater)"
+                  <button type="button" class="w-full flex flex-col border border-gray-300 rounded-lg px-4 py-2 text-left outline-none transition-colors duration-150 md:max-w-[364px] focus:(border-latte-rosewater text-latte-rosewater) hover:(border-latte-rosewater text-latte-rosewater)"
                     onClick={() => handleInstance(instance.url)}
                   >
                     <h3 class="w-full truncate text-sm font-bold md:text-lg">
@@ -352,13 +348,13 @@ const LinkPronoteAccount: Component = () => {
           </button>
         </form> */}
 
-        <Show when={state.instance_data}>
+        {/* <Show when={state.instance_data}>
           {instance => <SessionFromScratchModal.Component
             available_accounts={instance().accounts}
             pronote_url={instance().pronote_url}
             ent_url={instance().ent_url}
           />}
-        </Show>
+        </Show> */}
       </main>
     </>
   );
