@@ -1,7 +1,7 @@
 import type { Component } from "solid-js";
 import type { ApiLoginInformations, ApiUserData } from "@/types/api";
 
-import { A, useNavigate, useParams } from "solid-start";
+import { A, useNavigate, useParams, Outlet } from "solid-start";
 import { useLocale } from "@pawnote/i18n";
 
 import app, { AppStateCode } from "@/stores/app";
@@ -10,7 +10,9 @@ import sessions from "@/stores/sessions";
 
 import { renewAPIsSync } from "@/utils/client";
 
-import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
+// import { createModal } from "@/primitives/modal";
+// import { AuthenticateSessionModalContent } from "@/components/molecules/modals";
+
 import { PronoteApiAccountId } from "@/types/pronote";
 
 const AppLayout: Component = () => {
@@ -19,6 +21,20 @@ const AppLayout: Component = () => {
 
   const params = useParams();
   const slug = () => params.slug;
+
+  // const [showInstanceModal] = createModal(() => (
+  //   <Show when={user().slug}>
+  //     <AuthenticateSessionModalContent
+  //       instance={{
+  //         pronote_url: user().session!.instance.pronote_url as string,
+  //         ent_url: user().session!.instance.ent_url ?? undefined,
+  //         accounts: [],
+  //         school_name: ""
+  //       }}
+  //       loading={false}
+  //     />
+  //   </Show>
+  // ));
 
   const [loading, setLoading] = createSignal(true);
   createEffect(on(slug, async (slug) => {
@@ -31,7 +47,6 @@ const AppLayout: Component = () => {
       batch(() => {
         setLoading(false);
         app.cleanCurrentUser();
-        SessionFromScratchModal.show(false);
       });
 
       console.info("[debug]: cleaned 'app.current_user' and 'SessionFromScratchModal' state");
@@ -142,13 +157,6 @@ const AppLayout: Component = () => {
         <main class="bg-brand-white dark:bg-brand-dark min-h-screen pt-30">
           <Outlet />
         </main>
-      </Show>
-
-      <Show when={user().slug}>
-        <SessionFromScratchModal.Component
-          pronote_url={user().session!.instance.pronote_url as string}
-          ent_url={user().session!.instance.ent_url ?? undefined}
-        />
       </Show>
     </>
   );

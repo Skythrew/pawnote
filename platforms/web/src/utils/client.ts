@@ -34,8 +34,6 @@ import {
 import { ResponseErrorCode } from "@pawnote/api";
 import { ClientErrorCode } from "@pawnote/i18n";
 
-import SessionFromScratchModal from "@/components/modals/SessionFromScratch";
-
 import app, { AppStateCode } from "@/stores/app";
 import credentials from "@/stores/credentials";
 import endpoints from "@/stores/endpoints";
@@ -397,9 +395,9 @@ export const connectToPronote = async (options: {
   }
 
   if (!pronote_username || !pronote_password) {
-    // Ask for new credentials.
+    // TODO: Ask for new credentials.
     // User can choose if they'll be saved or not.
-    SessionFromScratchModal.show();
+    // SessionFromScratchModal.show();
 
     throw new ClientError({
       code: ClientErrorCode.SessionCantRestore
