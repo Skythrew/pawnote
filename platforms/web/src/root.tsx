@@ -28,7 +28,7 @@ import {
   switchLanguage
 } from "@pawnote/i18n";
 
-import { PawnoteUpdater } from "@/components/molecules/modals";
+import { PawnoteUpdaterModal } from "@/components/molecules/modals";
 import { Toaster } from "solid-toast";
 import version from "@/utils/version";
 
@@ -55,7 +55,7 @@ export default function Root () {
       </Head>
       <Body class="bg-latteBase font-sans text-latteText dark:bg-frappeBase dark:text-frappeText">
         <LocaleProvider>
-          <PawnoteUpdater />
+          <PawnoteUpdaterModal />
           <Toaster position="bottom-right" toastOptions={{
             className: "!bg-brand-white !text-brand-dark !dark:bg-dark-200 !dark:text-brand-white !border-2 !border-brand-primary"
           }} />

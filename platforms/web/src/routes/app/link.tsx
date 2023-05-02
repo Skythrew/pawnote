@@ -4,7 +4,7 @@ import type { ApiGeolocation, ApiInstance } from "@/types/api";
 import { A } from "solid-start";
 
 import { createModal } from "@/primitives/modal";
-import { AuthenticateSessionModal } from "@/components/molecules/modals";
+import { AuthenticateSessionModalContent } from "@/components/molecules/modals";
 
 import {
   callAPI,
@@ -29,15 +29,10 @@ const LinkPronoteAccount: Component = () => {
   });
 
   const [showInstanceModal] = createModal(() => (
-    <Show when={state.instance_data}>
-      {instance => (
-        <AuthenticateSessionModal
-          ent_url={instance().ent_url}
-          pronote_url={instance().pronote_url}
-          available_accounts={instance().accounts}
-        />
-      )}
-    </Show>
+    <AuthenticateSessionModalContent
+      instance={state.instance_data}
+      loading={state.loading_instance}
+    />
   ));
 
   /**
@@ -116,7 +111,7 @@ const LinkPronoteAccount: Component = () => {
 
       <main class="flex flex-col items-center gap-6 px-4">
 
-        <form class="max-w-lg w-full flex"
+        <form class="group max-w-lg w-full flex"
           onSubmit={(event) => {
             event.preventDefault();
             handleInstance();
@@ -125,7 +120,7 @@ const LinkPronoteAccount: Component = () => {
           <div class="relative w-full">
             <input type="url" id="_pronote_url" class="peer block w-full appearance-none border-2 border-r-0 border-gray-300 rounded-lg rounded-r-none bg-transparent px-2.5 pb-2.5 pt-4 text-sm text-latteText focus:border-latte-rosewater focus:outline-none focus:ring-0" placeholder=" "
               value={state.pronote_url}
-              onChange={event => setState("pronote_url", event.currentTarget.value)}
+              onInput={event => setState("pronote_url", event.currentTarget.value)}
             />
             <label for="_pronote_url" class="text-latte-subtext0 pointer-events-none absolute left-2 top-2 z-[1] origin-[0] scale-75 transform rounded-md bg-latte-base px-2 text-sm duration-150 peer-focus:top-2 peer-placeholder-shown:top-1/2 -translate-y-4 peer-focus:scale-75 peer-placeholder-shown:scale-100 peer-focus:bg-latte-rosewater peer-focus:px-2 peer-focus:text-latteBase peer-focus:-translate-y-4 peer-placeholder-shown:-translate-y-1/2">
               URL Pronote
@@ -134,9 +129,12 @@ const LinkPronoteAccount: Component = () => {
 
           <button
             type="submit"
-            class="rounded-r-lg from-latte-rosewater to-lattePink bg-gradient-to-r px-3 py-2 text-xl text-latteBase outline-none"
+            disabled={state.pronote_url.trim().length === 0}
+            class="border-2 border-l-0 border-gray-300 rounded-r-lg px-3 py-2 text-lg text-latteBase outline-none group-focus-within:border-latte-rosewater disabled:opacity-0"
           >
-            <IconMdiLoginVariant />
+            <div class="rounded-md bg-latte-rosewater p-1">
+              <IconMdiLoginVariant />
+            </div>
           </button>
         </form>
 

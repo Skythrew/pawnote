@@ -1,10 +1,12 @@
 import type { FlowComponent } from "solid-js";
 import { Dialog } from "@kobalte/core";
 
-const Modal: FlowComponent<{
-  open: boolean,
-  onOpenChange: (open: boolean) => void
-}> & {
+export interface ModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const Modal: FlowComponent<ModalProps> & {
   Title: typeof Dialog["Title"];
   Description: typeof Dialog["Description"];
   CloseButton: typeof Dialog["CloseButton"];
@@ -13,7 +15,7 @@ const Modal: FlowComponent<{
     <Dialog.Portal>
       <Dialog.Overlay class="fixed inset-0 z-50 animate-fade-out ui-expanded:animate-fade-in animate-duration-150 ui-expanded:animate-duration-150 bg-black/20" />
       <div class="fixed inset-0 z-50 flex items-center justify-center">
-        <Dialog.Content class="animate-scale-out ui-expanded:animate-scale-in z-50 m-[16px] max-w-[500px] w-full animate-duration-200 ui-expanded:animate-duration-200 rounded-lg bg-latte-base p-[16px] shadow">
+        <Dialog.Content class="z-50 m-[16px] max-w-[500px] w-full animate-scale-out ui-expanded:animate-scale-in animate-duration-200 ui-expanded:animate-duration-200 rounded-lg bg-latte-base p-[16px] shadow">
           {props.children}
         </Dialog.Content>
       </div>

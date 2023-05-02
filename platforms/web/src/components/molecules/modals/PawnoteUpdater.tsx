@@ -5,11 +5,33 @@ import toast from "solid-toast";
 
 import Modal from "@/components/atoms/Modal";
 
-/**
- * Component allowing us to update Pawnote.
- * Relies on `vite-plugin-pwa` for service worker related stuff.
- */
-export const PawnoteUpdater: Component = () => {
+export const PawnoteUpdaterModalContent: Component<{
+  updateServiceWorker: (refresh: boolean) => unknown
+}> = (props) => (
+  <>
+    <Modal.Title class="text-md dark:text-brand-white text-brand-primary text-center font-medium">
+      Nouvelle version disponible !
+    </Modal.Title>
+
+    <div class="flex flex-row justify-end gap-4 pt-4">
+      <Modal.CloseButton
+        onClick={() => props.updateServiceWorker(false)}
+        class="dark:text-brand-white hover:bg-brand-light hover:text-brand-primary dark:hover:text-brand-white rounded bg-transparent px-6 py-2 font-medium outline-none transition dark:(text-opacity-60) dark:hover:(bg-dark-100 text-opacity-100)"
+      >
+        Plus tard
+      </Modal.CloseButton>
+
+      <button
+        class="bg-brand-primary text-brand-white rounded px-6 py-2 font-medium outline-none transition"
+        onClick={() => props.updateServiceWorker(true)}
+      >
+        Actualiser
+      </button>
+    </div>
+  </>
+);
+
+export const PawnoteUpdaterModal: Component = () => {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker
@@ -27,24 +49,9 @@ export const PawnoteUpdater: Component = () => {
 
   return (
     <Modal open={needRefresh()} onOpenChange={setNeedRefresh}>
-      <Modal.Title class="text-md dark:text-brand-white text-brand-primary text-center font-medium">
-        Nouvelle version disponible !
-      </Modal.Title>
-
-      <div class="flex flex-row justify-end gap-4 pt-4">
-        <Modal.CloseButton
-          class="dark:text-brand-white hover:bg-brand-light hover:text-brand-primary dark:hover:text-brand-white rounded bg-transparent px-6 py-2 font-medium outline-none transition dark:(text-opacity-60) dark:hover:(bg-dark-100 text-opacity-100)"
-        >
-          Plus tard
-        </Modal.CloseButton>
-
-        <button
-          class="bg-brand-primary text-brand-white rounded px-6 py-2 font-medium outline-none transition"
-          onClick={() => updateServiceWorker(true)}
-        >
-          Actualiser
-        </button>
-      </div>
+      <PawnoteUpdaterModalContent
+        updateServiceWorker={updateServiceWorker}
+      />
     </Modal>
   );
 };

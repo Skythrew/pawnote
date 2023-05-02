@@ -5,7 +5,7 @@ import { createSignal, onCleanup } from "solid-js";
 
 import Modal from "@/components/atoms/Modal";
 
-export const createModal = (createModalChildren: (components: {
+export const createModal = (createModalContent: (components: {
   Title: typeof Modal["Title"],
   Description: typeof Modal["Description"],
   CloseButton: typeof Modal["CloseButton"]
@@ -17,7 +17,7 @@ export const createModal = (createModalChildren: (components: {
 
   const dispose = render(() => (
     <Modal open={open()} onOpenChange={setOpen}>
-      {createModalChildren({
+      {createModalContent({
         Title: Modal.Title,
         Description: Modal.Description,
         CloseButton: Modal.CloseButton

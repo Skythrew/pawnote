@@ -5,7 +5,7 @@ import type { ApiInstance, ApiLoginInformations, ApiUserData } from "@/types/api
 
 import { useNavigate } from "solid-start";
 
-import Modal from "@/components/atoms/Modal";
+import Modal, { type ModalProps } from "@/components/atoms/Modal";
 
 import { connectToPronote } from "@/utils/client";
 import { objectHasProperty } from "@/utils/globals";
@@ -16,18 +16,13 @@ import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
 import credentials_store from "@/stores/credentials";
 
-export const AuthenticateSessionModal: Component<{
-  pronote_url: string,
-  ent_url?: string,
+interface Props {
+  loading: boolean;
+  instance: ApiInstance["response"] | null;
+}
 
-  /**
-   * Only used for first connection, when user needs to select their account type.
-   * That's only needed for not-ENT users though.
-   */
-  available_accounts?: ApiInstance["response"]["accounts"];
-}> = (props) => {
-  const first_account_type = () => props?.available_accounts?.[0].id as number;
-  const navigate = useNavigate();
+export const AuthenticateSessionModalContent: Component<Props> = (props) => {
+  const first_account_type = () => props.instance ? props.instance.accounts?.[0].id as number : null;
 
   const [slugModalData, setSlugModalData] = createSignal<
     Awaited<ReturnType<typeof connectToPronote>> | null
@@ -36,7 +31,7 @@ export const AuthenticateSessionModal: Component<{
   const [loading, setLoading] = createSignal(false);
 
   const [credentials, setCredentials] = createStore<{
-    account_type: PronoteApiAccountId;
+    account_type: PronoteApiAccountId | null;
     use_ent: boolean;
 
     /** Used only for first-time connections. */
@@ -64,7 +59,7 @@ export const AuthenticateSessionModal: Component<{
   const processUserAuthentication: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
     event.preventDefault();
 
-    if (!credentials.username || !credentials.password) return;
+    if (!credentials.username || !credentials.password || !props.instance) return;
 
     const account_type = credentials.account_type;
     if (account_type === null || !objectHasProperty(PRONOTE_ACCOUNT_TYPES, account_type)) return;
@@ -73,7 +68,7 @@ export const AuthenticateSessionModal: Component<{
       setLoading(true);
 
       const data = await connectToPronote({
-        pronote_url: props.pronote_url,
+        pronote_url: props.instance.pronote_url,
         use_credentials: true,
 
         username: credentials.username,
@@ -82,7 +77,7 @@ export const AuthenticateSessionModal: Component<{
         ...(credentials.use_ent
           ? {
             use_ent: true,
-            ent_url: props.ent_url as string
+            ent_url: props.instance.ent_url as string
           }
           : {
             use_ent: false,
@@ -134,131 +129,125 @@ export const AuthenticateSessionModal: Component<{
     }
   };
 
-  const processSlugSave: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
-    event.preventDefault();
-
-    const data = slugModalData();
-    const slug = credentials.slug;
-    if (!slug) return;
-
-    setLoading(true);
-    await saveIntoSlug(slug, data);
-
-    batch(() => {
-      setLoading(false);
-      setSlugModalData(null);
-      app.setCurrentState({ restoring_session: false });
-
-      navigate("/");
-    });
-  };
-
   return (
-    <>
-      <Modal.Title
-        as="h3"
-        class="text-brand-dark text-center text-lg font-medium leading-6"
-      >
-        {app.current_user.slug
-          ? "Connexion perdue!"
-          : "Première connexion"
-        }
-      </Modal.Title>
-      <Modal.Description class="text-brand-dark text-sm text-opacity-80">
-        {app.current_user.slug
-          ? `
-            Renseignez de nouveau vos identifiants pour créer
-            une nouvelle session en fonction de l'ancienne.
-            Vos données ne seront pas perdues.
-          `
-          : `
-            Créez une nouvelle session sur cette instance en entrant vos identifiants.
-          `
-        }
-      </Modal.Description>
-
-      <form
-        class="mt-6 w-full flex flex-col gap-3"
-        onSubmit={processUserAuthentication}
-      >
-        <Show when={props.ent_url}>
-          <label
-            class="mx-auto mb-2 inline flex items-center justify-center gap-1 border rounded-full px-3 py-1 transition"
-            classList={{
-              "bg-brand-light border-brand-primary text-brand-primary": credentials.use_ent,
-              "text-brand-dark border-brand-dark": !credentials.use_ent
-            }}
+    <Show when={props.instance}>
+      {instance => (
+        <>
+          <Modal.Title
+            as="h3"
+            class="text-brand-dark text-center text-lg font-medium leading-6"
           >
-            {credentials.use_ent ? <IconMdiCheck /> : <IconMdiClose />} ENT
-            <input
-              type="checkbox"
-              checked={credentials.use_ent}
-              onChange={event => setCredentials("use_ent", event.currentTarget.checked)}
-              hidden
-            />
-          </label>
-        </Show>
+            {app.current_user.slug
+              ? "Connexion perdue!"
+              : instance().school_name
+            }
+          </Modal.Title>
+          <Modal.Description class="text-brand-dark text-sm text-opacity-80">
+            {app.current_user.slug
+              ? `
+              Renseignez de nouveau vos identifiants pour créer
+              une nouvelle session en fonction de l'ancienne.
+              Vos données ne seront pas perdues.
+            `
+              : `
+              Créez une nouvelle session sur cette instance en entrant vos identifiants.
+            `
+            }
+          </Modal.Description>
 
-        <Show when={!credentials.use_ent && !app.current_user.slug}>
-          <label class="text-brand-dark">Espace à utiliser
-            <select
-              class="bg-brand-white text-brand-dark border-brand-dark focus:border-brand-primary focus:bg-brand-light w-full appearance-none border rounded-md px-2 py-1 outline-none"
-              onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}
-            >
-              <For each={props.available_accounts}>
-                {espace => (
-                  <option value={espace.id}>{espace.name}</option>
-                )}
-              </For>
-            </select>
-          </label>
-        </Show>
+          <form
+            class="mt-6 w-full flex flex-col gap-3"
+            onSubmit={processUserAuthentication}
+          >
+            <Show when={instance().ent_url}>
+              <label
+                class="mx-auto mb-2 inline flex items-center justify-center gap-1 border rounded-full px-3 py-1 transition"
+                classList={{
+                  "bg-brand-light border-brand-primary text-brand-primary": credentials.use_ent,
+                  "text-brand-dark border-brand-dark": !credentials.use_ent
+                }}
+              >
+                {credentials.use_ent ? <IconMdiCheck /> : <IconMdiClose />} ENT
+                <input
+                  type="checkbox"
+                  checked={credentials.use_ent}
+                  onChange={event => setCredentials("use_ent", event.currentTarget.checked)}
+                  hidden
+                />
+              </label>
+            </Show>
 
-        <label class="text-brand-dark">
-          Nom d'utilisateur
-          <input
-            class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
-            type="text"
-            value={credentials.username}
-            onChange={event => setCredentials("username", event.currentTarget.value)}
-            autocomplete="username"
-          />
-        </label>
-        <label class="text-brand-dark">
+            <Show when={!credentials.use_ent && !app.current_user.slug}>
+              <label class="text-brand-dark">Espace à utiliser
+                <select
+                  class="bg-brand-white text-brand-dark border-brand-dark focus:border-brand-primary focus:bg-brand-light w-full appearance-none border rounded-md px-2 py-1 outline-none"
+                  onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}
+                >
+                  <For each={instance().accounts}>
+                    {espace => (
+                      <option value={espace.id}>{espace.name}</option>
+                    )}
+                  </For>
+                </select>
+              </label>
+            </Show>
+
+            <label class="text-brand-dark">
+            Nom d'utilisateur
+              <input
+                class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
+                type="text"
+                value={credentials.username}
+                onChange={event => setCredentials("username", event.currentTarget.value)}
+                autocomplete="username"
+              />
+            </label>
+            <label class="text-brand-dark">
               Mot de passe
-          <input
-            class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
-            type="password"
-            value={credentials.password}
-            onChange={event => setCredentials("password", event.currentTarget.value)}
-            autocomplete="current-password"
-          />
-        </label>
+              <input
+                class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
+                type="password"
+                value={credentials.password}
+                onChange={event => setCredentials("password", event.currentTarget.value)}
+                autocomplete="current-password"
+              />
+            </label>
 
-        <label
-          class="mx-auto my-2 inline border rounded-full px-3 py-1 transition"
-          classList={{
-            "bg-brand-light text-brand-primary border-brand-primary": credentials.save,
-            "border-brand-dark text-brand-dark":!credentials.save
-          }}
-        >
-              Se souvenir de mes identifiants
-          <input
-            type="checkbox"
-            checked={credentials.save}
-            onChange={(event) => setCredentials("save", event.currentTarget.checked)}
-            hidden
-          />
-        </label>
+            <label
+              class="mx-auto my-2 inline border rounded-full px-3 py-1 transition"
+              classList={{
+                "bg-brand-light text-brand-primary border-brand-primary": credentials.save,
+                "border-brand-dark text-brand-dark":!credentials.save
+              }}
+            >
+                Se souvenir de mes identifiants
+              <input
+                type="checkbox"
+                checked={credentials.save}
+                onChange={(event) => setCredentials("save", event.currentTarget.checked)}
+                hidden
+              />
+            </label>
 
-        <button
-          disabled={loading()}
-          class="bg-brand-primary text-brand-light mt-2 w-full rounded-md p-2 disabled:opacity-40"
-          type="submit"
-        >
-          {loading() ? "Connexion en cours..." : "Connexion !"}
-        </button>
-      </form>
-    </>
+            <button
+              disabled={loading()}
+              class="bg-brand-primary text-brand-light mt-2 w-full rounded-md p-2 disabled:opacity-40"
+              type="submit"
+            >
+              {loading() ? "Connexion en cours..." : "Connexion !"}
+            </button>
+          </form>
+        </>
+      )}
+    </Show>
   );
 };
+
+export const AuthenticateSessionModal: Component<ModalProps & Props> = (props) => (
+  <Modal open={props.open} onOpenChange={props.onOpenChange}>
+    <AuthenticateSessionModalContent
+      instance={props.instance}
+      loading={props.loading}
+    />
+  </Modal>
+);
