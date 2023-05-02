@@ -1,7 +1,7 @@
 import type { Component } from "solid-js";
 import type { Grade, GradeSubject } from "@/utils/client";
 
-import Modal from "@/components/Modal";
+import Modal from "@/components/atoms/Modal";
 
 const [visibility, setVisibility] = createSignal(false);
 const [informations, setInformations] = createSignal<{
@@ -14,8 +14,8 @@ const GradeInfoModal: Component = () => {
   const subject = () => informations()?.subject;
 
   return (
-    <Modal open={visibility() && informations() !== null} onClose={() => setVisibility(false)}>
-      <div class="bg-brand-light text-brand-dark dark:text-brand-white mb-4 flex flex-col rounded-lg p-4 dark:(bg-dark-200)">
+    <Modal open={visibility() && informations() !== null} onOpenChange={setVisibility}>
+      <div class="text-brand-dark dark:text-brand-white bg-brand-light mb-4 flex flex-col rounded-lg p-4 dark:(bg-dark-200)">
         <h4 class="text-center text-2xl font-medium">{subject()?.name}</h4>
         <Show keyed when={grade()?.description}>
           {description => (
