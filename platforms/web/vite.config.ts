@@ -91,9 +91,9 @@ export default defineConfig ({
           }
         ],
 
-        start_url: "/",
-        theme_color: "#17AA67",
-        background_color: "#17AA67",
+        start_url: "/app",
+        theme_color: "#DC8A78",
+        background_color: "#DC8A78",
         display: "standalone",
         orientation: "portrait"
       }

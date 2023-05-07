@@ -51,7 +51,7 @@ export default function Root () {
         <Title>{APP_NAME}</Title>
 
         <Meta name="color-scheme" content="dark light" />
-        <Meta name="theme-color" content="#17AA67" />
+        <Meta name="theme-color" content="#DC8A78" />
       </Head>
       <Body class="bg-latteBase font-sans text-latteText dark:bg-frappeBase dark:text-frappeText">
         <LocaleProvider>
