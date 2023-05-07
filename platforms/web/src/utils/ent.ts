@@ -11,6 +11,7 @@ interface AvailableENT {
 
 const OpenENT: AvailableENT = {
   hostnames: [
+    "enthdf.fr",
     "mon.lyceeconnecte.fr",
     "ent.l-educdenormandie.fr"
   ],
