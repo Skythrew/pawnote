@@ -38,6 +38,9 @@ jobs:
       - name: Build @pawnote/i18n
         run: pnpm --filter @pawnote/i18n run build
 
+      - name: Modify `index.html` for beta
+        run: sed -i 's/pawnote.vercel/beta-pawnote.vercel/g' ./platforms/web/index.html
+
       - name: Build @pawnote/web
         run: pnpm --filter @pawnote/web run build
         env:
