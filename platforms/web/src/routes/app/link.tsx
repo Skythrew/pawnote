@@ -130,9 +130,13 @@ const LinkPronoteAccount: Component = () => {
           <button
             type="submit"
             disabled={state.pronote_url.trim().length === 0}
-            class="border-2 border-l-0 border-gray-300 rounded-r-lg px-3 py-2 text-lg text-latteBase outline-none group-focus-within:border-latte-rosewater disabled:opacity-0"
+            class="border-2 border-l-0 border-gray-300 rounded-r-lg px-3 py-2 text-lg text-latteBase outline-none group-focus-within:border-latte-rosewater"
           >
-            <div class="rounded-md bg-latte-rosewater p-1">
+            <div class="rounded-md bg-latte-rosewater p-1"
+              classList={{
+                "opacity-0": state.pronote_url.trim().length === 0
+              }}
+            >
               <IconMdiLoginVariant />
             </div>
           </button>
