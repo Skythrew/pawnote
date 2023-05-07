@@ -16,12 +16,14 @@ import {
 const LinkPronoteAccount: Component = () => {
   const [state, setState] = createStore<{
     loading_instance: boolean;
+    loading_geolocation: boolean;
 
     pronote_url: string;
     instance_data: ApiInstance["response"] | null;
     geolocation_data: ApiGeolocation["response"] | null;
   }>({
     loading_instance: false,
+    loading_geolocation: false,
 
     pronote_url: "",
     instance_data: null,
@@ -42,6 +44,8 @@ const LinkPronoteAccount: Component = () => {
    */
   const handleGeolocation = async () => {
     try {
+      setState("loading_geolocation", true);
+
       const {
         coords: {
           latitude, longitude
@@ -55,10 +59,16 @@ const LinkPronoteAccount: Component = () => {
         return;
       }
 
-      setState("geolocation_data", data);
+      setState({
+        loading_geolocation: false,
+        geolocation_data: data
+      });
     }
     catch (err) {
-      setState("geolocation_data", null);
+      setState({
+        loading_geolocation: false,
+        geolocation_data: null
+      });
 
       if (err instanceof ApiError) {
         console.error(err.message);
@@ -75,17 +85,18 @@ const LinkPronoteAccount: Component = () => {
         pronote_url: url ?? state.pronote_url
       }));
 
-      batch(() =>  {
-        setState({
-          loading_instance: false,
-          instance_data: response
-        });
-
-        showInstanceModal();
+      setState({
+        loading_instance: false,
+        instance_data: response
       });
+
+      showInstanceModal();
     }
     catch (err) {
-      setState("loading_instance", false);
+      setState({
+        loading_instance: false,
+        instance_data: null
+      });
 
       if (err instanceof ApiError) {
         console.error(err.message);
@@ -145,7 +156,8 @@ const LinkPronoteAccount: Component = () => {
         <div class="max-w-[1280px] w-full flex items-center justify-between gap-4">
           <p class="px-2 font-semibold">proche de chez vous.</p>
           <hr class="flex-grow-1" />
-          <button type="button" class="rounded-full bg-latteText p-2 text-latteBase"
+          <button type="button" class="rounded-full bg-latteText p-2 text-latteBase disabled:(animate-spin opacity-60)"
+            disabled={state.loading_geolocation}
             onClick={() => handleGeolocation()}
           >
             <IconMdiRefresh />
