@@ -13,7 +13,9 @@ import {
   ApiError
 } from "@/utils/client";
 
-const LinkPronoteAccount: Component = () => {
+import Input from "@/components/atoms/Input";
+
+const Page: Component = () => {
   const [state, setState] = createStore<{
     loading_instance: boolean;
     loading_geolocation: boolean;
@@ -128,24 +130,24 @@ const LinkPronoteAccount: Component = () => {
             handleInstance();
           }}
         >
-          <div class="relative w-full">
-            <input type="url" id="_pronote_url" class="peer block w-full appearance-none border-2 border-r-0 border-gray-300 rounded-lg rounded-r-none bg-transparent px-2.5 pb-2.5 pt-4 text-sm text-latteText focus:border-latte-rosewater focus:outline-none focus:ring-0" placeholder=" "
-              value={state.pronote_url}
-              onInput={event => setState("pronote_url", event.currentTarget.value)}
-            />
-            <label for="_pronote_url" class="text-latte-subtext0 pointer-events-none absolute left-2 top-2 z-[1] origin-[0] scale-75 transform rounded-md bg-latte-base px-2 text-sm duration-150 peer-focus:top-2 peer-placeholder-shown:top-1/2 -translate-y-4 peer-focus:scale-75 peer-placeholder-shown:scale-100 peer-focus:bg-latte-rosewater peer-focus:px-2 peer-focus:text-latteBase peer-focus:-translate-y-4 peer-placeholder-shown:-translate-y-1/2">
-              URL Pronote
-            </label>
-          </div>
+          <Input.Text
+            type="url"
+            value={state.pronote_url}
+            onInput={value => setState("pronote_url", value)}
+            placeholder="URL Pronote"
+            autocomplete="pronote-url"
+            removeRightBorder
+          />
 
           <button
             type="submit"
             disabled={state.pronote_url.trim().length === 0}
             class="border-2 border-l-0 border-gray-300 rounded-r-lg px-3 py-2 text-lg text-latteBase outline-none group-focus-within:border-latte-rosewater"
           >
-            <div class="rounded-md bg-latte-rosewater p-1"
+            <div class="rounded-md bg-latte-rosewater p-1 transition-opacity"
               classList={{
-                "opacity-0": state.pronote_url.trim().length === 0
+                "opacity-0": state.pronote_url.trim().length === 0,
+                "opacity-100": state.pronote_url.trim().length > 0
               }}
             >
               <IconMdiLoginVariant />
@@ -176,7 +178,7 @@ const LinkPronoteAccount: Component = () => {
                       {instance.name}
                     </h3>
                     <p class="opcity-80 w-full truncate text-sm">
-                      Situé dans le {instance.postal_code} à {Math.floor(instance.distance / 1000)}km.
+                      Situé dans le {instance.postal_code} à {(instance.distance / 1000).toFixed(2)}km.
                     </p>
                     <p class="mt-1 w-full truncate text-xs font-light opacity-60 md:text-sm">
                       {instance.url}
@@ -187,192 +189,9 @@ const LinkPronoteAccount: Component = () => {
             )}
           </Show>
         </div>
-
-        {/* <div class="mb-12 text-center"> */}
-        {/* <button
-              class="text-brand-light dark:border-brand-primary border-brand-light dark:text-brand-primary border-b-2"
-              onClick={() => setState("info_dialog_open", true)}
-            >
-              Comment faire ?
-            </button> */}
-        {/* </div> */}
-
-        {/* <Portal>
-            <Transition
-              appear
-              show={state.info_dialog_open}
-            >
-              <Dialog
-                isOpen
-                class="fixed inset-0 z-10 overflow-y-auto"
-                onClose={() => setState("info_dialog_open", false)}
-              >
-                <div class="min-h-screen flex items-center justify-center px-4">
-                  <TransitionChild
-                    enter="ease-out duration-200"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                  >
-                    <DialogOverlay class="bg-brand-dark fixed inset-0 bg-opacity-50" />
-                  </TransitionChild>
-
-                  <span
-                    class="inline-block h-screen align-middle"
-                    aria-hidden="true"
-                  >
-                  &#8203;
-                  </span>
-                  <TransitionChild
-                    class="transform"
-                    enter="ease-out duration-200"
-                    enterFrom="opacity-0 scale-95"
-                    enterTo="opacity-100 scale-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100 scale-100"
-                    leaveTo="opacity-0 scale-95"
-                  >
-                    <DialogPanel class="bg-brand-white border-brand-primary dark:bg-brand-dark my-8 inline-block max-w-md w-full overflow-hidden border-2 rounded-md p-6 text-left align-middle shadow-xl">
-                      <DialogTitle
-                        as="h3"
-                        class="text-brand-primary text-center text-lg font-semibold"
-                      >
-                      Comment se connecter?
-                      </DialogTitle>
-                      <div class="text-brand-dark dark:text-brand-white mt-2 flex flex-col gap-2">
-                        <p class="font-medium">Pour effectuer la première étape de votre connexion, vous allez devoir choisir une instance Pronote.</p>
-                        <p>Pour cela, vous devez coller <b>l'URL de l'instance Pronote</b> dans la boite de texte.</p>
-                        <p>Autrement, vous pouvez cliquer sur le bouton de <b>Géolocalisation</b> pour trouver les instances Pronote proche de votre localisation et directement les utiliser.</p>
-                      </div>
-
-                      <div class="mt-4">
-                        <button
-                          class="bg-brand-primary text-brand-light w-full rounded-md px-2 py-1"
-                          type="button"
-                          onClick={() => setState("info_dialog_open", false)}
-                        >
-                        J'ai compris !
-                        </button>
-                      </div>
-                    </DialogPanel>
-                  </TransitionChild>
-                </div>
-              </Dialog>
-            </Transition>
-          </Portal> */}
-
-
-
-        {/* <form class="space-y-4" onSubmit={processInformations}>
-          <div class="flex">
-            <Show when={state.show_geolocation_data}>
-              <Listbox defaultOpen value={state.pronote_url} onSelectChange={instanceSelectChange}>
-                <div class="relative min-w-0 w-full">
-                  <ListboxButton type="button" class="bg-brand-white text-brand-dark focus-visible:border-brand-primary focus-visible:ring-offset-brand-primary relative h-full w-full cursor-default rounded-lg rounded-r-none py-2 pl-4 pr-10 text-left sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-opacity-75">
-                    <span class="block truncate text-sm">{checkMatchPronoteUrl()?.name || state.pronote_url}</span>
-                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <IconMdiChevronRight
-                        class="h-5 w-5"
-                        aria-hidden="true"
-                      />
-                    </span>
-                  </ListboxButton>
-                  <HeadlessDisclosureChild>
-                    {({ isOpen }) => (
-                      <Transition
-                        show={isOpen()}
-                        enter="transition ease-in duration-100"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="transition ease-out duration-100"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                      >
-                        <ListboxOptions
-                          class="absolute mt-1 h-[35vh] list-none overflow-auto rounded-md bg-white p-0 py-1 text-base text-sm shadow-lg ring-1 ring-black ring-opacity-5 md:text-base focus:outline-none"
-                        >
-                          <For each={state.geolocation_data}>
-                            {instance => (
-                              <ListboxOption class="group focus:outline-none" value={instance.url}>
-                                {({ isSelected }) => (
-                                  <div
-                                    classList={{
-                                      "text-brand-white bg-brand-primary": isSelected(),
-                                      "group-hover:(text-brand-primary bg-brand-light)": !isSelected()
-                                    }}
-                                    class="transitions relative cursor-default select-none py-2 pl-10 pr-4"
-                                  >
-                                    <span
-                                      class="block"
-                                      classList={{
-                                        "font-medium text-brand-white": isSelected(),
-                                        "font-normal text-brand-dark": !isSelected()
-                                      }}
-                                    >
-
-                                    </span>
-                                    <Show when={isSelected()}>
-                                      <span
-                                        class="text-brand-white absolute inset-y-0 left-0 flex items-center pl-3"
-                                      >
-                                        <IconMdiCheck class="h-5 w-5" aria-hidden="true" />
-                                      </span>
-                                    </Show>
-                                  </div>
-                                )}
-                              </ListboxOption>
-                            )}
-                          </For>
-                        </ListboxOptions>
-                      </Transition>
-                    )}
-                  </HeadlessDisclosureChild>
-                </div>
-              </Listbox>
-              <button
-                type="button"
-                class="bg-brand-light text-brand-dark dark:bg-brand-primary dark:text-brand-light flex rounded-lg rounded-l-none p-2 px-4"
-                onClick={() => setState("show_geolocation_data", false)}
-              >
-                <IconMdiPencil />
-              </button>
-            </Show>
-
-            <Show when={!state.show_geolocation_data}>
-              <input class="bg-brand-white text-brand-dark w-full rounded-lg rounded-r-none px-4 text-sm outline-none"
-                type="url"
-                placeholder="URL Pronote"
-                value={state.pronote_url}
-                onChange={event => setState("pronote_url", event.currentTarget.value)}
-              />
-
-              <button disabled={state.loading_geolocation} class="bg-brand-light text-brand-dark dark:bg-brand-primary dark:text-brand-light flex rounded-lg rounded-l-none px-4 py-2 disabled:opacity-60" type="button" onClick={handleGeolocation}>
-                {state.loading_geolocation
-                  ? <IconMdiDotsHorizontal />
-                  : <IconMdiMapMarkerRadius />
-                }
-              </button>
-            </Show>
-          </div>
-
-          <button disabled={!state.pronote_url || state.loading_instance} class="bg-brand-light dark:bg-brand-primary dark:text-brand-light w-full rounded-lg px-4 py-2 disabled:opacity-40" type="submit">
-            {state.loading_instance ? "Connexion..." : "Etablir une connexion"}
-          </button>
-        </form> */}
-
-        {/* <Show when={state.instance_data}>
-          {instance => <SessionFromScratchModal.Component
-            available_accounts={instance().accounts}
-            pronote_url={instance().pronote_url}
-            ent_url={instance().ent_url}
-          />}
-        </Show> */}
       </main>
     </>
   );
 };
 
-export default LinkPronoteAccount;
-
+export default Page;

@@ -3,9 +3,10 @@ import type { Component, JSX } from "solid-js";
 import type { PronoteApiAccountId } from "@/types/pronote";
 import type { ApiInstance, ApiLoginInformations, ApiUserData } from "@/types/api";
 
-import { useNavigate } from "solid-start";
+import { Select } from "@kobalte/core";
 
 import Modal, { type ModalProps } from "@/components/atoms/Modal";
+import Input from "@/components/atoms/Input";
 
 import { connectToPronote } from "@/utils/client";
 import { objectHasProperty } from "@/utils/globals";
@@ -178,6 +179,35 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
             </Show>
 
             <Show when={!credentials.use_ent && !app.current_user.slug}>
+              <Select.Root
+                options={instance().accounts}
+                optionValue="id"
+                optionTextValue="name"
+                placeholder="Sélectionner un compte…"
+                itemComponent={props => (
+                  <Select.Item item={props.item} class="relative h-[32px] w-full flex cursor-pointer items-center justify-between rounded-md ui-selected:bg-latteRosewater px-2 text-black outline-none hover:bg-latte-lavender">
+                    <Select.ItemLabel>{props.item.textValue}</Select.ItemLabel>
+                    <Select.ItemIndicator class="h-[20px] w-[20px] inline-flex items-center justify-center">
+                      <IconMdiCheck/>
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                )}
+              >
+                <Select.Trigger class="w-full inline-flex items-center justify-between border rounded-lg bg-white py-2 pl-[16px] pr-[10px] outline-none" aria-label="Compte">
+                  <Select.Value<{ name: string, id: PronoteApiAccountId }> class="overflow-hidden text-ellipsis whitespace-nowrap">
+                    {state => state.selectedOption().name}
+                  </Select.Value>
+                  <Select.Icon class="h-[20px] w-[20px] flex-[0_0_20px]">
+                    <IconMdiChevronDown />
+                  </Select.Icon>
+                </Select.Trigger>
+                <Select.Portal>
+                  <Select.Content class="z-100 transform-origin-[var(--kb-select-content-transform-origin)] border rounded-lg bg-white shadow-md">
+                    <Select.Listbox class="max-h-[360px] overflow-y-auto p-2" />
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+
               <label class="text-brand-dark">Espace à utiliser
                 <select
                   class="bg-brand-white text-brand-dark border-brand-dark focus:border-brand-primary focus:bg-brand-light w-full appearance-none border rounded-md px-2 py-1 outline-none"
@@ -192,26 +222,30 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
               </label>
             </Show>
 
-            <label class="text-brand-dark">
-            Nom d'utilisateur
-              <input
-                class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
-                type="text"
-                value={credentials.username}
-                onChange={event => setCredentials("username", event.currentTarget.value)}
-                autocomplete="username"
-              />
-            </label>
-            <label class="text-brand-dark">
+            <Input.Text
+              placeholder="Nom d'utilisateur"
+              value={credentials.username}
+              onInput={value => setCredentials("username", value)}
+              autocomplete="username"
+            />
+
+            <Input.Password
+              placeholder="Mot de passe"
+              value={credentials.password}
+              onInput={value => setCredentials("password", value)}
+              autocomplete="current-password"
+            />
+
+            {/* <label class="text-brand-dark">
               Mot de passe
               <input
                 class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
                 type="password"
                 value={credentials.password}
-                onChange={event => setCredentials("password", event.currentTarget.value)}
+                onChange={event =>  event.currentTarget.value)}
                 autocomplete="current-password"
               />
-            </label>
+            </label> */}
 
             <label
               class="mx-auto my-2 inline border rounded-full px-3 py-1 transition"
