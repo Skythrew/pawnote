@@ -2,6 +2,7 @@
 
 <p align="center">
   <kbd>SolidJS</kbd> - <kbd>WindiCSS</kbd> - <kbd>TypeScript</kbd> <br />
+  <a href="https://dsc.gg/pawnote">Discord</a>
 </p>
 
 <hr />
