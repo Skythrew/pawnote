@@ -136,14 +136,14 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
         <>
           <Modal.Title
             as="h3"
-            class="text-brand-dark text-center text-lg font-medium leading-6"
+            class="p-2 pb-2 text-center text-lg font-bold leading-6 text-latteText"
           >
             {app.current_user.slug
               ? "Connexion perdue!"
               : instance().school_name
             }
           </Modal.Title>
-          <Modal.Description class="text-brand-dark text-sm text-opacity-80">
+          <Modal.Description class="text-latteSubtext0 px-6 text-center text-sm">
             {app.current_user.slug
               ? `
               Renseignez de nouveau vos identifiants pour créer
@@ -179,47 +179,12 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
             </Show>
 
             <Show when={!credentials.use_ent && !app.current_user.slug}>
-              <Select.Root
-                options={instance().accounts}
-                optionValue="id"
-                optionTextValue="name"
-                placeholder="Sélectionner un compte…"
-                itemComponent={props => (
-                  <Select.Item item={props.item} class="relative h-[32px] w-full flex cursor-pointer items-center justify-between rounded-md ui-selected:bg-latteRosewater px-2 text-black outline-none hover:bg-latte-lavender">
-                    <Select.ItemLabel>{props.item.textValue}</Select.ItemLabel>
-                    <Select.ItemIndicator class="h-[20px] w-[20px] inline-flex items-center justify-center">
-                      <IconMdiCheck/>
-                    </Select.ItemIndicator>
-                  </Select.Item>
-                )}
-              >
-                <Select.Trigger class="w-full inline-flex items-center justify-between border rounded-lg bg-white py-2 pl-[16px] pr-[10px] outline-none" aria-label="Compte">
-                  <Select.Value<{ name: string, id: PronoteApiAccountId }> class="overflow-hidden text-ellipsis whitespace-nowrap">
-                    {state => state.selectedOption().name}
-                  </Select.Value>
-                  <Select.Icon class="h-[20px] w-[20px] flex-[0_0_20px]">
-                    <IconMdiChevronDown />
-                  </Select.Icon>
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Content class="z-100 transform-origin-[var(--kb-select-content-transform-origin)] border rounded-lg bg-white shadow-md">
-                    <Select.Listbox class="max-h-[360px] overflow-y-auto p-2" />
-                  </Select.Content>
-                </Select.Portal>
-              </Select.Root>
-
-              <label class="text-brand-dark">Espace à utiliser
-                <select
-                  class="bg-brand-white text-brand-dark border-brand-dark focus:border-brand-primary focus:bg-brand-light w-full appearance-none border rounded-md px-2 py-1 outline-none"
-                  onChange={event => setCredentials("account_type", parseInt(event.currentTarget.value))}
-                >
-                  <For each={instance().accounts}>
-                    {espace => (
-                      <option value={espace.id}>{espace.name}</option>
-                    )}
-                  </For>
-                </select>
-              </label>
+              <Input.Select<PronoteApiAccountId>
+                options={instance().accounts.map(instance => ({ label: instance.name, value: instance.id }))}
+                placeholder="Espace à utiliser"
+                triggerAriaLabel="Espace Pronote"
+                onChange={({ value }) => setCredentials("account_type", value)}
+              />
             </Show>
 
             <Input.Text
@@ -235,17 +200,6 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
               onInput={value => setCredentials("password", value)}
               autocomplete="current-password"
             />
-
-            {/* <label class="text-brand-dark">
-              Mot de passe
-              <input
-                class="bg-brand-white border-brand-dark text-brand-dark focus:border-brand-primary focus:bg-brand-light w-full border rounded-md px-2 py-1 outline-none"
-                type="password"
-                value={credentials.password}
-                onChange={event =>  event.currentTarget.value)}
-                autocomplete="current-password"
-              />
-            </label> */}
 
             <label
               class="mx-auto my-2 inline border rounded-full px-3 py-1 transition"
@@ -265,7 +219,7 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
 
             <button
               disabled={loading()}
-              class="bg-brand-primary text-brand-light mt-2 w-full rounded-md p-2 disabled:opacity-40"
+              class="mt-2 w-full rounded-md bg-latte-rosewater p-2 text-latte-base disabled:opacity-40"
               type="submit"
             >
               {loading() ? "Connexion en cours..." : "Connexion !"}
