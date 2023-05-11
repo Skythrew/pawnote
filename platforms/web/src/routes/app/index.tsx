@@ -54,9 +54,7 @@ const Page: Component = () => {
 
   return (
     <div class="h-full min-h-screen flex flex-col justify-between gap-12 p-10">
-      <header class={classNames(
-        "w-full text-center"
-      )}>
+      <header class="w-full text-center">
         <h1 class="text-3xl font-bold">
           Sélectionner un compte
         </h1>

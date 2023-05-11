@@ -52,11 +52,12 @@ export const SaveSessionIntoSlugModalContent: Component<Props> = (props) => {
             Vous êtes connecté en tant que {data().endpoints["/user/data"].donnees.ressource.L} à l'instance {data().endpoints["/user/data"].donnees.ressource.Etablissement.V.L.trim()}.
           </Modal.Description>
 
-          <p class="text-latteSubtext1 my-4 text-center text-sm">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
+          <p class="text-latteSubtext1 my-6 text-center text-sm">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
 
-          <form onSubmit={handleSlugSubmit}>
+          <form onSubmit={handleSlugSubmit} class="flex flex-col gap-4 px-2">
             <Input.Text
               value={slug()}
+              placeholder="Slug pour ce compte"
               onInput={value => {
                 setSlug(
                   value
@@ -69,8 +70,8 @@ export const SaveSessionIntoSlugModalContent: Component<Props> = (props) => {
 
             <button
               type="submit"
-              disabled={loading()}
-              class="bg-brand-primary text-brand-light mt-2 w-full rounded-md p-2 disabled:opacity-40"
+              disabled={loading() || !slug()}
+              class="mt-2 w-full rounded-md bg-latte-rosewater bg-opacity-100 p-2 text-latte-base outline-none transition-colors disabled:(bg-latte-text bg-opacity-5 text-latte-text text-opacity-80 focus:bg-opacity-10 hover:bg-opacity-10) focus:bg-opacity-90 hover:bg-opacity-90"
             >
               {loading() ? "Sauvegarde..." : "Sauvegarder la session"}
             </button>
