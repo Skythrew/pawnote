@@ -9,23 +9,32 @@ export const PawnoteUpdaterModalContent: Component<{
   updateServiceWorker: (refresh: boolean) => unknown
 }> = (props) => (
   <>
-    <Modal.Title class="text-md dark:text-brand-white text-brand-primary text-center font-medium">
+    <Modal.Title class="pt-2 text-center text-lg font-bold text-latte-text">
       Nouvelle version disponible !
     </Modal.Title>
 
-    <div class="flex flex-row justify-end gap-4 pt-4">
+    <Modal.Description class="px-4 py-4 text-sm">
+      Les changelogs ne sont pas encore disponible,
+      mais vous pouvez en savoir plus sur les MAJs en vérifiant les salons <span class="font-medium">#updates</span> et <span class="font-medium">#github</span>{" "}
+      du <a href="https://dsc.gg/pawnote" target="_blank" class="border-(b latte-rosewater dotted) font-semibold text-latte-rosewater hover:border-solid">serveur Discord de Pawnote</a>.
+
+      <br /><br />
+      Vous pouvez choisir de mettre à jour en rafraichissant la page maintenant, ou plus tard.
+    </Modal.Description>
+
+    <div class="flex flex-col-reverse items-center justify-end gap-4 pb-2 pt-4 sm:flex-row sm:gap-8">
       <Modal.CloseButton
         onClick={() => props.updateServiceWorker(false)}
-        class="dark:text-brand-white hover:bg-brand-light hover:text-brand-primary dark:hover:text-brand-white rounded bg-transparent px-6 py-2 font-medium outline-none transition dark:(text-opacity-60) dark:hover:(bg-dark-100 text-opacity-100)"
+        class="text-latteOverlay1 text-sm opacity-80 transition-colors focus:opacity-90 hover:opacity-90"
       >
         Plus tard
       </Modal.CloseButton>
 
       <button
-        class="bg-brand-primary text-brand-white rounded px-6 py-2 font-medium outline-none transition"
+        class="w-full rounded-lg bg-latte-rosewater bg-opacity-5 px-6 py-2 font-medium text-latte-rosewater outline-none transition-colors sm:w-fit hover:(bg-opacity-10)"
         onClick={() => props.updateServiceWorker(true)}
       >
-        Actualiser
+        Rafraichir
       </button>
     </div>
   </>
