@@ -9,6 +9,8 @@ import type {
   ApiUserGrades
 } from "@/types/api";
 
+import { ClientAppStateCode } from "@pawnote/i18n";
+
 const [current_user, setCurrentUser] = createStore<
   // User is into session.
   | {
@@ -46,25 +48,15 @@ const cleanCurrentUser = () => setCurrentUser({
   endpoints: null
 });
 
-/// Message that we use to show in the UI.
-export enum AppStateCode {
-  Idle,
-  FetchingTimetable,
-  FetchingHomeworks,
-  FetchingRessources,
-  FetchingGrades,
-  ChangingHomeworkState
-}
-
 const [current_state, setCurrentState] = createStore<{
   /** `true` when SessionFromScratch modal is shown/being used. */
   restoring_session: boolean;
   fetching: boolean;
-  code: AppStateCode
+  code: ClientAppStateCode
 }>({
   restoring_session: false,
   fetching: false,
-  code: AppStateCode.Idle
+  code: ClientAppStateCode.Idle
 });
 
 const fetch_queue: {
@@ -73,7 +65,7 @@ const fetch_queue: {
   action: () => unknown;
 }[] = [];
 
-const enqueue_fetch = (code: AppStateCode, action: () => unknown) => {
+const enqueue_fetch = (code: ClientAppStateCode, action: () => unknown) => {
   console.info("[enqueue_fetch]", code, fetch_queue);
   return new Promise((resolve, reject) => {
     fetch_queue.push({
@@ -123,7 +115,7 @@ const dequeue_fetch = async () => {
 const setStateToIdle = () => setCurrentState({
   fetching: false,
   restoring_session: false,
-  code: AppStateCode.Idle
+  code: ClientAppStateCode.Idle
 });
 
 export default {

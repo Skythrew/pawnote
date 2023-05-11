@@ -154,7 +154,7 @@ const AppHome: Component = () => {
               <div class="flex gap-1.5">
                 <button
                   onClick={() => setHomeworksDayNumber(prev => sanitizeDayNumber(--prev))}
-                  class="bg-brand-light text-brand-dark flex rounded-full px-2 py-1"
+                  class="text-brand-dark bg-brand-light flex rounded-full px-2 py-1"
                 >
                   <IconMdiArrowLeft />
                 </button>

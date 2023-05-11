@@ -2,9 +2,9 @@ import type { Component } from "solid-js";
 import type { ApiLoginInformations, ApiUserData } from "@/types/api";
 
 import { A, useNavigate, useParams, Outlet } from "solid-start";
-import { useLocale } from "@pawnote/i18n";
+import { useLocale, ClientAppStateCode } from "@pawnote/i18n";
 
-import app, { AppStateCode } from "@/stores/app";
+import app from "@/stores/app";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
 
@@ -21,20 +21,6 @@ const AppLayout: Component = () => {
 
   const params = useParams();
   const slug = () => params.slug;
-
-  // const [showInstanceModal] = createModal(() => (
-  //   <Show when={user().slug}>
-  //     <AuthenticateSessionModalContent
-  //       instance={{
-  //         pronote_url: user().session!.instance.pronote_url as string,
-  //         ent_url: user().session!.instance.ent_url ?? undefined,
-  //         accounts: [],
-  //         school_name: ""
-  //       }}
-  //       loading={false}
-  //     />
-  //   </Show>
-  // ));
 
   const [loading, setLoading] = createSignal(true);
   createEffect(on(slug, async (slug) => {
@@ -118,7 +104,7 @@ const AppLayout: Component = () => {
         <div class="bg-brand-primary dark:bg-brand-dark h-screen w-screen flex flex-col items-center justify-center gap-2 px-4">
           <h2 class="bg-brand-white text-md text-brand-primary dark:bg-brand-primary dark:text-brand-white rounded-full px-6 py-2 text-center font-medium">{t("PAGES.APP._.FETCHING")}</h2>
           <span class="text-brand-light dark:text-brand-white text-sm font-medium dark:text-opacity-60">{
-            app.current_state.code === AppStateCode.Idle ? t("PAGES.APP._.WAIT") : t(`APP_STATE.${app.current_state.code}`)
+            app.current_state.code === ClientAppStateCode.Idle ? t("PAGES.APP._.WAIT") : t(`APP_STATE.${app.current_state.code}`)
           }</span>
         </div>
       }>
@@ -145,10 +131,10 @@ const AppLayout: Component = () => {
             </A>
           </nav>
 
-          <Show keyed when={app.current_state.code !== AppStateCode.Idle && app.current_state.code}>
+          <Show when={app.current_state.code !== ClientAppStateCode.Idle && app.current_state.code}>
             {code => (
               <div class="bg-brand-white text-brand-dark dark:bg-brand-light dark:text-brand-primary h-8 flex items-center justify-center px-2">
-                <p class="text-center text-sm">{t(`APP_STATE.${code}`)}...</p>
+                <p class="text-center text-sm">{t(`APP_STATE.${code()}`)}...</p>
               </div>
             )}
           </Show>

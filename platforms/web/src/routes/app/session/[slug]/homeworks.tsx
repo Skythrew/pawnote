@@ -12,7 +12,8 @@ import {
   createExternalFileURL
 } from "@/utils/client";
 
-import app, { AppStateCode } from "@/stores/app";
+import app from "@/stores/app";
+import { ClientAppStateCode } from "@pawnote/i18n";
 import { Transition, TransitionChild } from "solid-headless";
 
 const AppHomeworks: Component = () => {
@@ -177,8 +178,8 @@ const AppHomeworks: Component = () => {
                 // Header is `h-18` and app state banner is `h-8`
                 // We add `+2` padding on `md` => `h-28`.
                 // Since this is the filter header, we add `+6` padding
-                "top-24 md:top-26": app.current_state.code === AppStateCode.Idle,
-                "top-32 md:top-34": app.current_state.code !== AppStateCode.Idle
+                "top-24 md:top-26": app.current_state.code === ClientAppStateCode.Idle,
+                "top-32 md:top-34": app.current_state.code !== ClientAppStateCode.Idle
               }}
             >
               <h4
@@ -243,8 +244,8 @@ const AppHomeworks: Component = () => {
                         classList={{
                           // Header is `h-18` and app state banner is `h-8`.
                           // We add `+2` padding on `md`.
-                          "top-18 md:top-20": app.current_state.code === AppStateCode.Idle,
-                          "top-26 md:top-28": app.current_state.code !== AppStateCode.Idle
+                          "top-18 md:top-20": app.current_state.code === ClientAppStateCode.Idle,
+                          "top-26 md:top-28": app.current_state.code !== ClientAppStateCode.Idle
                         }}
                       >{getDayNameFromDayNumber(day_index)}</h2>
                       <For each={applyFilters(homeworks()![day_index])}>
