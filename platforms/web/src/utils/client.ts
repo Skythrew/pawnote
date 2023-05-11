@@ -32,14 +32,13 @@ import {
 } from "@/types/pronote";
 
 import { ResponseErrorCode } from "@pawnote/api";
-import { ClientErrorCode } from "@pawnote/i18n";
 
-import app, { AppStateCode } from "@/stores/app";
+import app from "@/stores/app";
 import credentials from "@/stores/credentials";
 import endpoints from "@/stores/endpoints";
 import sessions from "@/stores/sessions";
 
-import { locale } from "@pawnote/i18n";
+import { locale, ClientAppStateCode, ClientErrorCode } from "@pawnote/i18n";
 
 import { decode as html_entities_decode } from "html-entities";
 import { unwrap } from "solid-js/store";
@@ -81,7 +80,7 @@ export class ClientError extends Error {
   public debug?: ResponseError["debug"];
   public message: string;
 
-  constructor (response: { code: number, debug?: unknown }) {
+  constructor (response: { code: ClientErrorCode, debug?: unknown }) {
     const [t] = locale;
 
     const error_message = t(`CLIENT_ERRORS.${response.code}`);
@@ -565,11 +564,11 @@ export const callUserTimetableAPI = async (
   };
 
   if (options.queue) {
-    app.enqueue_fetch(AppStateCode.FetchingTimetable, call);
+    app.enqueue_fetch(ClientAppStateCode.FetchingTimetable, call);
     return local_response?.data;
   }
 
-  app.setCurrentState({ code: AppStateCode.FetchingTimetable, fetching: true });
+  app.setCurrentState({ code: ClientAppStateCode.FetchingTimetable, fetching: true });
   await call();
   app.setStateToIdle();
 };
@@ -746,11 +745,11 @@ export const callUserHomeworksAPI = async (
   };
 
   if (options.queue) {
-    app.enqueue_fetch(AppStateCode.FetchingHomeworks, call);
+    app.enqueue_fetch(ClientAppStateCode.FetchingHomeworks, call);
     return local_response?.data;
   }
 
-  app.setCurrentState({ code: AppStateCode.FetchingHomeworks, fetching: true });
+  app.setCurrentState({ code: ClientAppStateCode.FetchingHomeworks, fetching: true });
   await call();
   app.setStateToIdle();
 };
@@ -823,11 +822,11 @@ export const callUserRessourcesAPI = async (
   };
 
   if (options.queue) {
-    app.enqueue_fetch(AppStateCode.FetchingRessources, call);
+    app.enqueue_fetch(ClientAppStateCode.FetchingRessources, call);
     return local_response?.data;
   }
 
-  app.setCurrentState({ code: AppStateCode.FetchingRessources, fetching: true });
+  app.setCurrentState({ code: ClientAppStateCode.FetchingRessources, fetching: true });
   await call();
   app.setStateToIdle();
 };
@@ -909,11 +908,11 @@ export const callUserGradesAPI = async (
   };
 
   if (options.queue) {
-    app.enqueue_fetch(AppStateCode.FetchingGrades, call);
+    app.enqueue_fetch(ClientAppStateCode.FetchingGrades, call);
     return local_response?.data;
   }
 
-  app.setCurrentState({ code: AppStateCode.FetchingGrades, fetching: true });
+  app.setCurrentState({ code: ClientAppStateCode.FetchingGrades, fetching: true });
   await call();
   app.setStateToIdle();
 };
@@ -1054,7 +1053,7 @@ export const callUserHomeworkDoneAPI = async (options: {
 
   const endpoint: ApiUserHomeworkDone["path"] = `/user/homework/${options.homework_id}/done`;
 
-  app.enqueue_fetch(AppStateCode.ChangingHomeworkState, async () => {
+  app.enqueue_fetch(ClientAppStateCode.UpdatingHomeworkState, async () => {
     const homeworks_endpoint: ApiUserHomeworks["path"] = `/user/homeworks/${options.week_number}`;
 
     // Call the API to update the homework state.

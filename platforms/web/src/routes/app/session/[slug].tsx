@@ -47,21 +47,21 @@ const AppLayout: Component = () => {
     if (!session) {
       console.error("[debug] no session found");
       console.groupEnd();
-      return navigate("/link");
+      return navigate("/app/link");
     }
     console.info("[debug]: got session");
 
     if (session.instance.account_type_id !== PronoteApiAccountId.Eleve) {
       alert("Seul le compte élève est disponible actuellement.");
       console.groupEnd();
-      return navigate("/");
+      return navigate("/app");
     }
 
     const user_data = await endpoints.get<ApiUserData>(slug, "/user/data");
     if (!user_data) {
       console.error("[debug] no endpoint '/user/data' found");
       console.groupEnd();
-      return navigate("/link");
+      return navigate("/app/link");
     }
     console.info("[debug]: got '/user/data'");
 
@@ -69,7 +69,7 @@ const AppLayout: Component = () => {
     if (!login_informations) {
       console.error("[debug] no endpoint '/login/informations' found");
       console.groupEnd();
-      return navigate("/link");
+      return navigate("/app/link");
     }
     console.info("[debug]: got '/login/informations'");
 
@@ -110,7 +110,7 @@ const AppLayout: Component = () => {
       }>
         <header class="fixed left-0 right-0 top-0 z-50 flex flex-col shadow dark:shadow-md">
           <nav class="bg-brand-primary h-18 flex items-center justify-between px-4">
-            <A href={`/app/${user().slug}`}>
+            <A href={`/app/session/${user().slug}`}>
               <div class="flex flex-col">
                 <h1 class="text-brand-white text-lg font-semibold">
                   {user().endpoints?.["/user/data"].donnees.ressource.L}
