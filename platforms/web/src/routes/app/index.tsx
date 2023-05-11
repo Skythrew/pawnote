@@ -53,7 +53,7 @@ const Page: Component = () => {
   });
 
   return (
-    <div class="h-full min-h-screen flex flex-col justify-between gap-12 p-12">
+    <div class="h-full min-h-screen flex flex-col justify-between gap-12 p-10">
       <header class={classNames(
         "w-full text-center"
       )}>
@@ -109,7 +109,7 @@ const Page: Component = () => {
                 )}
               </For>
 
-              <A href="/link">
+              <A href="/app/link">
                 {t("PAGES.INDEX.LINK_ANOTHER")}
               </A>
             </>

@@ -123,7 +123,6 @@ const Page: Component = () => {
       </header>
 
       <main class="flex flex-col items-center gap-6 px-4">
-
         <form class="group max-w-lg w-full flex"
           onSubmit={(event) => {
             event.preventDefault();
