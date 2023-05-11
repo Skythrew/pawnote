@@ -3,8 +3,6 @@ import type { Component, JSX } from "solid-js";
 import type { PronoteApiAccountId } from "@/types/pronote";
 import type { ApiInstance, ApiLoginInformations, ApiUserData } from "@/types/api";
 
-import { Select } from "@kobalte/core";
-
 import Modal, { type ModalProps } from "@/components/atoms/Modal";
 import Input from "@/components/atoms/Input";
 
@@ -17,6 +15,9 @@ import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
 import credentials_store from "@/stores/credentials";
 
+import { createModal } from "@/primitives/modal";
+import { SaveSessionIntoSlugModalContent } from "./SaveSessionIntoSlug";
+
 interface Props {
   loading: boolean;
   instance: ApiInstance["response"] | null;
@@ -24,6 +25,13 @@ interface Props {
 
 export const AuthenticateSessionModalContent: Component<Props> = (props) => {
   const first_account_type = () => props.instance ? props.instance.accounts?.[0].id as number : null;
+
+  const [showSlugModal] = createModal(() => (
+    <SaveSessionIntoSlugModalContent
+      slugModalData={slugModalData()}
+      onSubmit={(slug) => saveIntoSlug(slug, slugModalData())}
+    />
+  ));
 
   const [slugModalData, setSlugModalData] = createSignal<
     Awaited<ReturnType<typeof connectToPronote>> | null
@@ -35,9 +43,6 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
     account_type: PronoteApiAccountId | null;
     use_ent: boolean;
 
-    /** Used only for first-time connections. */
-    slug: string;
-
     username: string;
     password: string;
     save: boolean;
@@ -46,8 +51,6 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
     username: "",
     password: "",
     save: false,
-
-    slug: "",
 
     account_type: app.current_user.slug
       // We grab the account type from the old session when existing.
@@ -97,6 +100,7 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
 
       // Save the data for first-time users, so they can define their slug.
       setSlugModalData(data);
+      showSlugModal();
     }
     catch (err) {
       setLoading(false);
