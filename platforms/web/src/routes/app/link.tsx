@@ -113,7 +113,7 @@ const Page: Component = () => {
     <>
       <Title>Connexion - {APP_NAME}</Title>
       <header class="border-b-latteSubtext1 sticky top-0 z-10 mb-6 flex items-center justify-start gap-2 border-b-2 bg-latteBase px-2 py-4">
-        <A class="flex items-center justify-center px-4 py-2 text-xl" href="/">
+        <A class="flex items-center justify-center px-4 py-2 text-xl" href="/app">
           <IconMdiArrowLeft />
         </A>
 
