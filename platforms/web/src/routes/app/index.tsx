@@ -74,7 +74,7 @@ const Page: Component = () => {
         </div> */}
 
       </header>
-      <section class="mx-auto max-w-md w-full flex flex-col items-center justify-center gap-4 px-4">
+      <section class="mx-auto max-w-sm w-full flex flex-col items-center justify-center gap-6 px-4">
         <Show
           when={availableSessions()}
           fallback={
@@ -94,20 +94,23 @@ const Page: Component = () => {
                 {session => (
                   <A class="w-full" href={`/app/session/${session.slug}`}>
                     <div
-                      class="bg-brand-white dark:bg-brand-primary cursor-pointer rounded-full px-8 py-4 transition-colors hover:bg-opacity-80 hover:shadow-sm"
+                      class="transform cursor-pointer border-2 border-latte-text/60 rounded-lg bg-transparent px-6 py-4 text-latte-text outline-none transition-all hover:(scale-105 border-transparent rounded-xl bg-latte-rosewater bg-opacity-80 text-latte-base shadow-sm)"
                     >
-                      <h2 class="text-brand-primary dark:text-brand-white text-md font-semibold">
+                      <h2 class="text-sm font-bold sm:text-base">
                         {session.user_name}
                       </h2>
-                      <p class="dark:text-brand-light text-brand-dark text-sm">
+                      <p class="text-xs font-medium opacity-80 sm:text-sm">
                         {session.instance_name}
+                      </p>
+                      <p class="text-xs opacity-40">
+                        {session.slug}
                       </p>
                     </div>
                   </A>
                 )}
               </For>
 
-              <A href="/app/link">
+              <A href="/app/link" class="text-center text-latte-text text-opacity-50 underline underline-latte-text/50 underline-offset-4 underline-dotted hover:border-solid hover:underline-solid">
                 {t("PAGES.INDEX.LINK_ANOTHER")}
               </A>
             </>
@@ -116,12 +119,12 @@ const Page: Component = () => {
       </section>
 
       <footer class="w-full flex items-center justify-between text-sm">
-        <span class="block opacity-40">
+        <p class="block max-w-[200px] truncate opacity-40">
           {APP_NAME} {version()}
-        </span>
+        </p>
         <div class="flex gap-4">
           <a
-            class="text-brand-light dark:text-brand-white font-medium text-opacity-60 transition-colors dark:text-opacity-40 hover:text-opacity-80 dark:hover:text-opacity-60"
+            class="dark:text-brand-white text-brand-light font-medium text-opacity-60 transition-colors dark:text-opacity-40 hover:text-opacity-80 dark:hover:text-opacity-60"
             href="https://github.com/Vexcited/pornote"
             rel="noopener noreferrer"
             target="_blank"
