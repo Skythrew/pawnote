@@ -45,19 +45,12 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
 
     username: string;
     password: string;
-    save: boolean;
   }>({
     use_ent: false,
     username: "",
     password: "",
-    save: false,
 
-    account_type: app.current_user.slug
-      // We grab the account type from the old session when existing.
-      ? app.current_user.session.instance.account_type_id
-      // For first-time users, we'll select them
-      // the first account type provided by default.
-      : first_account_type()
+    account_type: first_account_type()
   });
 
   const processUserAuthentication: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
@@ -90,17 +83,12 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
         )
       });
 
-      setLoading(false);
+      batch(() => {
+        setLoading(false);
 
-      if (app.current_user.slug) {
-        await saveIntoSlug(app.current_user.slug, data);
-        app.setCurrentState({ restoring_session: false });
-        return;
-      }
-
-      // Save the data for first-time users, so they can define their slug.
-      setSlugModalData(data);
-      showSlugModal();
+        setSlugModalData(data);
+        showSlugModal();
+      });
     }
     catch (err) {
       setLoading(false);
@@ -123,15 +111,10 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
       slug, "/login/informations", data.endpoints["/login/informations"]
     );
 
-    // Make sure to delete the old credentials when
-    // user don't want to save them.
-    if (!credentials.save) await credentials_store.remove(slug);
-    else {
-      await credentials_store.upsert(slug, {
-        username: credentials.username,
-        password: credentials.password
-      });
-    }
+    await credentials_store.upsert(slug, {
+      username: credentials.username,
+      password: credentials.password
+    });
   };
 
   return (
@@ -204,22 +187,6 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
               onInput={value => setCredentials("password", value)}
               autocomplete="current-password"
             />
-
-            <label
-              class="mx-auto my-2 inline border rounded-full px-3 py-1 transition"
-              classList={{
-                "bg-brand-light text-brand-primary border-brand-primary": credentials.save,
-                "border-brand-dark text-brand-dark":!credentials.save
-              }}
-            >
-                Se souvenir de mes identifiants
-              <input
-                type="checkbox"
-                checked={credentials.save}
-                onChange={(event) => setCredentials("save", event.currentTarget.checked)}
-                hidden
-              />
-            </label>
 
             <button
               disabled={loading()}
