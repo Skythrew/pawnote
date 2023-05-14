@@ -40,6 +40,7 @@ export interface PronoteApiSession {
   h: string;
   /** Account Type ID. */
   a: PronoteApiAccountId;
+  /** Whether the instance is demo or not. */
   d: boolean;
 
   /** ENT Username. */
