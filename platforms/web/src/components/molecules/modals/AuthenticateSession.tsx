@@ -125,22 +125,10 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
             as="h3"
             class="p-2 pb-2 text-center text-lg font-bold leading-6 text-latteText"
           >
-            {app.current_user.slug
-              ? "Connexion perdue!"
-              : instance().school_name
-            }
+            {instance().school_name}
           </Modal.Title>
           <Modal.Description class="text-latteSubtext0 px-6 text-center text-sm">
-            {app.current_user.slug
-              ? `
-              Renseignez de nouveau vos identifiants pour créer
-              une nouvelle session en fonction de l'ancienne.
-              Vos données ne seront pas perdues.
-            `
-              : `
               Créez une nouvelle session sur cette instance en entrant vos identifiants.
-            `
-            }
           </Modal.Description>
 
           <form
