@@ -1,10 +1,30 @@
 {
   "name": "@pawnote/client",
+  "private": true,
   "version": "0.0.0",
-  "description": "",
-  "license": "MIT",
-  "main": "index.js",
+  "description": "Client functions for Pawnote.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": ""
+    "build": "pnpm lint && vite build",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@pawnote/api": "workspace:*",
+    "@pawnote/eslint-config-solid": "workspace:*",
+    "@types/node": "^18.16.9",
+    "eslint": "^8.40.0",
+    "solid-js": "^1.7.5",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.5",
+    "vite-plugin-dts": "^2.3.0",
+    "vite-plugin-solid": "^2.7.0"
+  },
+  "peerDependencies": {
+    "@pawnote/api": "workspace:*",
+    "solid-js": "^1.7.5"
   }
 }
