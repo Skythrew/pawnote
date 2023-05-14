@@ -1,14 +1,45 @@
-import type { PronoteApiSession, PronoteApiFunctionPayload } from "@/types/pronote";
-import type { SessionInstance, SessionEncryption, SessionExported } from "@/types/session";
+import { PronoteApiAccountId, type PronoteApiSession, type PronoteApiFunctionPayload } from "@/types/pronote_api";
+import { ResponseErrorCode } from "@/types/internals";
 
-import { PronoteApiAccountId } from "@/types/pronote";
-import { ResponseErrorCode } from "@/types/errors";
-
-import { aes } from "@/utils/globals";
+import { aes } from "@/utils/encryption";
 import forge from "node-forge";
 import pako from "pako";
 
-class Session {
+export interface SessionInstance {
+  pronote_url: string;
+  ent_url: string | null;
+
+  session_id: number;
+  account_type_id: PronoteApiAccountId;
+
+  ent_cookies: string[];
+  pronote_cookies: string[];
+
+  skip_encryption: boolean;
+  skip_compression: boolean;
+
+  use_ent: boolean;
+  order: number;
+}
+
+export interface SessionEncryption {
+  aes: {
+    iv?: string;
+    key?: string;
+  }
+
+  rsa: {
+    modulus: string;
+    exponent: string;
+  }
+}
+
+export interface SessionExported {
+  instance: SessionInstance;
+  encryption: SessionEncryption;
+}
+
+export class Session {
   public instance: SessionInstance;
   public encryption: SessionEncryption;
 
@@ -217,6 +248,3 @@ class Session {
     }
   }
 }
-
-export default Session;
-

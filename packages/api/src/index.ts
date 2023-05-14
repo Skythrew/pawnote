@@ -11,3 +11,5 @@ export type { HttpCallFunction, Response, ResponseError, ResponseSuccess } from 
 export { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 export { ResponseErrorCode } from "@/types/internals";
 export { cleanPronoteUrl } from "@/utils/globals";
+export { credentials } from "@/utils/credentials";
+export * from "@/utils/session";
