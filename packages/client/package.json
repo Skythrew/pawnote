@@ -15,7 +15,7 @@
   "devDependencies": {
     "@pawnote/api": "workspace:*",
     "@pawnote/eslint-config-solid": "workspace:*",
-    "@pawnote/i18n": "workspace:^",
+    "@pawnote/i18n": "workspace:*",
     "@solidjs/router": "^0.8.2",
     "@types/node": "^18.16.9",
     "eslint": "^8.40.0",
@@ -27,8 +27,11 @@
   },
   "peerDependencies": {
     "@pawnote/api": "workspace:*",
-    "@pawnote/i18n": "workspace:^",
+    "@pawnote/i18n": "workspace:*",
     "@solidjs/router": "^0.8.2",
     "solid-js": "^1.7.5"
+  },
+  "dependencies": {
+    "localforage": "^1.10.0"
   }
 }
