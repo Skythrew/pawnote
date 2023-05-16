@@ -27,7 +27,7 @@ export default defineConfig({
       fileName: "index"
     },
     rollupOptions: {
-      external: ["solid-js", "solid-js/web"]
+      external: ["solid-js", "solid-js/web", "@pawnote/api"]
     }
   }
 });
