@@ -4,16 +4,43 @@ import type { HttpCallFunction, ResponseError, ResponseSuccess, Response } from 
 const createApiFunction = <T extends {
   request: unknown;
   response: unknown;
+  /** Parameters that can be passed to the API function. */
+  params?: unknown;
 }>(callback: (
-  req: { fetch: HttpCallFunction, body: T["request"], userAgent: string },
+  req: {
+    fetch: HttpCallFunction,
+    body: T["request"],
+    params: T["params"],
+    userAgent: string
+  },
   res: {
-    error: (data: Omit<ResponseError, "success">, options?: { status?: number }) => { response: ResponseError, status: number },
-    success: (data: T["response"]) => { response: ResponseSuccess<T["response"]>, status: 200 }
+    error: (
+      data: Omit<ResponseError, "success">,
+      options?: { status?: number }
+    ) => {
+      response: ResponseError,
+      status: number
+    },
+    success: (
+      data: T["response"]
+    ) => {
+      response: ResponseSuccess<T["response"]>,
+      status: 200
+    }
   }
-) => Promise<{ response: Response<T["response"]>, status: number }>) => {
-  return (fetcher: HttpCallFunction, body: T["request"], userAgent: string) => callback({
+) => Promise<{
+  response: Response<T["response"]>,
+  status: number
+}>) => {
+  return (
+    fetcher: HttpCallFunction,
+    body: T["request"],
+    params: T["params"],
+    userAgent: string
+  ) => callback({
     fetch: fetcher,
     body,
+    params,
     userAgent
   }, {
     success: (data) => ({

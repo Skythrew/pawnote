@@ -5,7 +5,7 @@ import { createApiFunction, callPronoteAPI, ResponseErrorCode } from "@/utils/re
 import { Session } from "@/utils/session";
 
 export default createApiFunction<ApiUserGrades>(async (req, res) => {
-  const period_id = req.params.period_id as string | undefined;
+  const period_id = req.params.period_id;
 
   if (!("session" in req.body) || !("period" in req.body) || !period_id)
     return res.error({

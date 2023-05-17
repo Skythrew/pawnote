@@ -37,5 +37,9 @@ export interface ApiUserHomeworkDone {
     session: SessionExported;
   }
 
+  params: {
+    homework_id: string;
+  }
+
   path: ApiUserHomeworkDonePath;
 }

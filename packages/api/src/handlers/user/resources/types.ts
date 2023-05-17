@@ -198,5 +198,9 @@ export interface ApiUserResources {
     session: SessionExported;
   }
 
+  params: {
+    week: string;
+  }
+
   path: ApiUserResourcesPath;
 }

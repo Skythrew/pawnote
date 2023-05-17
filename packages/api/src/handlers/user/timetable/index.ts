@@ -5,7 +5,7 @@ import { createApiFunction, callPronoteAPI, ResponseErrorCode } from "@/utils/re
 import { Session } from "@/utils/session";
 
 export default createApiFunction<ApiUserTimetable>(async (req, res) => {
-  const week_number = parseInt(req.params.week as string);
+  const week_number = parseInt(req.params.week);
 
   if (Number.isNaN(week_number)) return res.error({
     code: ResponseErrorCode.IncorrectParameters,

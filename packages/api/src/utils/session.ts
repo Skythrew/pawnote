@@ -1,5 +1,5 @@
 import { PronoteApiAccountId, type PronoteApiSession, type PronoteApiFunctionPayload } from "@/types/pronote_api";
-import { ResponseErrorCode } from "@/types/internals";
+import { ResponseErrorCode } from "@/utils/requests";
 
 import { aes } from "@/utils/encryption";
 import forge from "node-forge";

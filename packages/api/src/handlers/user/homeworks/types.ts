@@ -116,5 +116,9 @@ export interface ApiUserHomeworks {
     session: SessionExported;
   }
 
+  params: {
+    week: string;
+  }
+
   path: ApiUserHomeworksPath;
 }

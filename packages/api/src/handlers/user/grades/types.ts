@@ -287,5 +287,9 @@ export interface ApiUserGrades {
     session: SessionExported;
   }
 
+  params: {
+    period_id: string;
+  }
+
   path: ApiUserGradesPath;
 }

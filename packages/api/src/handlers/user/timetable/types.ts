@@ -117,5 +117,9 @@ export interface ApiUserTimetable {
     session: SessionExported;
   }
 
+  params: {
+    week: string;
+  }
+
   path: ApiUserTimetablePath;
 }

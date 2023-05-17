@@ -1,6 +1,1 @@
-export * from "./done/types";
-import { default as done } from "./done";
-
-export const homework = {
-  done
-};
+export { default as done } from "./done";

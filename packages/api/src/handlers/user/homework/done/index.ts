@@ -5,7 +5,7 @@ import { createApiFunction, callPronoteAPI, ResponseErrorCode } from "@/utils/re
 import { Session } from "@/utils/session";
 
 export default createApiFunction<ApiUserHomeworkDone>(async (req, res) => {
-  const homework_id = req.params.homework_id as string;
+  const homework_id = req.params.homework_id;
 
   if (!("session" in req.body) || !("done" in req.body) || !homework_id)
     return res.error({
