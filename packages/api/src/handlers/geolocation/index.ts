@@ -15,6 +15,12 @@ import { decode } from "html-entities";
  */
 export default createApiFunction<ApiGeolocation>(async (req, res) => {
   try {
+    if (!("latitude" in req.body) || !("longitude" in req.body))
+      return res.error({
+        code: ResponseErrorCode.MissingParameters,
+        debug: { received_body: req.body }
+      }, { status: 400 });
+
     // Build the request we're gonna send to Pronote.
     const request_body: PronoteApiGeolocation["request"] = {
       nomFonction: "geoLoc",

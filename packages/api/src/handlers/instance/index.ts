@@ -21,8 +21,15 @@ const isPronoteApiAccountType = (item: PronoteApiAccountType | undefined): item 
  */
 export default createApiFunction<ApiInstance>(async (req, res) => {
   try {
+    if (!("pronote_url" in req.body))
+      return res.error({
+        code: ResponseErrorCode.MissingParameters,
+        debug: { received_body: req.body }
+      }, { status: 400 });
+
     const pronote_url = cleanPronoteUrl(req.body.pronote_url);
     const informations_url = `${pronote_url}/${PRONOTE_INSTANCE_MOBILE_INFOS_PATH}`;
+
 
     const response = await req.fetch(informations_url, {
       method: "GET"
