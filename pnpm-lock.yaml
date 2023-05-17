@@ -55,6 +55,9 @@ importers:
       serialize-error:
         specifier: ^11.0.0
         version: 11.0.0
+      set-cookie-parser:
+        specifier: ^2.6.0
+        version: 2.6.0
     devDependencies:
       '@pawnote/eslint-config':
         specifier: workspace:*
@@ -74,6 +77,9 @@ importers:
       '@types/pako':
         specifier: ^2.0.0
         version: 2.0.0
+      '@types/set-cookie-parser':
+        specifier: ^2.4.2
+        version: 2.4.2
       esbuild:
         specifier: ^0.17.18
         version: 0.17.18

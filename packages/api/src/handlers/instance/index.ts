@@ -1,8 +1,8 @@
 import type { PronoteApiInstance, ApiInstance } from "./types";
 import type { PronoteApiAccountType } from "@/types/pronote_api";
-import { ResponseErrorCode } from "@/types/internals";
 
-import { createApiFunction, cleanPronoteUrl } from "@/utils/globals";
+import { cleanPronoteUrl } from "@/utils/requests/pronote";
+import { createApiFunction, ResponseErrorCode } from "@/utils/requests";
 import { PRONOTE_ACCOUNT_TYPES, PRONOTE_INSTANCE_MOBILE_INFOS_PATH } from "@/utils/constants";
 
 /**
@@ -19,7 +19,7 @@ const isPronoteApiAccountType = (item: PronoteApiAccountType | undefined): item 
  * - instance name ;
  * - base URL and potential ENT URL
  */
-const instance = createApiFunction<ApiInstance>(async (req, res) => {
+export default createApiFunction<ApiInstance>(async (req, res) => {
   try {
     const pronote_url = cleanPronoteUrl(req.body.pronote_url);
     const informations_url = `${pronote_url}/${PRONOTE_INSTANCE_MOBILE_INFOS_PATH}`;
@@ -49,5 +49,3 @@ const instance = createApiFunction<ApiInstance>(async (req, res) => {
     });
   }
 });
-
-export default instance;

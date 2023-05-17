@@ -1,7 +1,6 @@
 import type { PronoteApiGeolocation, ApiGeolocation } from "./types";
-import { ResponseErrorCode } from "@/types/internals";
 
-import { createApiFunction } from "@/utils/globals";
+import { createApiFunction, ResponseErrorCode } from "@/utils/requests";
 import { PRONOTE_GEOLOCATION_URL } from "@/utils/constants";
 
 import { serializeError } from "serialize-error";
@@ -14,7 +13,7 @@ import { decode } from "html-entities";
  *
  * Gives every Pronote instance in a 20km radius of the given `longitude` and `latitude`.
  */
-const geolocation = createApiFunction<ApiGeolocation>(async (req, res) => {
+export default createApiFunction<ApiGeolocation>(async (req, res) => {
   try {
     // Build the request we're gonna send to Pronote.
     const request_body: PronoteApiGeolocation["request"] = {
@@ -26,11 +25,12 @@ const geolocation = createApiFunction<ApiGeolocation>(async (req, res) => {
     const body = new URLSearchParams();
     body.set("data", JSON.stringify(request_body));
 
+    const headers = new Headers();
+    headers.set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+
     const response = await req.fetch(PRONOTE_GEOLOCATION_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-      },
+      headers,
       body
     });
 
@@ -76,5 +76,3 @@ const geolocation = createApiFunction<ApiGeolocation>(async (req, res) => {
     });
   }
 });
-
-export default geolocation;

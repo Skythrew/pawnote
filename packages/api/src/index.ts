@@ -1,16 +1,12 @@
 export * as handlers from "@/handlers";
 
-// Handlers typings.
-export type { PronoteApiInstance, ApiInstance } from "@/handlers/instance/types";
-export type { PronoteApiGeolocation, ApiGeolocation } from "@/handlers/geolocation/types";
-
 // Internals typings.
-export type { HttpCallFunction, Response, ResponseError, ResponseSuccess } from "@/types/internals";
+export type { HttpCallFunction, Response, ResponseError, ResponseSuccess } from "@/utils/requests";
+export { ResponseErrorCode } from "@/utils/requests";
 export * from "@/types/pronote_api";
 
 // Utilities that can be used outside.
 export { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
-export { ResponseErrorCode } from "@/types/internals";
-export { cleanPronoteUrl } from "@/utils/globals";
+export { cleanPronoteUrl } from "@/utils/requests/pronote";
 export { credentials } from "@/utils/credentials";
 export * from "@/utils/session";
