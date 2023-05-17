@@ -1,4 +1,4 @@
-export type * from "./done/types";
+export * from "./done/types";
 import { default as done } from "./done";
 
 export const homework = {
