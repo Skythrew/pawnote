@@ -1,4 +1,9 @@
-import type { PronoteApiAccountId } from "@/types/pronote_api";
+import type { PronoteApiAccountId } from "@/utils/requests/pronote";
+import { z } from "zod";
+
+export const ApiInstanceRequestSchema = z.object({
+  pronote_url: z.string()
+});
 
 export interface PronoteApiInstance {
   request: Record<string, never>;
@@ -13,9 +18,7 @@ export interface PronoteApiInstance {
 }
 
 export interface ApiInstance {
-  request: {
-    pronote_url: string;
-  }
+  request: z.infer<typeof ApiInstanceRequestSchema>
 
   response: {
     school_name: string;

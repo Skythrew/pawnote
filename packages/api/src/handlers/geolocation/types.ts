@@ -1,3 +1,10 @@
+import { z } from "zod";
+
+export const ApiGeolocationRequestSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number()
+});
+
 export interface PronoteApiGeolocation {
   request: {
     nomFonction: "geoLoc";
@@ -15,10 +22,7 @@ export interface PronoteApiGeolocation {
 }
 
 export interface ApiGeolocation {
-  request: {
-    latitude: number;
-    longitude: number;
-  }
+  request: z.infer<typeof ApiGeolocationRequestSchema>
 
   response: {
     url: string;
