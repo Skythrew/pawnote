@@ -1,27 +1,52 @@
 {
   // Indentation
-  "editor.tabSize": 2,
   "editor.detectIndentation": false,
   "editor.insertSpaces": true,
+  "editor.tabSize": 2,
 
-  // ESLint Configuration
+  // ESLint configuration
   "eslint.packageManager": "pnpm",
   "eslint.workingDirectories": [
     "platforms/web",
     "packages/*"
   ],
 
-  // ESLint
+  // Always disable prettier, we only use ESLint
   "prettier.enable": false,
+
+  // Auto-format using ESLint on save.
   "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
 
-  // UnoCSS
+  // UnoCSS configuration
   "unocss.root": "platforms/web",
 
+  // Emmet configuration for SolidJS
   "emmet.includeLanguages": {
     "typescriptreact": "html"
-  }
+  },
+
+  // cSpell configuration
+  "cSpell.language": "en,fr",
+  "cSpell.words": [
+    "academie",
+    "Academie",
+    "appelfonction",
+    "Defaut",
+    "derniere",
+    "Dernieres",
+    "eleve",
+    "Eleve",
+    "Etab",
+    "expir",
+    "numero",
+    "Parametres",
+    "pawnote",
+    "pronote",
+    "Pronote",
+    "Securisation",
+    "viescolaire"
+  ]
 }
