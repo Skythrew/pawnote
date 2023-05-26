@@ -58,6 +58,9 @@ importers:
       set-cookie-parser:
         specifier: ^2.6.0
         version: 2.6.0
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
     devDependencies:
       '@pawnote/eslint-config':
         specifier: workspace:*
@@ -348,6 +351,9 @@ importers:
       '@unocss/eslint-config':
         specifier: ^0.51.8
         version: 0.51.8(eslint@8.39.0)(typescript@5.0.4)
+      '@unocss/preset-rem-to-px':
+        specifier: ^0.52.3
+        version: 0.52.3
       '@unocss/preset-uno':
         specifier: ^0.51.8
         version: 0.51.8
@@ -4963,6 +4969,10 @@ packages:
     resolution: {integrity: sha512-myHRKBphEN3h0OnsUhg2JaFKjFGfqF/jmmzZCCMNU5UmxbheZomXANNLYXVgEP6LHvd4xAF0DEzrOBcDPLf0HQ==}
     dev: true
 
+  /@unocss/core@0.52.3:
+    resolution: {integrity: sha512-AdpksuSj1+jAjF7Ek1Ubtt+pE/bi4EmVqz/sx7PTgp9RUyBX1457kDlSWJPFOvEEkKL8VLtwXB46hD2oPAp36Q==}
+    dev: true
+
   /@unocss/eslint-config@0.51.8(eslint@8.39.0)(typescript@5.0.4):
     resolution: {integrity: sha512-IvoRqVvXO9V+qkiYpidrvGc1rZoDz05bQWuW3qPAN+v5RmUXPH6O01car/rcHTpKP4xdSA6ZQAkBjc8j9/MzZg==}
     engines: {node: '>=14'}
@@ -5037,6 +5047,12 @@ packages:
     dependencies:
       '@unocss/core': 0.51.8
       '@unocss/extractor-arbitrary-variants': 0.51.8
+    dev: true
+
+  /@unocss/preset-rem-to-px@0.52.3:
+    resolution: {integrity: sha512-8ZPDX5cSPljz19R/XAP749xznGHz4RZdQx9TbYZ1GOD5oMMnWTsExrwAwqKQzsz6dyk4j9DPkNa9vIw+XURxqw==}
+    dependencies:
+      '@unocss/core': 0.52.3
     dev: true
 
   /@unocss/preset-tagify@0.51.8:
@@ -10959,3 +10975,7 @@ packages:
     optionalDependencies:
       commander: 9.5.0
     dev: true
+
+  /zod@3.21.4:
+    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+    dev: false

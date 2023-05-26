@@ -1,43 +1,51 @@
-import { PronoteApiAccountId, type PronoteApiSession, type PronoteApiFunctionPayload } from "@/types/pronote_api";
-import { ResponseErrorCode } from "@/utils/requests";
-
-import { aes } from "@/utils/encryption";
+import { serializeError } from "serialize-error";
 import forge from "node-forge";
 import pako from "pako";
+import { z } from "zod";
 
-export interface SessionInstance {
-  pronote_url: string;
-  ent_url: string | null;
+import { PronoteApiAccountId, type PronoteApiSession, type PronoteApiFunctionPayload } from "@/utils/requests/pronote";
+import { ApiResponseErrorCode, HandlerResponseError } from "@/utils/handlers/errors";
+import { aes } from "@/utils/encryption";
 
-  session_id: number;
-  account_type_id: PronoteApiAccountId;
+export const SessionInstanceSchema = z.object({
+  pronote_url: z.string(),
+  ent_url: z.string().nullable(),
 
-  ent_cookies: string[];
-  pronote_cookies: string[];
+  session_id: z.number(),
+  account_type_id: z.nativeEnum(PronoteApiAccountId),
 
-  skip_encryption: boolean;
-  skip_compression: boolean;
+  ent_cookies: z.array(z.string()),
+  pronote_cookies: z.array(z.string()),
 
-  use_ent: boolean;
-  order: number;
-}
+  skip_encryption: z.boolean(),
+  skip_compression: z.boolean(),
 
-export interface SessionEncryption {
-  aes: {
-    iv?: string;
-    key?: string;
-  }
+  use_ent: z.boolean(),
+  order: z.number()
+});
 
-  rsa: {
-    modulus: string;
-    exponent: string;
-  }
-}
+export type SessionInstance = z.infer<typeof SessionInstanceSchema>;
 
-export interface SessionExported {
-  instance: SessionInstance;
-  encryption: SessionEncryption;
-}
+export const SessionEncryptionSchema = z.object({
+  aes: z.object({
+    iv: z.optional(z.string()),
+    key: z.optional(z.string())
+  }),
+
+  rsa: z.object({
+    modulus: z.string(),
+    exponent: z.string()
+  })
+});
+
+export type SessionEncryption = z.infer<typeof SessionEncryptionSchema>;
+
+export const SessionExportedSchema = z.object({
+  instance: SessionInstanceSchema,
+  encryption: SessionEncryptionSchema
+});
+
+export type SessionExported = z.infer<typeof SessionExportedSchema>;
 
 export class Session {
   public instance: SessionInstance;
@@ -168,10 +176,10 @@ export class Session {
 
     if (!this.instance.skip_encryption) {
       const data = !this.instance.skip_compression
-      // If the data has been compressed, we get the bytes
-      // Of the compressed data (from HEX).
+        // If the data has been compressed, we get the bytes
+        // Of the compressed data (from HEX).
         ? forge.util.hexToBytes(final_data as string)
-      // Otherwise, we get the JSON as string.
+        // Otherwise, we get the JSON as string.
         : forge.util.encodeUtf8("" + JSON.stringify(final_data));
 
       const encrypted_data = aes.decrypt(data, {
@@ -192,18 +200,18 @@ export class Session {
    * Returns an object when the request was successful
    * and `string` if an error has been found.
    */
-  readPronoteFunctionPayload <Res>(response_body: string): Res | ResponseErrorCode {
-    if (response_body.includes("La page a expir")) {
-      return ResponseErrorCode.SessionExpired;
-    }
+  readPronoteFunctionPayload <Res>(response_body: string): Res {
+    if (response_body.includes("La page a expir")) throw new HandlerResponseError(
+      ApiResponseErrorCode.SessionExpired, { status: 401 }
+    );
 
-    if (response_body.includes("Votre adresse IP est provisoirement suspendue")) {
-      return ResponseErrorCode.PronoteBannedIP;
-    }
+    if (response_body.includes("Votre adresse IP est provisoirement suspendue")) throw new HandlerResponseError(
+      ApiResponseErrorCode.PronoteBannedIP, { status: 401 }
+    );
 
-    if (response_body.includes("La page demandée n'existe pas")) {
-      return ResponseErrorCode.PronoteClosedInstance;
-    }
+    if (response_body.includes("La page demandée n'existe pas")) throw new HandlerResponseError(
+      ApiResponseErrorCode.PronoteClosedInstance, { status: 404 }
+    );
 
     this.instance.order++;
     const response = JSON.parse(response_body) as PronoteApiFunctionPayload<Res>;
@@ -215,8 +223,9 @@ export class Session {
         iv: aes_iv, key: aes_key
       });
 
-      if (this.instance.order !== parseInt(decrypted_order))
-        return ResponseErrorCode.NotMatchingOrders;
+      if (this.instance.order !== parseInt(decrypted_order)) throw new HandlerResponseError(
+        ApiResponseErrorCode.NotMatchingOrders, { status: 400 }
+      );
 
       let final_data = response.donneesSec;
 
@@ -243,8 +252,12 @@ export class Session {
       return final_data;
     }
     catch (error) {
-      console.error("[session:read...]", error, "\nres:", response);
-      return ResponseErrorCode.ResponsePayloadBroken;
+      throw new HandlerResponseError(ApiResponseErrorCode.ResponsePayloadBroken, {
+        debug: {
+          error: serializeError(error),
+          response
+        }
+      });
     }
   }
 }
