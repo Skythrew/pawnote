@@ -5,6 +5,7 @@ import { defineConfig } from "unocss";
 
 // Presets.
 import presetUno from "@unocss/preset-uno";
+import presetRemToPx from "@unocss/preset-rem-to-px";
 import { presetKobalte } from "unocss-preset-primitives";
 
 // Transformers.
@@ -16,9 +17,8 @@ import { extendCatppuccin } from "unocss-catppuccin-colours";
 export default defineConfig({
   presets: [
     presetUno(),
-    presetKobalte({
-      prefix: "ui"
-    }) as Preset<Theme>
+    presetRemToPx() as Preset<Theme>,
+    presetKobalte() as Preset<Theme>
   ],
 
   transformers: [

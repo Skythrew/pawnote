@@ -44,6 +44,7 @@
     "@types/pako": "^2.0.0",
     "@types/set-cookie-parser": "^2.4.2",
     "@unocss/eslint-config": "^0.51.8",
+    "@unocss/preset-rem-to-px": "^0.52.3",
     "@unocss/preset-uno": "^0.51.8",
     "@unocss/transformer-variant-group": "^0.51.8",
     "eslint": "^8.39.0",
