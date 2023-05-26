@@ -25,7 +25,7 @@ const searchParamsToObject = (entries: IterableIterator<[string, string]>) => {
   return result;
 };
 
-export const createFetcher: (user_agent: string) => HttpCallFunction = (user_agent) => async (url, options) => {
+export const createFetcher = (user_agent: string): HttpCallFunction => async (url, options) => {
   const response = await fetch(url, {
     method: options.method,
     body: options.body as BodyInit | undefined,
