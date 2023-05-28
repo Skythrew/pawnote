@@ -15,6 +15,7 @@
     "@fontsource/comfortaa": "^4.5.11",
     "@kobalte/core": "^0.9.4",
     "@pawnote/api": "workspace:*",
+    "@pawnote/client": "workspace:*",
     "@pawnote/i18n": "workspace:*",
     "@solid-primitives/connectivity": "^0.3.12",
     "@solid-primitives/i18n": "^1.2.4",

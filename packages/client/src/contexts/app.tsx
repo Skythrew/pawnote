@@ -4,15 +4,15 @@ import { SetStoreFunction, createStore } from "solid-js/store";
 import { useNavigate } from "@solidjs/router";
 
 import { ClientAppStateCode } from "@pawnote/i18n";
-
 import { PronoteApiAccountId } from "@pawnote/api";
+
 import type {
   SessionExported,
   ApiLoginInformations,
   ApiUserData,
   ApiUserHomeworks,
   ApiUserTimetable,
-  ApiUserRessources,
+  ApiUserResources,
   ApiUserGrades
 } from "@pawnote/api";
 
@@ -35,7 +35,7 @@ export interface CurrentUserStoreReady {
     // Not available when not cached/fetched.
     [key: ApiUserTimetable["path"]]: ApiUserTimetable["response"]["received"] | undefined;
     [key: ApiUserHomeworks["path"]]: ApiUserHomeworks["response"]["received"] | undefined;
-    [key: ApiUserRessources["path"]]: ApiUserRessources["response"]["received"] | undefined;
+    [key: ApiUserResources["path"]]: ApiUserResources["response"]["received"] | undefined;
     [key: ApiUserGrades["path"]]: ApiUserGrades["response"]["received"] | undefined;
   }
 }
@@ -92,14 +92,14 @@ export const UserProvider: FlowComponent<{
     const user_data = await endpoints.select<ApiUserData>(slug, "/user/data");
     if (!user_data) {
       console.error("[debug] no endpoint '/user/data' found");
-      navigate("/app/link");
+      return navigate("/app/link");
     }
     console.info("[debug]: got '/user/data'");
 
     const login_informations = await endpoints.select<ApiLoginInformations>(slug, "/login/informations");
     if (!login_informations) {
       console.error("[debug] no endpoint '/login/informations' found");
-      navigate("/app/link");
+      return navigate("/app/link");
     }
     console.info("[debug]: got '/login/informations'");
 

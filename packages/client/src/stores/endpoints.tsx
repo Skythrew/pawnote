@@ -1,5 +1,5 @@
 import localforage from "localforage";
-import { useUser } from "@/contexts/app";
+import { CurrentUserStoreReady, useUser } from "@/contexts/app";
 
 import { onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
@@ -145,9 +145,9 @@ export const removeAllStartingWith = async (slug: string, searchString: string) 
 };
 
 export const useEndpoint = <Api extends {
-  path: string,
-  response: { received: unknown }
-}>(endpoint: Api["path"], fetcher: () => Promise<Api["response"]>) => {
+  path: keyof CurrentUserStoreReady["endpoints"],
+  response: CurrentUserStoreReady["endpoints"][keyof CurrentUserStoreReady["endpoints"]]
+}>(endpoint: keyof CurrentUserStoreReady["endpoints"], fetcher: () => Promise<Api["response"]>) => {
   const [user, { mutate }] = useUser();
   const navigate = useNavigate();
 
@@ -163,7 +163,7 @@ export const useEndpoint = <Api extends {
     }
 
     const data = await fetcher();
-    mutate("endpoints", { [endpoint]: data });
+    mutate("endpoints", endpoint, data);
   };
 
   const getter = () => user.slug ? user.endpoints[endpoint] ?? null : null;

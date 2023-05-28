@@ -33,7 +33,7 @@ export const select = async (slug: string) => {
  *
  * // You don't have to be in a reactive scope to use the function.
  * const succeed = await credentials.upsert(slug, { username, password });
- * if (!succeed) throw new Error(`Can't insert or update the credentiqls of ${slug}`);
+ * if (!succeed) throw new Error(`Can't insert or update the credentials of ${slug}`);
  */
 export const upsert = async (slug: string, decoded_credentials: {
   username: string;
