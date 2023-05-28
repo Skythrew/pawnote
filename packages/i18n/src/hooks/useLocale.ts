@@ -11,7 +11,7 @@ type DotNestedKeys<T> = (T extends object ?
  * Modified `useI18n` from `@solid-primitives/i18n` that includes typings and auto-completion.
  *
  * @example
- * import { useLocale } from "@pornote/i18n";
+ * import { useLocale } from "@pawnote/i18n";
  * const [t, { add, locale, dict }] = useLocale();
  */
 const useLocale: () => [

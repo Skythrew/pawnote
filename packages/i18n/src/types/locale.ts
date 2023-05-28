@@ -1,8 +1,8 @@
 import type { ClientAppStateCode, ClientErrorCode } from "./client";
-import type { ResponseErrorCode } from "@pawnote/api";
+import type { ApiResponseErrorCode } from "@pawnote/api";
 
 export interface Language {
-  API_ERRORS: Record<ResponseErrorCode, string>;
+  API_ERRORS: Record<ApiResponseErrorCode, string>;
   CLIENT_ERRORS: Record<ClientErrorCode, string>;
   APP_STATE: Omit<Record<ClientAppStateCode, string>, ClientAppStateCode.Idle>;
   PAGES: {
