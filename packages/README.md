@@ -1,6 +1,6 @@
 # Pawnote - Internal packages
 
-Inside Pawnote, we use internal packages that is re-used across platforms, so we don't have to write stuff everytime twice.
+Inside Pawnote, we use internal packages that is re-used across platforms, so we don't have to write stuff twice.
 
 1. [`api`](./api/): Contains code to call Pronote's API. Here, we export functions that works on every platforms.
 2. [`i18n`](./i18n/): Contains locales for Pawnote. Everyone can help in the translations, just make a Pull Request !
