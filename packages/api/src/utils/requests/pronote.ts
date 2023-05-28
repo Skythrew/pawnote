@@ -1,8 +1,10 @@
+import type { HttpCallFunction } from "@/utils/handlers/create";
 import type { SessionInstance } from "@/utils/session";
-import { retrieveResponseCookies } from "@/utils/requests/cookies";
+
+import { retrieveResponseCookies } from "@/utils/requests/headers";
 import { ApiResponseErrorCode, HandlerResponseError } from "@/utils/handlers/errors";
+
 import { serializeError } from "serialize-error";
-import { HttpCallFunction } from "../handlers/create";
 
 export enum PronoteApiAccountId {
   Commun = 0,
@@ -147,3 +149,84 @@ export const createPronoteAPICall = (fetcher: HttpCallFunction) => async <T>(
     });
   }
 };
+
+export const downloadPronotePage = async (fetcher: HttpCallFunction, options: {
+  url: string,
+  cookies?: string[],
+  user_agent: string
+}): Promise<{
+  /** Data **as text** from the given URL. */
+  body: string;
+
+  /**
+   * Cookies can be given by Pronote for authentification step
+   * when a session is being restored OR when using ENT.
+   */
+  cookies: string[];
+}> => {
+  try {
+    const headers = new Headers();
+    headers.set("Cookie", options.cookies?.join("; ") ?? "");
+
+    const response = await fetcher(options.url, {
+      method: "GET",
+      redirect: "manual",
+      headers
+    });
+
+    return {
+      cookies: retrieveResponseCookies(response.headers),
+      body: await response.text()
+    };
+  }
+  catch (error) {
+    throw new HandlerResponseError(ApiResponseErrorCode.PronotePageDownload, {
+      debug: {
+        url: options.url,
+        error: serializeError(error)
+      }
+    });
+  }
+};
+
+
+export const extractPronoteSessionFromBody = (body: string): PronoteApiSession => {
+  if (body.includes("Votre adresse IP est provisoirement suspendue")) throw new HandlerResponseError(
+    ApiResponseErrorCode.PronoteBannedIP
+  );
+
+  if (body.includes("Le site n'est pas disponible")) throw new HandlerResponseError(
+    ApiResponseErrorCode.PronoteClosedInstance
+  );
+
+  try {
+    // Remove all spaces and line breaks.
+    const body_cleaned = body.replace(/ /ug, "").replace(/\n/ug, "");
+
+    // Find the relaxed JSON of the session.
+    const from = "Start(";
+    const to = ")}catch";
+
+    const relaxed_data = body_cleaned.substring(
+      body_cleaned.indexOf(from) + from.length,
+      body_cleaned.indexOf(to)
+    );
+
+    // Convert the relaxed JSON to something we can parse.
+    const session_data_string = relaxed_data
+      .replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/gu, "\"$2\": ")
+      .replace(/'/gu, "\"");
+
+    const session_data_raw = JSON.parse(session_data_string) as PronoteApiSession;
+    return session_data_raw;
+  }
+  catch (error) {
+    throw new HandlerResponseError(ApiResponseErrorCode.SessionReadData, {
+      debug: {
+        error: serializeError(error),
+        body
+      }
+    });
+  }
+};
+
