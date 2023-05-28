@@ -1,28 +1,15 @@
-/// These utility functions are made for server-side usage only.
-
-import type { PronoteApiFunctions, PronoteApiSession } from "@/types/pronote";
-import type { SessionInstance } from "@/types/session";
-
-import type { HttpCallFunction, ResponseError, Response as ApiResponse } from "@pawnote/api";
-import { ResponseErrorCode } from "@pawnote/api";
+import type { HttpCallFunction, ApiResponseError, ApiResponse } from "@pawnote/api";
+import { ApiResponseErrorCode } from "@pawnote/api";
 
 import rate_limiter, { type RateLimiter } from "lambda-rate-limiter";
 import { type APIEvent, json } from "solid-start/api";
+
+import { searchParamsToObject } from "@/utils/globals";
 
 declare global {
   // eslint-disable-next-line no-var
   var _rate_limiter: RateLimiter;
 }
-
-const searchParamsToObject = (entries: IterableIterator<[string, string]>) => {
-  const result: Record<string, unknown> = {};
-
-  for (const [key, value] of entries) {
-    result[key] = value;
-  }
-
-  return result;
-};
 
 export const createFetcher = (user_agent: string): HttpCallFunction => async (url, options) => {
   const response = await fetch(url, {
@@ -52,7 +39,7 @@ export const handleServerRequest = <T extends {
     fetcher: HttpCallFunction
   },
   res: {
-    error: (params: Omit<ResponseError, "success">, options?: ResponseInit) => ReturnType<typeof json>,
+    error: (params: Omit<ApiResponseError, "success">, options?: ResponseInit) => ReturnType<typeof json>,
     success: (data: T["response"], options?: ResponseInit) => ReturnType<typeof json>,
     from: (data: { response: ApiResponse<T["response"]>, status: number }) => ReturnType<typeof json>
   }
@@ -74,7 +61,7 @@ export const handleServerRequest = <T extends {
     catch (count) {
       return json({
         success: false,
-        code: ResponseErrorCode.RateLimit,
+        code: ApiResponseErrorCode.RateLimit,
         debug: {
           current_count: count,
           limit_count
@@ -92,7 +79,7 @@ export const handleServerRequest = <T extends {
     catch {
       return json({
         success: false,
-        code: ResponseErrorCode.IncorrectParameters
+        code: ApiResponseErrorCode.InvalidRequestBody
       });
     }
 
@@ -103,7 +90,7 @@ export const handleServerRequest = <T extends {
     let user_agent = evt.request.headers.get("user-agent");
     if (!user_agent) return json({
       success: false,
-      code: ResponseErrorCode.IncorrectParameters,
+      code: ApiResponseErrorCode.InvalidRequestBody,
       debug: { user_agent }
     });
 
