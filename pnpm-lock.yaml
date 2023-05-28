@@ -269,6 +269,9 @@ importers:
       '@pawnote/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@pawnote/client':
+        specifier: workspace:*
+        version: link:../../packages/client
       '@pawnote/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
