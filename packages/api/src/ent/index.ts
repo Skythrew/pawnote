@@ -1,7 +1,9 @@
-import { cleanPronoteUrl } from "@/utils/requests/pronote";
-import { HttpCallFunction } from "..";
-import { retrieveResponseCookies } from "@/utils/requests/cookies";
+import type { HttpCallFunction } from "@/utils/handlers/create";
 import { ApiResponseErrorCode, HandlerResponseError } from "@/utils/handlers/errors";
+
+import { cleanPronoteUrl } from "@/utils/requests/pronote";
+import { getHeaderFromFetcherResponse, retrieveResponseCookies } from "@/utils/requests/headers";
+
 import { serializeError } from "serialize-error";
 
 interface AvailableENT {
@@ -53,26 +55,45 @@ const OpenENT: AvailableENT = {
 
     async process_ticket (fetcher, { ent_cookies, pronote_url }) {
       try {
-        const { headers } = await got.get(`${url.protocol}//${url.hostname}/cas/login`, {
-          maxRedirects: 1,
-          followRedirect: true,
-          searchParams: new URLSearchParams({
-            service: cleanPronoteUrl(pronote_url) + "/" // Add trailing slash.
-          }),
-          headers: {
-            "Cookie": ent_cookies.join("; ")
+        const ticketURL = new URL(`${url.protocol}//${url.hostname}/cas/login`);
+        // We don't forget to put a trailing slash, **very important**.
+        ticketURL.searchParams.set("service", cleanPronoteUrl(pronote_url) + "/");
+
+        const ticketHeaders = new Headers();
+        ticketHeaders.set("cookie", ent_cookies.join("; "));
+
+        const ticketResponse = await fetcher(ticketURL.href, {
+          method: "GET",
+          redirect: "manual",
+          headers: ticketHeaders
+        });
+
+        const processTicketURL = getHeaderFromFetcherResponse(ticketResponse.headers, "location");
+        if (!processTicketURL) throw new HandlerResponseError(ApiResponseErrorCode.PronoteTicketFetch, {
+          status: 500,
+          debug: {
+            message: "`location` header not found on `ticketResponse`.",
+            response_headers: ticketResponse.headers
           }
         });
 
-        return headers["location"] as string;
+        const processTicketResponse = await fetcher(processTicketURL, {
+          method: "GET",
+          redirect: "manual"
+        });
+
+        const pronoteURL = getHeaderFromFetcherResponse(processTicketResponse.headers, "location");
+        if (!pronoteURL) throw new HandlerResponseError(ApiResponseErrorCode.PronoteTicketFetch, {
+          status: 500,
+          debug: {
+            message: "`location` header not found on `processTicketResponse`.",
+            response_headers: processTicketResponse.headers
+          }
+        });
+
+        return pronoteURL;
       }
       catch (error) {
-        // If the login is successful and it redirects to the Pronote
-        // ticket, get the redirected URL (for 'identifiant' parsing).
-        if (error instanceof MaxRedirectsError) {
-          return error.response.headers["location"] as string;
-        }
-
         throw new HandlerResponseError(ApiResponseErrorCode.PronoteTicketFetch, {
           status: 500,
           debug: { error: serializeError(error) }
