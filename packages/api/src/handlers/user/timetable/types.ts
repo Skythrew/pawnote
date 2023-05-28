@@ -1,6 +1,12 @@
 import type { PronoteApiUserData, ApiUserData } from "@/handlers/user/data/types";
-import { PronoteApiOnglets, PronoteApiFunctions } from "@/types/pronote_api";
-import type { SessionExported } from "@/utils/session";
+import { PronoteApiOnglets, PronoteApiFunctions } from "@/utils/requests/pronote";
+import { SessionExportedSchema, type SessionExported } from "@/utils/session";
+import { z } from "zod";
+
+export const ApiUserTimetableRequestSchema = z.object({
+  session: SessionExportedSchema,
+  resource: z.object({})
+});
 
 export enum PronoteApiUserTimetableContentType {
   Subject = 16,

@@ -1,5 +1,10 @@
-import { PronoteApiFunctions, PronoteApiOnglets } from "@/types/pronote_api";
-import type { SessionExported } from "@/utils/session";
+import { PronoteApiFunctions, PronoteApiOnglets } from "@/utils/requests/pronote";
+import { SessionExportedSchema, type SessionExported } from "@/utils/session";
+import { z } from "zod";
+
+export const ApiUserDataRequestSchema = z.object({
+  session: SessionExportedSchema
+});
 
 export interface PronoteApiUserData {
   request: Record<string, never>;
@@ -136,7 +141,6 @@ export interface PronoteApiUserData {
           }[];
         };
       };
-
 
       /** Informations about school. */
       listeInformationsEtablissements: {
@@ -287,9 +291,7 @@ export interface PronoteApiUserData {
 }
 
 export interface ApiUserData {
-  request: {
-    session: SessionExported;
-  }
+  request: z.infer<typeof ApiUserDataRequestSchema>
 
   response: {
     received: PronoteApiUserData["response"];

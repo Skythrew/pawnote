@@ -1,5 +1,12 @@
-import { PronoteApiAccountId, PronoteApiFunctions } from "@/types/pronote_api";
-import type { SessionExported } from "@/utils/session";
+import { PronoteApiAccountId, PronoteApiFunctions } from "@/utils/requests/pronote";
+import { SessionExportedSchema, type SessionExported } from "@/utils/session";
+import { z } from "zod";
+
+export const ApiLoginIdentifyRequestSchema = z.object({
+  pronote_username: z.string(),
+  session: SessionExportedSchema,
+  cookies: z.optional(z.array(z.string()))
+});
 
 export interface PronoteApiLoginIdentify {
   request: {
@@ -34,12 +41,7 @@ export interface PronoteApiLoginIdentify {
 }
 
 export interface ApiLoginIdentify {
-  request: {
-    pronote_username: string;
-
-    session: SessionExported;
-    cookies?: string[];
-  }
+  request:  z.infer<typeof ApiLoginIdentifyRequestSchema>
 
   response: {
     received: PronoteApiLoginIdentify["response"];

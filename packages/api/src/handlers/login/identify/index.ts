@@ -1,64 +1,39 @@
 import type { PronoteApiLoginIdentify, ApiLoginIdentify } from "./types";
-import { PronoteApiFunctions } from "@/types/pronote_api";
+import { ApiLoginIdentifyRequestSchema } from "./types";
 
-import { createApiFunction, callPronoteAPI, ResponseErrorCode } from "@/utils/requests";
+import { createPronoteAPICall, PronoteApiFunctions } from "@/utils/requests/pronote";
+import { createApiFunction } from "@/utils/handlers/create";
 import { Session } from "@/utils/session";
 
-export default createApiFunction<ApiLoginIdentify>(async (req, res) => {
-  if (!("session" in req.body) || !("pronote_username" in req.body))
-    return res.error({
-      code: ResponseErrorCode.MissingParameters,
-      debug: { received_body: req.body }
-    }, { status: 400 });
+export default createApiFunction<ApiLoginIdentify>(ApiLoginIdentifyRequestSchema, async (req, res) => {
+  const session = Session.importFromObject(req.body.session);
 
-  try {
-    const session = Session.importFromObject(req.body.session);
+  const request_payload = session.writePronoteFunctionPayload<PronoteApiLoginIdentify["request"]>({
+    donnees: {
+      genreConnexion: 0,
+      genreEspace: session.instance.account_type_id,
+      identifiant: req.body.pronote_username,
+      pourENT: session.instance.use_ent ?? false,
+      enConnexionAuto: false,
+      demandeConnexionAuto: false,
+      demandeConnexionAppliMobile: false,
+      demandeConnexionAppliMobileJeton: false,
+      uuidAppliMobile: "",
+      loginTokenSAV: ""
+    }
+  });
 
-    const request_payload = session.writePronoteFunctionPayload<PronoteApiLoginIdentify["request"]>({
-      donnees: {
-        genreConnexion: 0,
-        genreEspace: session.instance.account_type_id,
-        identifiant: req.body.pronote_username,
-        pourENT: session.instance.use_ent ?? false,
-        enConnexionAuto: false,
-        demandeConnexionAuto: false,
-        demandeConnexionAppliMobile: false,
-        demandeConnexionAppliMobileJeton: false,
-        uuidAppliMobile: "",
-        loginTokenSAV: ""
-      }
-    });
+  const response = await createPronoteAPICall(req.fetch)(PronoteApiFunctions.Identify, {
+    session_instance: session.instance,
+    cookies: req.body.cookies ?? [],
+    payload: request_payload,
+    user_agent: req.userAgent
+  });
 
-    const response = await callPronoteAPI(PronoteApiFunctions.Identify, {
-      session_instance: session.instance,
-      cookies: req.body.cookies ?? [],
-      payload: request_payload,
-      user_agent: req.userAgent
-    });
+  const received = session.readPronoteFunctionPayload<PronoteApiLoginIdentify["response"]>(response.payload);
 
-    if (response === null) return res.error({
-      code: ResponseErrorCode.NetworkFail
-    }, { status: 500 });
-
-    const received = session.readPronoteFunctionPayload<PronoteApiLoginIdentify["response"]>(response.payload);
-    if (typeof received === "number") return res.error({
-      code: received,
-      debug: {
-        response,
-        request_payload,
-        cookies: req.body.cookies
-      }
-    }, { status: 400 });
-
-    return res.success({
-      received,
-      session: session.exportToObject()
-    });
-  }
-  catch (error) {
-    return res.error({
-      code: ResponseErrorCode.ServerSideError,
-      debug: { trace: error }
-    });
-  }
+  return res.success({
+    received,
+    session: session.exportToObject()
+  });
 });

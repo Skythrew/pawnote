@@ -1,5 +1,25 @@
-import { PronoteApiFunctions, PronoteApiAccountId } from "@/types/pronote_api";
+import { PronoteApiFunctions, PronoteApiAccountId } from "@/utils/requests/pronote";
 import type { SessionExported } from "@/utils/session";
+import { z } from "zod";
+
+export const ApiLoginInformationsRequestSchema = z.object({
+  account_type: z.nativeEnum(PronoteApiAccountId),
+  pronote_url: z.string(),
+
+  /**
+    * Tells the server to not clean the Pronote URL.
+    * Defaults to `false`.
+    */
+  raw_url: z.optional(z.boolean()),
+
+  /**
+   * Cookies used when downloading the Pronote page.
+   * Required when creating a new session from ENT or an already set-up session.
+   *
+   * This will append `e` and `f` in to the `setup` object.
+   */
+  cookies: z.optional(z.array(z.string()))
+});
 
 export interface PronoteApiLoginInformations {
 	request: {
@@ -364,24 +384,7 @@ export interface PronoteApiLoginInformations {
 }
 
 export interface ApiLoginInformations {
-	request: {
-    account_type: PronoteApiAccountId;
-		pronote_url: string;
-
-    /**
-      * Tells the server to not clean the Pronote URL.
-      * Defaults to `false`.
-      */
-    raw_url?: boolean;
-
-    /**
-     * Cookies used when downloading the Pronote page.
-     * Required when creating a new session from ENT or an already set-up session.
-     *
-     * This will append `e` and `f` in to the `setup` object.
-     */
-    cookies?: string[];
-	}
+	request: z.infer<typeof ApiLoginInformationsRequestSchema>
 
 	response: {
 		received: PronoteApiLoginInformations["response"];

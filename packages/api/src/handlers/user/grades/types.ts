@@ -1,6 +1,12 @@
-import { PronoteApiOnglets, PronoteApiFunctions } from "@/types/pronote_api";
+import { PronoteApiOnglets, PronoteApiFunctions } from "@/utils/requests/pronote";
 import type { PronoteApiUserData } from "@/handlers/user/data/types";
-import type { SessionExported } from "@/utils/session";
+import { SessionExportedSchema, type SessionExported } from "@/utils/session";
+import { z } from "zod";
+
+export const ApiUserGradesRequestSchema = z.object({
+  session: SessionExportedSchema,
+  period: z.object({})
+});
 
 export interface PronoteApiUserGrades {
   request: {

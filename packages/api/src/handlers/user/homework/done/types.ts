@@ -1,5 +1,11 @@
-import { PronoteApiOnglets, PronoteApiFunctions } from "@/types/pronote_api";
-import type { SessionExported } from "@/utils/session";
+import { PronoteApiOnglets, PronoteApiFunctions } from "@/utils/requests/pronote";
+import { SessionExportedSchema, type SessionExported } from "@/utils/session";
+import { z } from "zod";
+
+export const ApiUserHomeworkDoneRequestSchema = z.object({
+  session: SessionExportedSchema,
+  done: z.boolean()
+});
 
 export interface PronoteApiUserHomeworkDone {
   request: {
@@ -27,10 +33,7 @@ export interface PronoteApiUserHomeworkDone {
 
 type ApiUserHomeworkDonePath = `/user/homework/${string}/done`;
 export interface ApiUserHomeworkDone {
-  request: {
-    session: SessionExported;
-    done: boolean;
-  }
+  request: z.infer<typeof ApiUserHomeworkDoneRequestSchema>
 
   response: {
     received: PronoteApiUserHomeworkDone["response"];

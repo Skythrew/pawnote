@@ -1,5 +1,10 @@
-import { PronoteApiFunctions, PronoteApiOnglets } from "@/types/pronote_api";
-import type { SessionExported } from "@/utils/session";
+import { PronoteApiFunctions, PronoteApiOnglets } from "@/utils/requests/pronote";
+import { SessionExportedSchema, type SessionExported } from "@/utils/session";
+import { z } from "zod";
+
+export const ApiUserResourcesRequestSchema = z.object({
+  session: SessionExportedSchema
+});
 
 export interface PronoteApiUserResources {
   request: {
@@ -189,9 +194,7 @@ export interface PronoteApiUserResources {
 
 type ApiUserResourcesPath = `/user/resources/${number}`;
 export interface ApiUserResources {
-  request: {
-    session: SessionExported;
-  }
+  request: z.infer<typeof ApiUserResourcesRequestSchema>
 
   response: {
     received: PronoteApiUserResources["response"];
