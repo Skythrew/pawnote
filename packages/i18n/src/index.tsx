@@ -4,7 +4,8 @@ import { createI18nContext, I18nContext } from "@solid-primitives/i18n";
 // We import the French locale since it's the language by default.
 import fr from "@/locales/fr";
 export const LANGUAGES = {
-  en: () => import("@/locales/en"),
+  // eslint-disable-next-line no-return-await
+  en: async () => await import("@/locales/en"),
   fr
 };
 
@@ -15,10 +16,9 @@ export const LANGUAGES = {
 export const FULLNAME_LANGUAGE_LIST: {
   [name: string]: keyof typeof LANGUAGES
 } = {
-  "English": "en",
-  "Français": "fr"
+  English: "en",
+  Français: "fr"
 } as const;
-
 
 // By default, only add French so we can lazy load the other locales.
 const context = createI18nContext({ fr }, "fr");
@@ -30,13 +30,12 @@ export const LocaleProvider: FlowComponent = (props) => (
 );
 
 export const findLanguageBasedOnBrowser = (): keyof typeof LANGUAGES => {
-  const browserLanguages = window.navigator.languages || [window.navigator.language].map(str => str.toLowerCase());
-
   // Try to find a match based on the first part of the available languages (i.e., match "en" for "en-US")
-  for (const language of browserLanguages) {
+  for (const language of window.navigator.languages) {
     for (const availableLanguage of Object.keys(LANGUAGES)) {
-      if (language.startsWith(availableLanguage))
+      if (language.startsWith(availableLanguage)) {
         return availableLanguage as keyof typeof LANGUAGES;
+      }
     }
   }
 
@@ -47,19 +46,19 @@ export const findLanguageBasedOnBrowser = (): keyof typeof LANGUAGES => {
  * Helper function to switch current locale easily.
  * It also implements the lazy loading when needed.
  */
-export const switchLanguage = async (lang: keyof typeof LANGUAGES) => {
+export const switchLanguage = async (lang: keyof typeof LANGUAGES): Promise<void> => {
   const { add, locale } = context[1]; // `[1]` since `context` is `[t, {...actions}]`
 
   // When the language is not available, default to French (`fr`).
-  if (!LANGUAGES[lang]) {
+  if (!(lang in LANGUAGES)) {
     localStorage.setItem("lang", "fr");
     locale("fr");
     return;
   }
 
   // Since French is already imported, we don't need to import it again.
-  const dict = lang !== "fr" ?
-    await LANGUAGES[lang]()
+  const dict = lang !== "fr"
+    ? await LANGUAGES[lang]()
     : LANGUAGES[lang];
 
   // Add the language to locales.

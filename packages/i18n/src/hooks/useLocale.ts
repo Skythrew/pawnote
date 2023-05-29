@@ -17,7 +17,7 @@ type DotNestedKeys<T> = (T extends object ?
 const useLocale: () => [
   template: (key: DotNestedKeys<Language>, params?: Record<string, string>, defaultValue?: string) => string,
   actions: {
-    add: (lang: string, table: Language) => void;
+    add: (lang: string, table: Language) => void
     /**
      * @example
      * // Get current locale.
@@ -26,8 +26,8 @@ const useLocale: () => [
      * // Set current locale.
      * locale("fr") // Sets locale to `fr`.
      */
-    locale: (lang?: string) => string;
-    dict: (lang: string) => Record<string, Record<string, unknown>>;
+    locale: (lang?: string) => string
+    dict: (lang: string) => Record<string, Record<string, unknown>>
   }
 ] = useI18n;
 

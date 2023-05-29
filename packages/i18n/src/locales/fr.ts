@@ -65,5 +65,4 @@ export default {
   CLIENT_ERRORS,
   APP_STATE,
   PAGES
-} as Language;
-
+} satisfies Language;

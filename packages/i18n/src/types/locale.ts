@@ -2,9 +2,9 @@ import type { ClientAppStateCode, ClientErrorCode } from "./client";
 import type { ApiResponseErrorCode } from "@pawnote/api";
 
 export interface Language {
-  API_ERRORS: Record<ApiResponseErrorCode, string>;
-  CLIENT_ERRORS: Record<ClientErrorCode, string>;
-  APP_STATE: Omit<Record<ClientAppStateCode, string>, ClientAppStateCode.Idle>;
+  API_ERRORS: Record<ApiResponseErrorCode, string>
+  CLIENT_ERRORS: Record<ClientErrorCode, string>
+  APP_STATE: Omit<Record<ClientAppStateCode, string>, ClientAppStateCode.Idle>
   PAGES: {
     /** Corresponds to `@/root.tsx` */
     _: Record<

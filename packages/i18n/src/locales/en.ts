@@ -65,4 +65,4 @@ export default {
   APP_STATE,
   API_ERRORS,
   CLIENT_ERRORS
-} as Language;
+} satisfies Language;
