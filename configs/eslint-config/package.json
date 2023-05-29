@@ -12,6 +12,7 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
+    "ts-standard": "^12.0.2",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "@typescript-eslint/utils": "^5.57.1",

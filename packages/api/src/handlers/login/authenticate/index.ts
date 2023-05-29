@@ -26,23 +26,27 @@ export default createApiFunction<ApiLoginAuthenticate>(ApiLoginAuthenticateReque
   });
 
   const received = session.readPronoteFunctionPayload<PronoteApiLoginAuthenticate["response"]>(response.payload);
-  if (typeof received === "number") return res.error({
-    code: received,
-    debug: {
-      response,
-      request_payload,
-      cookies: req.body.cookies
-    }
-  }, { status: 400 });
+  if (typeof received === "number") {
+    return res.error({
+      code: received,
+      debug: {
+        response,
+        request_payload,
+        cookies: req.body.cookies
+      }
+    }, { status: 400 });
+  }
 
-  if (!received.donnees.cle) return res.error({
-    code: ApiResponseErrorCode.IncorrectCredentials,
-    debug: {
-      received,
-      request_payload,
-      cookies: req.body.cookies
-    }
-  }, { status: 403 });
+  if (received.donnees.cle === undefined || received.donnees.cle === null) {
+    return res.error({
+      code: ApiResponseErrorCode.IncorrectCredentials,
+      debug: {
+        received,
+        request_payload,
+        cookies: req.body.cookies
+      }
+    }, { status: 403 });
+  }
 
   return res.success({
     received,

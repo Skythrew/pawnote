@@ -19,9 +19,9 @@ export enum PronoteApiAccountId {
 }
 
 export interface PronoteApiAccountType {
-  id: PronoteApiAccountId;
-  name: string;
-  path: string;
+  id: PronoteApiAccountId
+  name: string
+  path: string
 }
 
 export enum PronoteApiFunctions {
@@ -45,47 +45,47 @@ export enum PronoteApiOnglets {
 
 export interface PronoteApiSession {
   /** Session ID as a **string**. */
-  h: string;
+  h: string
   /** Account Type ID. */
-  a: PronoteApiAccountId;
+  a: PronoteApiAccountId
   /** Whether the instance is demo or not. */
-  d: boolean;
+  d: boolean
 
   /** ENT Username. */
-  e?: string;
+  e?: string
   /** ENT Password. */
-  f?: string;
-  g?: number;
+  f?: string
+  g?: number
 
   /** Modulus for RSA encryption. */
-  MR: string;
+  MR: string
   /** Exponent for RSA encryption. */
-  ER: string;
+  ER: string
 
   /** Skip request encryption. */
-  sCrA: boolean;
+  sCrA: boolean
   /** Skip request compression. */
-  sCoA: boolean;
+  sCoA: boolean
 }
 
 export interface PronoteApiFunctionPayload<T> {
-  nom: string;
-  session: number;
-  numeroOrdre: string;
+  nom: string
+  session: number
+  numeroOrdre: string
 
   /** `string` only when compressed and/or encrypted. */
-  donneesSec: T | string;
+  donneesSec: T | string
 }
 
 export interface PronoteApiFunctionError {
   Erreur: {
-    G: number;
-    Message: string;
-    Titre: string;
+    G: number
+    Message: string
+    Titre: string
   }
 }
 
-export const cleanPronoteUrl = (url: string) => {
+export const cleanPronoteUrl = (url: string): string => {
   let pronote_url = new URL(url);
   // Clean any unwanted data from URL.
   pronote_url = new URL(`${pronote_url.protocol}//${pronote_url.host}${pronote_url.pathname}`);
@@ -100,22 +100,22 @@ export const cleanPronoteUrl = (url: string) => {
   pronote_url.pathname = paths.join("/");
 
   // Return rebuilt URL without trailing slash.
-  return pronote_url.href.endsWith("/") ?
-    pronote_url.href.slice(0, -1) :
-    pronote_url.href;
+  return pronote_url.href.endsWith("/")
+    ? pronote_url.href.slice(0, -1)
+    : pronote_url.href;
 };
 
 export const createPronoteAPICall = (fetcher: HttpCallFunction) => async <T>(
   function_name: PronoteApiFunctions,
   data: {
     /** Returned value of `Session.writePronoteFunctionPayload`. */
-    payload: { order: string, data: T | string },
+    payload: { order: string, data: T | string }
     /** Force to use this URL instead of the one in `session_instance` */
-    pronote_url?: string;
-    session_instance: SessionInstance;
+    pronote_url?: string
+    session_instance: SessionInstance
     /** `User-Agent` header to prevent browser/bot detection issues. */
-    user_agent: string;
-    cookies?: string[];
+    user_agent: string
+    cookies?: string[]
   }
 ) => {
   try {
@@ -126,7 +126,7 @@ export const createPronoteAPICall = (fetcher: HttpCallFunction) => async <T>(
       headers: {
         "User-Agent": data.user_agent,
         "Content-Type": "application/json",
-        "Cookie": data.cookies?.join("; ") ?? ""
+        Cookie: data.cookies?.join("; ") ?? ""
       },
       body: JSON.stringify({
         session: data.session_instance.session_id,
@@ -151,18 +151,18 @@ export const createPronoteAPICall = (fetcher: HttpCallFunction) => async <T>(
 };
 
 export const downloadPronotePage = async (fetcher: HttpCallFunction, options: {
-  url: string,
-  cookies?: string[],
+  url: string
+  cookies?: string[]
   user_agent: string
 }): Promise<{
   /** Data **as text** from the given URL. */
-  body: string;
+  body: string
 
   /**
    * Cookies can be given by Pronote for authentification step
    * when a session is being restored OR when using ENT.
    */
-  cookies: string[];
+  cookies: string[]
 }> => {
   try {
     const headers = new Headers();
@@ -189,15 +189,18 @@ export const downloadPronotePage = async (fetcher: HttpCallFunction, options: {
   }
 };
 
-
 export const extractPronoteSessionFromBody = (body: string): PronoteApiSession => {
-  if (body.includes("Votre adresse IP est provisoirement suspendue")) throw new HandlerResponseError(
-    ApiResponseErrorCode.PronoteBannedIP
-  );
+  if (body.includes("Votre adresse IP est provisoirement suspendue")) {
+    throw new HandlerResponseError(
+      ApiResponseErrorCode.PronoteBannedIP
+    );
+  }
 
-  if (body.includes("Le site n'est pas disponible")) throw new HandlerResponseError(
-    ApiResponseErrorCode.PronoteClosedInstance
-  );
+  if (body.includes("Le site n'est pas disponible")) {
+    throw new HandlerResponseError(
+      ApiResponseErrorCode.PronoteClosedInstance
+    );
+  }
 
   try {
     // Remove all spaces and line breaks.
@@ -229,4 +232,3 @@ export const extractPronoteSessionFromBody = (body: string): PronoteApiSession =
     });
   }
 };
-

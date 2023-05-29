@@ -4,14 +4,14 @@ import { z } from "zod";
 import { serializeError } from "serialize-error";
 
 export interface ApiResponseError {
-  success: false;
-  code: ApiResponseErrorCode;
-  debug?: unknown;
+  success: false
+  code: ApiResponseErrorCode
+  debug?: unknown
 }
 
 export interface ApiResponseSuccess<T> {
-  success: true;
-  data: T;
+  success: true
+  data: T
 }
 
 export type ApiResponse<T> = ApiResponseSuccess<T> | ApiResponseError;
@@ -21,31 +21,31 @@ export type ApiResponse<T> = ApiResponseSuccess<T> | ApiResponseError;
  * typings used to fetch external resources.
  */
 export type HttpCallFunction = (url: string, options: {
-  method: "GET" | "POST";
+  method: "GET" | "POST"
   /** Headers that should be appended to the request. */
-  headers?: Record<string, string> | Headers;
+  headers?: Record<string, string> | Headers
   /** Body of the request of type given in the "Content-Type" header. */
-  body?: unknown;
+  body?: unknown
   /** Whether we should automatically handle the redirections or do it by hand. */
-  redirect?: "follow" | "manual";
+  redirect?: "follow" | "manual"
 }) => Promise<{
-  headers: Record<string, string> | Headers;
-  text: () => Promise<string>;
-  json: <T>() => Promise<T>;
+  headers: Record<string, string> | Headers
+  text: () => Promise<string>
+  json: <T>() => Promise<T>
 }>;
 
-type RequestLikeApi = {
-  request: unknown;
-  response: unknown;
+interface RequestLikeApi {
+  request: unknown
+  response: unknown
   /** Parameters that can be passed to the API function. */
-  params?: unknown;
+  params?: unknown
 }
 
 type HandlerFunction<T extends RequestLikeApi> = (
   req: {
-    fetch: HttpCallFunction,
-    body: T["request"],
-    params: T["params"],
+    fetch: HttpCallFunction
+    body: T["request"]
+    params: T["params"]
     userAgent: string
   },
   res: {
@@ -53,15 +53,15 @@ type HandlerFunction<T extends RequestLikeApi> = (
       data: Omit<ApiResponseError, "success">,
       options?: { status?: number }
     ) => {
-      response: ApiResponseError,
+      response: ApiResponseError
       status: number
-    },
+    }
     success: (data: T["response"]) => {
-      response: ApiResponseSuccess<T["response"]>,
+      response: ApiResponseSuccess<T["response"]>
       status: 200
     }
   }
-) => Promise<{ response: ApiResponse<T["response"]>, status: number}>
+) => Promise<{ response: ApiResponse<T["response"]>, status: number }>
 
 /** Internal helper to create handlers easily with built-in support for typings. */
 export const createApiFunction = <T extends RequestLikeApi>(requestBodySchema: z.ZodType, callback: HandlerFunction<T>) => async (
@@ -72,16 +72,18 @@ export const createApiFunction = <T extends RequestLikeApi>(requestBodySchema: z
 ): ReturnType<HandlerFunction<T>> => {
   // Validate the request body before continue.
   const requestBodyCheck = requestBodySchema.safeParse(body);
-  if (!requestBodyCheck.success) return ({
-    status: 400,
-    response: {
-      success: false,
-      code: ApiResponseErrorCode.InvalidRequestBody
-    }
-  });
+  if (!requestBodyCheck.success) {
+    return ({
+      status: 400,
+      response: {
+        success: false,
+        code: ApiResponseErrorCode.InvalidRequestBody
+      }
+    });
+  }
 
   try {
-    return callback({
+    return await callback({
       fetch: fetcher,
       body,
       params,

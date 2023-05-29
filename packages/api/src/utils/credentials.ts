@@ -2,8 +2,8 @@ import forge from "node-forge";
 
 export const credentials = {
   encode (options: {
-    username: string;
-    password: string;
+    username: string
+    password: string
   }) {
     return forge.util.createBuffer(`${forge.util.encode64(options.username)}:${forge.util.encode64(options.password)}`)
     // My own encrypting method, inspired by Pronote developers.

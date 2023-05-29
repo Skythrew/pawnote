@@ -15,9 +15,9 @@ export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsReque
   const account_type = PRONOTE_ACCOUNT_TYPES[req.body.account_type];
 
   // Don't clean the URL when `raw_url` is set to `true`.
-  const pronote_page_url = req.body.raw_url && req.body.raw_url === true
+  const pronote_page_url = req.body.raw_url === true && req.body.raw_url
     ? req.body.pronote_url
-    : pronote_url + `/${account_type.path}?login=true`;
+    : pronote_url + `/${account_type.path as string}?login=true`;
 
   const pronote_page = await downloadPronotePage(req.fetch, {
     url: pronote_page_url,
@@ -43,14 +43,16 @@ export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsReque
   );
 
   const aes_iv = session.encryption.aes.iv;
-  if (!aes_iv) return res.error({
-    code: ApiResponseErrorCode.NoIVForAESCreated,
-    debug: {
-      pronote_page,
-      pronote_page_url,
-      encryption: session.encryption
-    }
-  }, { status: 500 });
+  if (aes_iv === undefined) {
+    return res.error({
+      code: ApiResponseErrorCode.NoIVForAESCreated,
+      debug: {
+        pronote_page,
+        pronote_page_url,
+        encryption: session.encryption
+      }
+    }, { status: 500 });
+  }
 
   // Create "Uuid" property for the request.
   const rsa_uuid = forge.util.encode64(rsa_key.encrypt(aes_iv), 64);
@@ -82,9 +84,11 @@ export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsReque
     cookies: response.cookies,
     received,
 
-    setup: session_data.e && session_data.f ? {
-      username: session_data.e,
-      password: session_data.f
-    } : undefined
+    setup: session_data.e !== undefined && session_data.f !== undefined
+      ? {
+        username: session_data.e,
+        password: session_data.f
+      }
+      : undefined
   });
 });

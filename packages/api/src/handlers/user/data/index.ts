@@ -1,10 +1,9 @@
 import type { PronoteApiUserData, ApiUserData } from "./types";
 import { ApiUserDataRequestSchema } from "./types";
 
-import { PronoteApiFunctions } from "@/utils/requests/pronote";
+import { PronoteApiFunctions, createPronoteAPICall } from "@/utils/requests/pronote";
 
 import { createApiFunction } from "@/utils/handlers/create";
-import { createPronoteAPICall } from "@/utils/requests/pronote";
 import { Session } from "@/utils/session";
 
 export default createApiFunction<ApiUserData>(ApiUserDataRequestSchema, async (req, res) => {
@@ -22,7 +21,7 @@ export default createApiFunction<ApiUserData>(ApiUserDataRequestSchema, async (r
 
   // This is the authenticated cookie that will be used to restore sessions!
   const pronote_session_cookie = response.cookies.find(cookie => cookie.startsWith("CASTGC="));
-  if (pronote_session_cookie) {
+  if (pronote_session_cookie !== undefined) {
     // Define the golden cookie in the session to export.
     session.instance.pronote_cookies = [pronote_session_cookie];
   }

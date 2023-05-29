@@ -6,12 +6,14 @@ import { getHeaderFromFetcherResponse, retrieveResponseCookies } from "@/utils/r
 
 import { serializeError } from "serialize-error";
 
+interface MethodsENT {
+  authenticate: (fetcher: HttpCallFunction, options: { username: string, password: string }) => Promise<string[]>
+  process_ticket: (fetcher: HttpCallFunction, options: { ent_cookies: string[], pronote_url: string }) => Promise<string>
+}
+
 interface AvailableENT {
-  hostnames: string[];
-  methods: (url: URL) => {
-    authenticate: (fetcher: HttpCallFunction, options: { username: string, password: string}) => Promise<string[]>;
-    process_ticket: (fetcher: HttpCallFunction, options: { ent_cookies: string[], pronote_url: string }) => Promise<string>;
-  }
+  hostnames: string[]
+  methods: (url: URL) => MethodsENT
 }
 
 const OpenENT: AvailableENT = {
@@ -29,7 +31,7 @@ const OpenENT: AvailableENT = {
 
         const body = new URLSearchParams({
           email: username,
-          password: password,
+          password,
           rememberMe: "true"
         }).toString();
 
@@ -69,13 +71,15 @@ const OpenENT: AvailableENT = {
         });
 
         const processTicketURL = getHeaderFromFetcherResponse(ticketResponse.headers, "location");
-        if (!processTicketURL) throw new HandlerResponseError(ApiResponseErrorCode.PronoteTicketFetch, {
-          status: 500,
-          debug: {
-            message: "`location` header not found on `ticketResponse`.",
-            response_headers: ticketResponse.headers
-          }
-        });
+        if (processTicketURL === null) {
+          throw new HandlerResponseError(ApiResponseErrorCode.PronoteTicketFetch, {
+            status: 500,
+            debug: {
+              message: "`location` header not found on `ticketResponse`.",
+              response_headers: ticketResponse.headers
+            }
+          });
+        }
 
         const processTicketResponse = await fetcher(processTicketURL, {
           method: "GET",
@@ -83,13 +87,15 @@ const OpenENT: AvailableENT = {
         });
 
         const pronoteURL = getHeaderFromFetcherResponse(processTicketResponse.headers, "location");
-        if (!pronoteURL) throw new HandlerResponseError(ApiResponseErrorCode.PronoteTicketFetch, {
-          status: 500,
-          debug: {
-            message: "`location` header not found on `processTicketResponse`.",
-            response_headers: processTicketResponse.headers
-          }
-        });
+        if (pronoteURL === null) {
+          throw new HandlerResponseError(ApiResponseErrorCode.PronoteTicketFetch, {
+            status: 500,
+            debug: {
+              message: "`location` header not found on `processTicketResponse`.",
+              response_headers: processTicketResponse.headers
+            }
+          });
+        }
 
         return pronoteURL;
       }
@@ -107,7 +113,7 @@ const available_ents: AvailableENT[] = [
   OpenENT
 ];
 
-export const findENT = (raw_url: string) => {
+export const findENT = (raw_url: string): MethodsENT => {
   let url = new URL(raw_url);
 
   // Workarounds for some URLs.
@@ -124,7 +130,7 @@ export const findENT = (raw_url: string) => {
       current => current === url.hostname
     );
 
-    if (contains_hostname) return service.methods(url);
+    if (contains_hostname !== undefined) return service.methods(url);
   }
 
   throw new HandlerResponseError(ApiResponseErrorCode.ENTNotFound, {

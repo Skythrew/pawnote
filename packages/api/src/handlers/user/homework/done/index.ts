@@ -4,8 +4,7 @@ import { ApiUserHomeworkDoneRequestSchema } from "./types";
 import { createApiFunction } from "@/utils/handlers/create";
 import { ApiResponseErrorCode } from "@/utils/handlers/errors";
 
-import { PronoteApiFunctions, PronoteApiOnglets } from "@/utils/requests/pronote";
-import { createPronoteAPICall } from "@/utils/requests/pronote";
+import { PronoteApiFunctions, PronoteApiOnglets, createPronoteAPICall } from "@/utils/requests/pronote";
 import { Session } from "@/utils/session";
 
 import { z } from "zod";
@@ -14,10 +13,12 @@ export default createApiFunction<ApiUserHomeworkDone>(ApiUserHomeworkDoneRequest
   const homework_id = req.params.homework_id;
   const homework_id_check = (z.string()).safeParse(homework_id);
 
-  if (!homework_id_check.success) return res.error({
-    code: ApiResponseErrorCode.InvalidRequestBody,
-    debug: { homework_id, error: homework_id_check.error.toString() }
-  }, { status: 400 });
+  if (!homework_id_check.success) {
+    return res.error({
+      code: ApiResponseErrorCode.InvalidRequestBody,
+      debug: { homework_id, error: homework_id_check.error.toString() }
+    }, { status: 400 });
+  }
 
   const session = Session.importFromObject(req.body.session);
 

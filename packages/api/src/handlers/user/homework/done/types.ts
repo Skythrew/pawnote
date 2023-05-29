@@ -9,25 +9,25 @@ export const ApiUserHomeworkDoneRequestSchema = z.object({
 
 export interface PronoteApiUserHomeworkDone {
   request: {
-		_Signature_: {
-			onglet: PronoteApiOnglets.Homeworks;
-		}
+    _Signature_: {
+      onglet: PronoteApiOnglets.Homeworks
+    }
 
     donnees: {
-      listeTAF: {
+      listeTAF: Array<{
         /** ID of the homework. */
-        N: string;
-        E: 2; // Why 2 ? I don't even know.
+        N: string
+        E: 2 // Why 2 ? I don't even know.
         /** Homework has been done or not. */
-        TAFFait: boolean;
-      }[];
+        TAFFait: boolean
+      }>
     }
   }
 
   response: {
-    nom: PronoteApiFunctions.HomeworkDone;
-    RapportSaisie: Record<string, never>;
-    donnees: Record<string, never>;
+    nom: PronoteApiFunctions.HomeworkDone
+    RapportSaisie: Record<string, never>
+    donnees: Record<string, never>
   }
 }
 
@@ -36,13 +36,13 @@ export interface ApiUserHomeworkDone {
   request: z.infer<typeof ApiUserHomeworkDoneRequestSchema>
 
   response: {
-    received: PronoteApiUserHomeworkDone["response"];
-    session: SessionExported;
+    received: PronoteApiUserHomeworkDone["response"]
+    session: SessionExported
   }
 
   params: {
-    homework_id: string;
+    homework_id: string
   }
 
-  path: ApiUserHomeworkDonePath;
+  path: ApiUserHomeworkDonePath
 }

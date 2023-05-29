@@ -5,10 +5,7 @@ module.exports = /** @type {import('@typescript-eslint/utils').TSESLint.Linter.C
   plugins: [
     "@typescript-eslint"
   ],
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
+  extends: "standard-with-typescript",
   rules: {
     "brace-style": [
       "error", "stroustrup"
@@ -34,7 +31,13 @@ module.exports = /** @type {import('@typescript-eslint/utils').TSESLint.Linter.C
 
     "no-return-await": "error",
     "no-trailing-spaces": "error",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/semi": "off",
+    "@typescript-eslint/brace-style": "off",
+    "@typescript-eslint/quotes": "off",
+    "@typescript-eslint/indent": "off",
 
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "@typescript-eslint/naming-convention": "off",
+    "n/no-callback-literal": "off"
   }
 });
