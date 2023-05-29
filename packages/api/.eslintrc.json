@@ -1,9 +1,0 @@
-{
-  "extends": [
-    "@pawnote/eslint-config"
-  ],
-  "parserOptions": {
-    "project": "./tsconfig.json"
-  },
-  "ignorePatterns": ["rollup.config.js"]
-}

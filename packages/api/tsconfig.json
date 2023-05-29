@@ -13,12 +13,12 @@
     "strict": true,
     "noEmit": true,
 
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]
     }
   },
 
-  "include": ["src"],
-  "exclude": ["node_module/**", "dist/**"]
+  "include": ["src", ".eslintrc.cjs", "rollup.config.js"],
+  "exclude": ["node_modules/**", "dist/**"]
 }

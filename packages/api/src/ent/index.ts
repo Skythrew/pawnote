@@ -118,11 +118,11 @@ export const findENT = (raw_url: string): MethodsENT => {
 
   // Workarounds for some URLs.
   switch (url.hostname) {
-  case "jeunes.nouvelle-aquitaine.fr":
-  case "connexion.l-educdenormandie.fr": {
-    const callback = url.searchParams.get("callback") as string;
-    url = new URL(callback);
-  }
+    case "jeunes.nouvelle-aquitaine.fr":
+    case "connexion.l-educdenormandie.fr": {
+      const callback = url.searchParams.get("callback") as string;
+      url = new URL(callback);
+    }
   }
 
   for (const service of Object.values(available_ents)) {

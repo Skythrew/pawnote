@@ -24,6 +24,6 @@
     "types": ["vite/client"]
   },
 
-  "include": ["src"],
-  "exclude": ["node_module/**", "dist/**"]
+  "include": ["src", ".eslintrc.cjs", "vite.config.ts"],
+  "exclude": ["node_modules/**", "dist/**"]
 }
