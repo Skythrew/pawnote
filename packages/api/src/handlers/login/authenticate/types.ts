@@ -13,27 +13,27 @@ export const ApiLoginAuthenticateRequestSchema = z.object({
 export interface PronoteApiLoginAuthenticate {
   request: {
     donnees: {
-      connexion: 0;
-      challenge: string;
-      espace: PronoteApiAccountId;
+      connexion: 0
+      challenge: string
+      espace: PronoteApiAccountId
     }
   }
 
   response: {
-    nom: PronoteApiFunctions.Authenticate;
+    nom: PronoteApiFunctions.Authenticate
     donnees: {
       /** AES encryption key to use from now on. */
-      cle: string;
+      cle: string
 
       /** Last authentication date. */
       derniereConnexion: {
-        _T: 7;
-        V: string;
-      };
+        _T: 7
+        V: string
+      }
 
       /** Name of the authenticated user. */
-      libelleUtil: string;
-      modeSecurisationParDefaut: number;
+      libelleUtil: string
+      modeSecurisationParDefaut: number
     }
   }
 }
@@ -42,9 +42,9 @@ export interface ApiLoginAuthenticate {
   request: z.infer<typeof ApiLoginAuthenticateRequestSchema>
 
   response: {
-    received: PronoteApiLoginAuthenticate["response"];
-    session: SessionExported;
+    received: PronoteApiLoginAuthenticate["response"]
+    session: SessionExported
   }
 
-  path: "/login/authenticate";
+  path: "/login/authenticate"
 }

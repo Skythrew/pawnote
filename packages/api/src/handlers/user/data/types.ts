@@ -7,286 +7,286 @@ export const ApiUserDataRequestSchema = z.object({
 });
 
 export interface PronoteApiUserData {
-  request: Record<string, never>;
+  request: Record<string, never>
 
   response: {
     donnees: {
       ressource: {
         /** Account name. */
-        L: string;
+        L: string
         /** Account ID. */
-        N: string;
+        N: string
 
-        G: number;
-        P: number;
+        G: number
+        P: number
 
         Etablissement: {
-          _T: 24;
+          _T: 24
           V: {
             /** School name. */
-            L: string;
+            L: string
             /** School ID. */
-            N: string;
-          };
-        };
+            N: string
+          }
+        }
 
         /** Student have a profile picture. */
-        avecPhoto: boolean;
+        avecPhoto: boolean
 
         /** Class of the student. */
         classeDEleve: {
           /** Class name. */
-          L: string;
+          L: string
           /** Class ID. */
-          N: string;
-        };
+          N: string
+        }
 
         listeClassesHistoriques: {
-          _T: 24;
-          V: {
+          _T: 24
+          V: Array<{
             /** Class name. */
-            L: string;
+            L: string
             /** Class ID. */
-            N: string;
+            N: string
 
-            AvecNote: boolean;
-            AvecFiliere: boolean;
-          }[];
-        };
+            AvecNote: boolean
+            AvecFiliere: boolean
+          }>
+        }
 
         /** List of student groups. */
         listeGroupes: {
-          _T: 24;
-          V: {
+          _T: 24
+          V: Array<{
             /** Group name. */
-            L: string;
+            L: string
             /** Group ID. */
-            N: string;
-          }[];
-        };
+            N: string
+          }>
+        }
 
         listeOngletsPourPiliers: {
-          _T: 24;
+          _T: 24
           V: {
-            G: 45;
+            G: 45
 
             listePaliers: {
-              _T: 24;
-              V: {
+              _T: 24
+              V: Array<{
                 /** Name. */
-                L: string;
+                L: string
                 /** ID. */
-                N: string;
+                N: string
 
-                G: number;
+                G: number
 
                 listePiliers: {
-                  _T: 24,
+                  _T: 24
                   V: {
                     /** Name. */
-                    L: string;
+                    L: string
                     /** ID. */
-                    N: string;
+                    N: string
 
-                    G: number;
-                    P: number;
+                    G: number
+                    P: number
 
-                    estPilierLVE: boolean;
-                    estPersonnalise: boolean;
+                    estPilierLVE: boolean
+                    estPersonnalise: boolean
 
-                    Service?: {
-                      _T: 24;
+                    Service?: Array<{
+                      _T: 24
                       V: {
                         /** Name. */
-                        L: string;
+                        L: string
                         /** ID. */
-                        N: string;
+                        N: string
                       }
-                    }[];
-                  };
-                };
-              }[];
-            };
+                    }>
+                  }
+                }
+              }>
+            }
           }
-        };
+        }
 
         listeOngletsPourPeriodes: {
-          _T: 24;
-          V: {
-            G: PronoteApiOnglets;
+          _T: 24
+          V: Array<{
+            G: PronoteApiOnglets
 
             listePeriodes: {
-              T: 24;
-              V: {
+              T: 24
+              V: Array<{
                 /** Name of the period. */
-                L: string;
+                L: string
                 /** ID of the period. */
-                N: string;
+                N: string
 
-                G: number;
-                A: boolean;
+                G: number
+                A: boolean
 
-                GenreNotation: number;
-              }[];
-            };
+                GenreNotation: number
+              }>
+            }
 
             periodeParDefaut: {
-              _T: 24;
+              _T: 24
               V: {
                 /** Name of the period. */
-                L: string;
-                N: string;
-              };
-            };
-          }[];
-        };
-      };
+                L: string
+                N: string
+              }
+            }
+          }>
+        }
+      }
 
       /** Informations about school. */
       listeInformationsEtablissements: {
-        _T: 24;
-        V: {
+        _T: 24
+        V: Array<{
           /** School name. */
-          L: string;
+          L: string
           /** School ID. */
-          N: string;
+          N: string
 
           Logo: {
-            _T: 25;
-            V: number;
-          };
+            _T: 25
+            V: number
+          }
 
           /** School location. */
           Coordonnees: {
-            Adresse1: SVGStringList;
-            Adresse2: string;
-            CodePostal: string;
-            LibellePostal: string;
-            LibelleVille: string;
-            Province: string;
-            Pays: string;
-            SiteInternet: string;
-          };
+            Adresse1: SVGStringList
+            Adresse2: string
+            CodePostal: string
+            LibellePostal: string
+            LibelleVille: string
+            Province: string
+            Pays: string
+            SiteInternet: string
+          }
 
-          avecInformations: boolean;
-        }[];
-      };
+          avecInformations: boolean
+        }>
+      }
 
       /** User settings. */
       parametresUtilisateur: {
-        version: number;
+        version: number
 
         /** Settings for the timetable. */
         EDT: {
           /** Show canceled classes. */
-          afficherCoursAnnules: boolean;
+          afficherCoursAnnules: boolean
 
           /** Swap time and day position. */
-          axeInverseEDT: boolean;
-          axeInversePlanningHebdo: boolean;
-          axeInversePlanningJour: boolean;
-          axeInversePlanningJour2: boolean;
+          axeInverseEDT: boolean
+          axeInversePlanningHebdo: boolean
+          axeInversePlanningJour: boolean
+          axeInversePlanningJour2: boolean
 
-          nbJours: number;
-          nbRessources: number;
-          nbJoursEDT: number;
-          nbSequences: number;
-        };
+          nbJours: number
+          nbRessources: number
+          nbJoursEDT: number
+          nbSequences: number
+        }
 
         /** User's current theme. */
         theme: {
-          theme: number;
-        };
+          theme: number
+        }
 
         Communication: {
-          DiscussionNonLues: false;
-        };
-      };
+          DiscussionNonLues: false
+        }
+      }
 
       autorisationsSession: {
         fonctionnalites: {
-          gestionTwitter: boolean;
-          attestationEtendue: boolean;
-        };
-      };
+          gestionTwitter: boolean
+          attestationEtendue: boolean
+        }
+      }
 
       /** Authorization for the current student. */
       autorisations: {
         /** Allow messages tab. */
-        AvecDiscussion: boolean;
+        AvecDiscussion: boolean
         /** Allow messages with the staff. */
-        AvecDiscussionPersonnels: boolean;
+        AvecDiscussionPersonnels: boolean
         /** Allow messages with the teachers. */
-        AvecDiscussionProfesseurs: boolean;
+        AvecDiscussionProfesseurs: boolean
 
-        incidents: unknown;
-        intendance: unknown;
-        services: unknown;
+        incidents: unknown
+        intendance: unknown
+        services: unknown
 
         cours: {
           domaineConsultationEDT: {
-            _T: 8;
-            V: string;
-          };
+            _T: 8
+            V: string
+          }
 
           domaineModificationCours: {
-            _T: 8;
-            V: string;
-          };
+            _T: 8
+            V: string
+          }
 
-          masquerPartiesDeClasse: boolean;
-        };
+          masquerPartiesDeClasse: boolean
+        }
 
-        tailleMaxDocJointEtablissement: number;
-        tailleMaxRenduTafEleve: number;
+        tailleMaxDocJointEtablissement: number
+        tailleMaxRenduTafEleve: number
 
         compte: {
-          avecSaisieMotDePasse: boolean;
-          avecInformationsPersonnelles: boolean;
-        };
+          avecSaisieMotDePasse: boolean
+          avecInformationsPersonnelles: boolean
+        }
 
-        consulterDonneesAdministrativesAutresEleves: boolean;
-        autoriserImpression: boolean;
-      };
+        consulterDonneesAdministrativesAutresEleves: boolean
+        autoriserImpression: boolean
+      }
 
       reglesSaisieMDP: {
-        min: number;
-        max: number;
+        min: number
+        max: number
 
         regles: {
-          _T: 26;
+          _T: 26
           /** Array of numbers ? */
-          V: string;
-        };
-      };
+          V: string
+        }
+      }
 
-      autorisationKiosque: boolean;
-      tabEtablissementsModeleGrille: unknown[];
+      autorisationKiosque: boolean
+      tabEtablissementsModeleGrille: unknown[]
 
-      listeOnglets: {
-        G: number;
-        Onglet: {
-          G: number;
-        }[];
-      }[];
+      listeOnglets: Array<{
+        G: number
+        Onglet: Array<{
+          G: number
+        }>
+      }>
 
-      listeOngletsInvisibles: number[];
-      listeOngletsNotification: number[];
-    };
+      listeOngletsInvisibles: number[]
+      listeOngletsNotification: number[]
+    }
 
-    nom: PronoteApiFunctions.UserData;
+    nom: PronoteApiFunctions.UserData
 
     _Signature_: {
       notifications: {
-        compteurCentraleNotif: number;
-      };
+        compteurCentraleNotif: number
+      }
 
-      actualisationMessage: boolean;
-      notificationsCommunication: {
-        onglet: number;
-        nb: number;
-      }[];
-    };
+      actualisationMessage: boolean
+      notificationsCommunication: Array<{
+        onglet: number
+        nb: number
+      }>
+    }
   }
 }
 
@@ -294,9 +294,9 @@ export interface ApiUserData {
   request: z.infer<typeof ApiUserDataRequestSchema>
 
   response: {
-    received: PronoteApiUserData["response"];
-    session: SessionExported;
+    received: PronoteApiUserData["response"]
+    session: SessionExported
   }
 
-  path: "/user/data";
+  path: "/user/data"
 }

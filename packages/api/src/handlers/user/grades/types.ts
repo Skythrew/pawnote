@@ -11,271 +11,271 @@ export const ApiUserGradesRequestSchema = z.object({
 export interface PronoteApiUserGrades {
   request: {
     _Signature_: {
-      onglet: PronoteApiOnglets.Grades;
+      onglet: PronoteApiOnglets.Grades
     }
 
     donnees: {
-      Periode: PronoteApiUserData["response"]["donnees"]["ressource"]["listeOngletsPourPeriodes"]["V"][number]["listePeriodes"]["V"][number];
+      Periode: PronoteApiUserData["response"]["donnees"]["ressource"]["listeOngletsPourPeriodes"]["V"][number]["listePeriodes"]["V"][number]
     }
   }
 
   response: {
-    nom: PronoteApiFunctions.Grades;
+    nom: PronoteApiFunctions.Grades
     donnees: {
       moyGenerale: {
-        _T: 10;
-        V: string;
+        _T: 10
+        V: string
       }
       moyGeneraleClasse: {
-        _T: 10;
-        V: string;
+        _T: 10
+        V: string
       }
 
       baremeMoyGenerale: {
-        _T: 10;
-        V: string;
+        _T: 10
+        V: string
       }
 
       baremeMoyGeneraleParDefaut: {
-        _T: 10;
-        V: string;
+        _T: 10
+        V: string
       }
 
-      avecDetailDevoir: boolean;
-      avecDetailService: boolean;
+      avecDetailDevoir: boolean
+      avecDetailService: boolean
 
       listeServices: {
-        _T: 24;
-        V: {
+        _T: 24
+        V: Array<{
           /** Name of the service/subject. */
-          L: string;
-          N: string;
-          G: number;
-          ordre: number;
+          L: string
+          N: string
+          G: number
+          ordre: number
 
-          estServiceEnGroupe: boolean;
+          estServiceEnGroupe: boolean
 
           moyEleve: {
-            _T: 10;
-            V: string;
+            _T: 10
+            V: string
           }
 
           baremeMoyEleve: {
-            _T: 10;
-            V: string;
+            _T: 10
+            V: string
           }
 
           baremeMoyEleveParDefaut: {
-            _T: 10;
-            V: string;
+            _T: 10
+            V: string
           }
 
           moyClasse: {
-            _T: 10;
-            V: string;
+            _T: 10
+            V: string
           }
 
           moyMin: {
-            _T: 10;
-            V: string;
+            _T: 10
+            V: string
           }
 
           moyMax: {
-            _T: 10;
-            V: string;
+            _T: 10
+            V: string
           }
 
           /** HEX color given in Pronote. */
-          couleur: string;
-        }[];
+          couleur: string
+        }>
       }
 
       listeDevoirs: {
-        _T: 24;
-        V: {
-          N: string;
-          G: number;
+        _T: 24
+        V: Array<{
+          N: string
+          G: number
 
           note: {
-            _T: number;
+            _T: number
             /** Grade the user had. */
-            V: string;
+            V: string
           }
 
           bareme: {
-            _T: 10;
+            _T: 10
             /** The maximum grade value. */
-            V: string;
+            V: string
           }
 
           baremeParDefaut: {
-            _T: 10;
-            V: string;
+            _T: 10
+            V: string
           }
 
           date: {
-            _T: 7;
+            _T: 7
             /** Date in "DD/MM/YYYY" format. */
-            V: string;
+            V: string
           }
 
           service: {
-            _T: 24;
+            _T: 24
             V: {
-              L: string;
-              N: string;
-              G: 12;
-              couleur: string;
+              L: string
+              N: string
+              G: 12
+              couleur: string
             }
           }
 
           periode: {
-            _T: 24;
+            _T: 24
             V: {
-              L: string;
-              N: string;
+              L: string
+              N: string
             }
           }
 
           ListeThemes: {
-            _T: 24;
-            V: unknown[];
+            _T: 24
+            V: unknown[]
           }
 
           moyenne: {
-            _T: 10;
+            _T: 10
             /** Overall grade on this exam. */
-            V: string;
+            V: string
           }
 
-          estEnGroupe: boolean;
+          estEnGroupe: boolean
 
           noteMax: {
-            _T: 10;
+            _T: 10
             /** Best grade someone had. */
-            V: string;
+            V: string
           }
 
           noteMin: {
-            _T: 10;
+            _T: 10
             /** Worst grade someone had. */
-            V: string;
+            V: string
           }
 
           /** Description of the exam. */
-          commentaire: string;
+          commentaire: string
 
-          coefficient: number;
-          estFacultatif: boolean;
-          estBonus: boolean;
-          estRamenerSur20: boolean;
+          coefficient: number
+          estFacultatif: boolean
+          estBonus: boolean
+          estRamenerSur20: boolean
 
           /** Available when the grade was based on a quiz. */
           executionQCM?: {
-            _T: 24;
+            _T: 24
             V: {
-              N: string;
-              G: number;
+              N: string
+              G: number
               QCM: {
-                _T: 24,
+                _T: 24
                 V: {
                   /** Name of the quiz. */
-                  L: string;
-                  N: string;
-                  G: number;
+                  L: string
+                  N: string
+                  G: number
                   /** Number of questions. */
-                  nbQuestionsTotal: number;
+                  nbQuestionsTotal: number
                   /** Maximum amout of points. */
-                  nombreDePointsTotal: number;
-                  avecQuestionsSoumises: boolean;
-                  nombreQuestObligatoires: number;
-                  nbCompetencesTotal: number;
+                  nombreDePointsTotal: number
+                  avecQuestionsSoumises: boolean
+                  nombreQuestObligatoires: number
+                  nbCompetencesTotal: number
                 }
               }
 
               ListeThemes: {
-                _T: 24;
-                V: unknown[];
+                _T: 24
+                V: unknown[]
               }
 
-              fichierDispo: boolean;
-              estEnPublication: boolean;
+              fichierDispo: boolean
+              estEnPublication: boolean
 
               dateDebutPublication: {
-                _T: 7;
+                _T: 7
                 /** Date in format "DD/MM/YYYY HH:mm:ss". */
-                V: string;
+                V: string
               }
 
               dateFinPublication: {
-                _T: 7;
+                _T: 7
                 /** Date in format "DD/MM/YYYY HH:mm:ss". */
-                V: string;
+                V: string
               }
 
               consigne: {
-                _T: 21;
-                V: string;
+                _T: 21
+                V: string
               }
 
-              estLieADevoir: boolean;
-              estLieAEvaluation: boolean;
-              estUnTAF: boolean;
-              estSupprimable: boolean;
-              estDemarre: boolean;
-              etatCloture: number;
-              nbQuestRepondues: number;
-              nbQuestBonnes: number;
+              estLieADevoir: boolean
+              estLieAEvaluation: boolean
+              estUnTAF: boolean
+              estSupprimable: boolean
+              estDemarre: boolean
+              etatCloture: number
+              nbQuestRepondues: number
+              nbQuestBonnes: number
 
               noteQCM: {
-                _T: 10;
-                V: string;
+                _T: 10
+                V: string
               }
 
-              autoriserLaNavigation: boolean;
-              homogeneiserNbQuestParNiveau: boolean;
-              melangerLesQuestionsGlobalement: boolean;
-              melangerLesQuestionsParNiveau: boolean;
-              melangerLesReponses: boolean;
-              ressentiRepondant: boolean;
-              publierCorrige: boolean;
-              tolererFausses: boolean;
-              acceptIncomplet: boolean;
-              pointsSelonPourcentage: boolean;
-              afficherResultatNote: boolean;
-              afficherResultatNiveauMaitrise: boolean;
+              autoriserLaNavigation: boolean
+              homogeneiserNbQuestParNiveau: boolean
+              melangerLesQuestionsGlobalement: boolean
+              melangerLesQuestionsParNiveau: boolean
+              melangerLesReponses: boolean
+              ressentiRepondant: boolean
+              publierCorrige: boolean
+              tolererFausses: boolean
+              acceptIncomplet: boolean
+              pointsSelonPourcentage: boolean
+              afficherResultatNote: boolean
+              afficherResultatNiveauMaitrise: boolean
 
-              modeDiffusionCorrige: number;
-              nombreQuestionsSoumises: number;
-              dureeMaxQCM: number;
-              nombreDePoints: number;
+              modeDiffusionCorrige: number
+              nombreQuestionsSoumises: number
+              dureeMaxQCM: number
+              nombreDePoints: number
 
               listeProfesseurs: {
-                _T: 24;
-                V: {
-                    L: string;
-                    N: string;
-                }[];
+                _T: 24
+                V: Array<{
+                  L: string
+                  N: string
+                }>
               }
 
-              ramenerSur20: boolean;
+              ramenerSur20: boolean
               service: {
-                _T: 24;
+                _T: 24
                 V: {
-                  L: string;
-                  N: string;
+                  L: string
+                  N: string
                 }
               }
 
               coefficientDevoir: {
-                _T: 10;
-                V: string;
+                _T: 10
+                V: string
               }
 
-              nomPublic: string;
+              nomPublic: string
             }
           }
-        }[];
+        }>
       }
     }
   }
@@ -284,18 +284,18 @@ export interface PronoteApiUserGrades {
 type ApiUserGradesPath = `/user/grades/${string}`;
 export interface ApiUserGrades {
   request: {
-    session: SessionExported;
-    period: PronoteApiUserGrades["request"]["donnees"]["Periode"];
+    session: SessionExported
+    period: PronoteApiUserGrades["request"]["donnees"]["Periode"]
   }
 
   response: {
-    received: PronoteApiUserGrades["response"];
-    session: SessionExported;
+    received: PronoteApiUserGrades["response"]
+    session: SessionExported
   }
 
   params: {
-    period_id: string;
+    period_id: string
   }
 
-  path: ApiUserGradesPath;
+  path: ApiUserGradesPath
 }

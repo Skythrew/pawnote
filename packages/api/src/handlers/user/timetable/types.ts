@@ -17,96 +17,96 @@ export enum PronoteApiUserTimetableContentType {
 export interface PronoteApiUserTimetable {
   request: {
     donnees: {
-      ressource: PronoteApiUserData["response"]["donnees"]["ressource"];
-      Ressource: PronoteApiUserData["response"]["donnees"]["ressource"];
+      ressource: PronoteApiUserData["response"]["donnees"]["ressource"]
+      Ressource: PronoteApiUserData["response"]["donnees"]["ressource"]
 
-      NumeroSemaine: number;
-      numeroSemaine: number;
+      NumeroSemaine: number
+      numeroSemaine: number
 
-      avecAbsencesEleve: boolean;
-      avecAbsencesRessource: boolean;
-      avecConseilDeClasse: boolean;
-      avecCoursSortiePeda: boolean;
-      avecDisponibilites: boolean;
-      avecInfosPrefsGrille: boolean;
-      avecRessourcesLibrePiedHoraire: boolean;
-      estEDTPermanence: boolean;
+      avecAbsencesEleve: boolean
+      avecAbsencesRessource: boolean
+      avecConseilDeClasse: boolean
+      avecCoursSortiePeda: boolean
+      avecDisponibilites: boolean
+      avecInfosPrefsGrille: boolean
+      avecRessourcesLibrePiedHoraire: boolean
+      estEDTPermanence: boolean
     }
 
     _Signature_: {
-      onglet: PronoteApiOnglets.Timetable;
+      onglet: PronoteApiOnglets.Timetable
     }
   }
 
   response: {
-    nom: PronoteApiFunctions.Timetable;
+    nom: PronoteApiFunctions.Timetable
     donnees: {
-      ParametreExportiCal: string;
-      avecExportICal: boolean;
+      ParametreExportiCal: string
+      avecExportICal: boolean
 
-      avecCoursAnnule: boolean;
-      debutDemiPensionHebdo: number;
-      finDemiPensionHebdo: number;
+      avecCoursAnnule: boolean
+      debutDemiPensionHebdo: number
+      finDemiPensionHebdo: number
 
       prefsGrille: {
-        genreRessource: number;
+        genreRessource: number
       }
 
       absences: {
         joursCycle: {
-          _T: 24;
-          V: {
-            jourCycle: number;
-            numeroSemaine: number;
-          }[];
+          _T: 24
+          V: Array<{
+            jourCycle: number
+            numeroSemaine: number
+          }>
         }
       }
 
       recreations: {
-        _T: 24;
-        V: {
-          L: string;
-          place: number;
-        }[];
+        _T: 24
+        V: Array<{
+          L: string
+          place: number
+        }>
       }
 
-      ListeCours: {
-        place: number;
-        duree: number;
+      ListeCours: Array<{
+        place: number
+        duree: number
 
         /** Whether the lesson is canceled or not. */
-        estAnnule?: boolean;
-        Statut?: string;
+        estAnnule?: boolean
+        Statut?: string
 
         DateDuCours: {
-          _T: 7;
-          V: string;
+          _T: 7
+          V: string
         }
 
-        CouleurFond: string;
+        CouleurFond: string
         ListeContenus: {
-          _T: 24,
-          V: ({ L: string } & (
+          _T: 24
+          V: Array<{ L: string } & (
             | {
-              G: PronoteApiUserTimetableContentType.Subject;
-              N: string;
+              G: PronoteApiUserTimetableContentType.Subject
+              N: string
             }
             | {
-              G: PronoteApiUserTimetableContentType.Room;
-              N: string;
+              G: PronoteApiUserTimetableContentType.Room
+              N: string
             }
             | {
-              G: PronoteApiUserTimetableContentType.Teacher;
+              G: PronoteApiUserTimetableContentType.Teacher
             }
-          ))[];
-        };
+          )>
+        }
 
-        N: string;
-        P: number;
-        G: number;
+        N: string
+        P: number
+        G: number
 
-        AvecTafPublie: boolean;
-      }[];
+        AvecTafPublie: boolean
+      }>
     }
   }
 }
@@ -114,18 +114,18 @@ export interface PronoteApiUserTimetable {
 type ApiUserTimetablePath = `/user/timetable/${number}`;
 export interface ApiUserTimetable {
   request: {
-    session: SessionExported;
-    resource: ApiUserData["response"]["received"]["donnees"]["ressource"];
+    session: SessionExported
+    resource: ApiUserData["response"]["received"]["donnees"]["ressource"]
   }
 
   response: {
-    received: PronoteApiUserTimetable["response"];
-    session: SessionExported;
+    received: PronoteApiUserTimetable["response"]
+    session: SessionExported
   }
 
   params: {
-    week: string;
+    week: string
   }
 
-  path: ApiUserTimetablePath;
+  path: ApiUserTimetablePath
 }

@@ -5,7 +5,7 @@ import forge from "node-forge";
  * @param buffer - ByteBuffer to convert to MD5.
  * @returns A new ByteBuffer in MD5.
  */
-export const md5 = (buffer: forge.util.ByteStringBuffer) =>
+export const md5 = (buffer: forge.util.ByteStringBuffer): forge.util.ByteStringBuffer =>
   forge.md.md5.create().update(buffer.bytes()).digest();
 
 export const aes = {
@@ -13,11 +13,11 @@ export const aes = {
     key = forge.util.createBuffer(),
     iv
   }: {
-   key?: forge.util.ByteStringBuffer;
-   iv?: forge.util.ByteStringBuffer;
- }) {
+    key?: forge.util.ByteStringBuffer
+    iv?: forge.util.ByteStringBuffer
+  }) {
     // IV => Generate a MD5 ByteBuffer from current IV.
-    if (iv && iv.length()) iv = md5(iv);
+    if (iv !== undefined && iv.length() > 0) iv = md5(iv);
     // No IV => Create an empty buffer of 16 bytes.
     else iv = forge.util.createBuffer().fillWithByte(0, 16);
 
@@ -39,9 +39,9 @@ export const aes = {
     key = forge.util.createBuffer(),
     iv
   }: {
-   key?: forge.util.ByteStringBuffer;
-   iv?: forge.util.ByteStringBuffer;
- }) {
+    key?: forge.util.ByteStringBuffer
+    iv?: forge.util.ByteStringBuffer
+  }) {
     /**
     * Create cipher using 'AES-CBC' method and
     * use an MD5 ByteBuffer of the given 'key'.
@@ -49,7 +49,7 @@ export const aes = {
     const cipher = forge.cipher.createCipher("AES-CBC", md5(key));
 
     // IV => Generate a MD5 ByteBuffer from current IV.
-    if (iv && iv.length()) iv = md5(iv);
+    if (iv !== undefined && iv.length() > 0) iv = md5(iv);
     // No IV => Create an empty buffer of 16 bytes.
     else iv = forge.util.createBuffer().fillWithByte(0, 16);
 

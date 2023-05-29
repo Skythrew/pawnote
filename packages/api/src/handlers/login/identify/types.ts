@@ -11,42 +11,42 @@ export const ApiLoginIdentifyRequestSchema = z.object({
 export interface PronoteApiLoginIdentify {
   request: {
     donnees: {
-      genreConnexion: 0;
-      genreEspace: PronoteApiAccountId;
-      identifiant: string;
-      pourENT: boolean;
-      enConnexionAuto: false;
-      demandeConnexionAuto: false;
-      demandeConnexionAppliMobile: false;
-      demandeConnexionAppliMobileJeton: false;
-      uuidAppliMobile: string;
-      loginTokenSAV: string;
+      genreConnexion: 0
+      genreEspace: PronoteApiAccountId
+      identifiant: string
+      pourENT: boolean
+      enConnexionAuto: false
+      demandeConnexionAuto: false
+      demandeConnexionAppliMobile: false
+      demandeConnexionAppliMobileJeton: false
+      uuidAppliMobile: string
+      loginTokenSAV: string
     }
   }
 
   response: {
-    nom: PronoteApiFunctions.Identify;
+    nom: PronoteApiFunctions.Identify
     donnees: {
       /** String used in the challenge. */
-      alea: string;
+      alea: string
       /** Challenge for authentication. */
-      challenge: string;
+      challenge: string
 
       /** Should lowercase username. */
-      modeCompLog: 0 | 1; // Boolean.
+      modeCompLog: 0 | 1 // Boolean.
       /** Should lowercase password. */
-      modeCompMdp: 0 | 1; // Boolean.
+      modeCompMdp: 0 | 1 // Boolean.
     }
   }
 }
 
 export interface ApiLoginIdentify {
-  request:  z.infer<typeof ApiLoginIdentifyRequestSchema>
+  request: z.infer<typeof ApiLoginIdentifyRequestSchema>
 
   response: {
-    received: PronoteApiLoginIdentify["response"];
-    session: SessionExported;
+    received: PronoteApiLoginIdentify["response"]
+    session: SessionExported
   }
 
-  path: "/login/identify";
+  path: "/login/identify"
 }

@@ -10,7 +10,7 @@ import { PRONOTE_ACCOUNT_TYPES, PRONOTE_INSTANCE_MOBILE_INFOS_PATH } from "@/uti
  * Allows to check that every item is defined and make them typed to `PronoteApiAccountType`.
  */
 const isPronoteApiAccountType = (item: PronoteApiAccountType | undefined): item is PronoteApiAccountType => {
-  return !!item;
+  return !(item === null);
 };
 
 /**
@@ -38,6 +38,6 @@ export default createApiFunction<ApiInstance>(ApiInstanceRequestSchema, async (r
     accounts,
     pronote_url,
     school_name: data.nomEtab,
-    ent_url: data.CAS.actif ? data.CAS.casURL : undefined
+    ent_url: data.CAS.actif === true ? data.CAS.casURL : undefined
   });
 });

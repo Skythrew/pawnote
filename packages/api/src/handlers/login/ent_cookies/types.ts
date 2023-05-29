@@ -9,8 +9,8 @@ export interface ApiLoginEntCookies {
   request: z.infer<typeof ApiLoginEntCookiesRequestSchema>
 
   response: {
-    ent_cookies: string[];
+    ent_cookies: string[]
   }
 
-  path: "/login/ent_cookies";
+  path: "/login/ent_cookies"
 }

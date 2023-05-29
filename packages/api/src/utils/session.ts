@@ -70,10 +70,10 @@ export class Session {
     };
   }
 
-  static importFromObject (session: SessionExported) {
+  static importFromObject (session: SessionExported): Session {
     return new Session(
       session.instance,
-      session.encryption,
+      session.encryption
     );
   }
 
@@ -82,15 +82,15 @@ export class Session {
    * to make it usable inside this class.
    **/
   static from_raw (session_data: PronoteApiSession, instance: {
-    pronote_url: string;
-    ent_url: string | null;
+    pronote_url: string
+    ent_url: string | null
 
-    ent_cookies?: string[];
-    pronote_cookies?: string[];
+    ent_cookies?: string[]
+    pronote_cookies?: string[]
 
-    use_ent: boolean;
-  }) {
-    let aes_iv: string | undefined = undefined;
+    use_ent: boolean
+  }): Session {
+    let aes_iv: string | undefined;
 
     // Sometimes, the "a" parameter is not available in "Commun".
     if (typeof session_data.a !== "number") {
@@ -137,20 +137,20 @@ export class Session {
    * Properties can return `undefined` when they're not
    * given in `this.encryption.aes`.
    */
-  private encryption_aes () {
+  private encryption_aes (): { aes_iv?: forge.util.ByteStringBuffer, aes_key?: forge.util.ByteStringBuffer } {
     // At the first order, we always take an undefined IV.
-    const aes_iv = this.encryption.aes.iv && this.instance.order !== 1
+    const aes_iv = this.encryption.aes.iv !== undefined && this.instance.order !== 1
       ? forge.util.createBuffer(this.encryption.aes.iv)
       : undefined;
 
-    const aes_key = this.encryption.aes.key
+    const aes_key = this.encryption.aes.key !== undefined
       ? forge.util.createBuffer(this.encryption.aes.key)
       : undefined;
 
     return { aes_iv, aes_key };
   }
 
-  writePronoteFunctionPayload <Req>(data: Req) {
+  writePronoteFunctionPayload <Req>(data: Req): { order: string, data: Req | string } {
     this.instance.order++;
 
     let final_data: Req | string = data;
@@ -201,17 +201,23 @@ export class Session {
    * and `string` if an error has been found.
    */
   readPronoteFunctionPayload <Res>(response_body: string): Res {
-    if (response_body.includes("La page a expir")) throw new HandlerResponseError(
-      ApiResponseErrorCode.SessionExpired, { status: 401 }
-    );
+    if (response_body.includes("La page a expir")) {
+      throw new HandlerResponseError(
+        ApiResponseErrorCode.SessionExpired, { status: 401 }
+      );
+    }
 
-    if (response_body.includes("Votre adresse IP est provisoirement suspendue")) throw new HandlerResponseError(
-      ApiResponseErrorCode.PronoteBannedIP, { status: 401 }
-    );
+    if (response_body.includes("Votre adresse IP est provisoirement suspendue")) {
+      throw new HandlerResponseError(
+        ApiResponseErrorCode.PronoteBannedIP, { status: 401 }
+      );
+    }
 
-    if (response_body.includes("La page demandée n'existe pas")) throw new HandlerResponseError(
-      ApiResponseErrorCode.PronoteClosedInstance, { status: 404 }
-    );
+    if (response_body.includes("La page demandée n'existe pas")) {
+      throw new HandlerResponseError(
+        ApiResponseErrorCode.PronoteClosedInstance, { status: 404 }
+      );
+    }
 
     this.instance.order++;
     const response = JSON.parse(response_body) as PronoteApiFunctionPayload<Res>;
@@ -223,9 +229,11 @@ export class Session {
         iv: aes_iv, key: aes_key
       });
 
-      if (this.instance.order !== parseInt(decrypted_order)) throw new HandlerResponseError(
-        ApiResponseErrorCode.NotMatchingOrders, { status: 400 }
-      );
+      if (this.instance.order !== parseInt(decrypted_order)) {
+        throw new HandlerResponseError(
+          ApiResponseErrorCode.NotMatchingOrders, { status: 400 }
+        );
+      }
 
       let final_data = response.donneesSec;
 

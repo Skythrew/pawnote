@@ -11,8 +11,8 @@ export interface ApiLoginEntTicket {
 
   response: {
     /** New URL with "?identifiant=XXXX" parameter. */
-    pronote_url: string;
+    pronote_url: string
   }
 
-  path: "/login/ent_ticket";
+  path: "/login/ent_ticket"
 }

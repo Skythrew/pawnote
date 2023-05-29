@@ -1,11 +1,10 @@
 import type { PronoteApiUserGrades, ApiUserGrades } from "./types";
 import { ApiUserGradesRequestSchema } from "./types";
 
-import { PronoteApiFunctions, PronoteApiOnglets } from "@/utils/requests/pronote";
+import { PronoteApiFunctions, PronoteApiOnglets, createPronoteAPICall } from "@/utils/requests/pronote";
 import { ApiResponseErrorCode } from "@/utils/handlers/errors";
 
 import { createApiFunction } from "@/utils/handlers/create";
-import { createPronoteAPICall } from "@/utils/requests/pronote";
 import { Session } from "@/utils/session";
 
 import { z } from "zod";
@@ -14,10 +13,12 @@ export default createApiFunction<ApiUserGrades>(ApiUserGradesRequestSchema, asyn
   const period_id = req.params.period_id;
   const period_id_check = (z.string()).safeParse(period_id);
 
-  if (!period_id_check.success) return res.error({
-    code: ApiResponseErrorCode.InvalidRequestBody,
-    debug: { period_id, error: period_id_check.error.toString() }
-  }, { status: 400 });
+  if (!period_id_check.success) {
+    return res.error({
+      code: ApiResponseErrorCode.InvalidRequestBody,
+      debug: { period_id, error: period_id_check.error.toString() }
+    }, { status: 400 });
+  }
 
   const session = Session.importFromObject(req.body.session);
 
