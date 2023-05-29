@@ -101,42 +101,42 @@ export const readFloatFromString = (value: string) => parseFloat(value.replace("
 /** TODO: Use an enum and also give translation for the strings. */
 export const readGradeValue = (value: string) => {
   switch (value) {
-  case "|1":
-    return "Absent";
-  case "|3":
-    return "N. Noté";
-  case "|5":
-    return "N. Rendu";
-  default: {
-    const result = readFloatFromString(value);
-    return Number.isNaN(result) ? "?" : result;
-  }
+    case "|1":
+      return "Absent";
+    case "|3":
+      return "N. Noté";
+    case "|5":
+      return "N. Rendu";
+    default: {
+      const result = readFloatFromString(value);
+      return Number.isNaN(result) ? "?" : result;
+    }
   }
 };
 
 export const callAPI = async <Api extends {
-  path: string;
-  request: unknown;
-  response: unknown;
+  path: string
+  request: unknown
+  response: unknown
 }>(
   path_raw: Api["path"] | Accessor<Api["path"]>,
   body: Accessor<Api["request"]>,
   options: {
     /** Prevents the response from being saved in the localForage. */
-    prevent_cache?: boolean;
+    prevent_cache?: boolean
     /**
       * When we receive an SessionExpired error,
     * we restore a new session but don't run a new call.
       */
-    prevent_catch_rerun?: boolean;
+    prevent_catch_rerun?: boolean
   } = {
     prevent_cache: false,
     prevent_catch_rerun: false
   }
 ): Promise<Api["response"]> => {
   const path = () => typeof path_raw === "function"
-    ? (path_raw as Accessor<Api["path"]>)()
-    : path_raw as Api["path"];
+    ? (path_raw)()
+    : path_raw;
 
   const url = () => "/api" + path();
 
@@ -201,7 +201,7 @@ export const callAPI = async <Api extends {
           });
         }
 
-        if (!data) {
+        if (data == null) {
           throw new ClientError({
             code: ClientErrorCode.SessionCantRestore
           });
@@ -226,7 +226,7 @@ export const callAPI = async <Api extends {
         toast("La session a été restorée.");
         if (options.prevent_catch_rerun) throw new ApiError(response);
 
-        return callAPI<Api>(path, body, options);
+        return await callAPI<Api>(path, body, options);
       }
 
       // Should be a first-time login.
@@ -244,8 +244,8 @@ export const callAPI = async <Api extends {
   // When the response contains a session or a Pronote response, we store it.
   if (user.slug) {
     const typed_response = response.data as unknown as {
-      session?: SessionExported;
-      received?: unknown;
+      session?: SessionExported
+      received?: unknown
     };
 
     typed_response.session && await sessions.upsert(user.slug, typed_response.session);
@@ -264,14 +264,14 @@ export const callAPI = async <Api extends {
  * const { coords } = await getGeolocationPosition();
  * console.log(coords.latitude, coords.longitude);
  */
-export const getGeolocationPosition = (options?: PositionOptions): Promise<GeolocationPosition> => {
-  return new Promise((resolve, reject) =>
+export const getGeolocationPosition = async (options?: PositionOptions): Promise<GeolocationPosition> => {
+  return await new Promise((resolve, reject) =>
     navigator.geolocation.getCurrentPosition(resolve, reject, options)
   );
 };
 
 /** Helper for classes. */
-export const classNames = (...classes: (string | boolean | undefined)[]): string =>
+export const classNames = (...classes: Array<string | boolean | undefined>): string =>
   classes.filter(Boolean).join(" ");
 
 export const guessPronoteAccountTypeFromUrl = (raw_url: string) => {
@@ -282,7 +282,7 @@ export const guessPronoteAccountTypeFromUrl = (raw_url: string) => {
     entry => entry[1].path === account_type_path
   );
 
-  if (!result) return null;
+  if (result == null) return null;
   const account_type_id = parseInt(result[0]) as PronoteApiAccountId;
   return account_type_id;
 };
@@ -290,37 +290,37 @@ export const guessPronoteAccountTypeFromUrl = (raw_url: string) => {
 export const connectToPronote = async (options: {
   // We always need the base Pronote URL,
   // in case it has been modified.
-  pronote_url: string;
+  pronote_url: string
 } & (
   | {
-    use_ent: false;
-    use_credentials: true;
+    use_ent: false
+    use_credentials: true
 
-    username: string;
-    password: string;
-    account_type: PronoteApiAccountId;
+    username: string
+    password: string
+    account_type: PronoteApiAccountId
   }
   | {
-    use_ent: true;
-    use_credentials: true;
+    use_ent: true
+    use_credentials: true
 
-    username: string;
-    password: string;
-    ent_url: string;
+    username: string
+    password: string
+    ent_url: string
   }
   | {
-    use_ent: true;
-    use_credentials: false;
+    use_ent: true
+    use_credentials: false
 
-    ent_cookies: string[];
-    ent_url: string;
+    ent_cookies: string[]
+    ent_url: string
   }
   | {
-    use_ent: false;
-    use_credentials: false;
+    use_ent: false
+    use_credentials: false
 
-    pronote_cookies: string[];
-    account_type: PronoteApiAccountId;
+    pronote_cookies: string[]
+    account_type: PronoteApiAccountId
   }
 )) => {
   let pronote_username = !options.use_ent && options.use_credentials ? options.username : "";
@@ -338,7 +338,7 @@ export const connectToPronote = async (options: {
         username: options.username,
         password: options.password
       })
-    }), { prevent_cache : true });
+    }), { prevent_cache: true });
 
     ent_cookies = ent_cookies_response.ent_cookies;
   }
@@ -351,7 +351,7 @@ export const connectToPronote = async (options: {
       ent_url: options.ent_url,
       pronote_url,
       ent_cookies
-    }), { prevent_cache : true });
+    }), { prevent_cache: true });
 
     pronote_url = ent_ticket_response.pronote_url;
   }
@@ -435,7 +435,7 @@ export const connectToPronote = async (options: {
   const challengeAesKey = (informations_response.setup
     ? "" // When using generated credentials, we don't have to lowercase.
     : pronote_username.toLowerCase()
-  ) +  challengeAesKeyHash.toHex().toUpperCase();
+  ) + challengeAesKeyHash.toHex().toUpperCase();
 
   const challengeAesKeyBuffer = forge.util.createBuffer(
     forge.util.encodeUtf8(challengeAesKey)
@@ -467,7 +467,6 @@ export const connectToPronote = async (options: {
       iv: aesIvBuffer,
       key: challengeAesKeyBuffer
     });
-
   }
   catch {
     throw new ApiError({ code: ResponseErrorCode.IncorrectCredentials });
@@ -505,7 +504,7 @@ export const connectToPronote = async (options: {
   const user_data_response = await callAPI<ApiUserData>("/user/data", () => ({
     session: authenticate_response.session
   }), { // Here, we prevent the cache even if we'll cache it later.
-    prevent_cache : true
+    prevent_cache: true
   });
 
   /// Preparing to export datas.
@@ -546,9 +545,11 @@ export const callUserTimetableAPI = async (
   options: { force?: boolean, queue?: boolean } = { force: false, queue: true }
 ) => {
   const user = app.current_user;
-  if (!user.slug) throw new ApiError ({
-    code: ResponseErrorCode.UserUnavailable
-  });
+  if (!user.slug) {
+    throw new ApiError({
+      code: ResponseErrorCode.UserUnavailable
+    });
+  }
 
   const endpoint: ApiUserTimetable["path"] = `/user/timetable/${week}`;
   const local_response = await endpoints.get<ApiUserTimetable>(user.slug, endpoint);
@@ -574,24 +575,24 @@ export const callUserTimetableAPI = async (
 };
 
 export interface TimetableLesson {
-  type: "lesson";
+  type: "lesson"
 
-  date: dayjs.Dayjs;
-  duration: number;
-  position: number;
-  color: string;
+  date: dayjs.Dayjs
+  duration: number
+  position: number
+  color: string
 
-  name?: string;
-  room?: string;
-  teacher?: string;
-  status?: string;
+  name?: string
+  room?: string
+  teacher?: string
+  status?: string
 }
 
 export interface TimetableBreak {
-  type: "break";
+  type: "break"
 
-  from: number;
-  to: number;
+  from: number
+  to: number
 }
 
 export const parseTimetableLessons = (
@@ -611,7 +612,7 @@ export const parseTimetableLessons = (
    * So the structure is basically `dayOfWeek[lesson[]]`,
    * where `dayOfWeek` is a number and starts from 0 for Sunday.
    */
-  const raw_output: (TimetableLesson | TimetableBreak)[][] = [...Array.from(Array(7), () => [])];
+  const raw_output: Array<Array<TimetableLesson | TimetableBreak>> = [...Array.from(Array(7), () => [])];
   for (let lesson_index = 0; lesson_index < lessons.length; lesson_index++) {
     const lesson = lessons[lesson_index];
 
@@ -653,7 +654,6 @@ export const parseTimetableLessons = (
         }
         else {
           if (position !== 0) {
-
             const break_item: TimetableBreak = {
               type: "break",
               from: 0,
@@ -677,15 +677,15 @@ export const parseTimetableLessons = (
 
     for (const content of lesson.ListeContenus.V) {
       switch (content.G) {
-      case PronoteApiUserTimetableContentType.Subject:
-        parsed_lesson.name = content.L;
-        break;
-      case PronoteApiUserTimetableContentType.Room:
-        parsed_lesson.room = content.L;
-        break;
-      case PronoteApiUserTimetableContentType.Teacher:
-        parsed_lesson.teacher = content.L;
-        break;
+        case PronoteApiUserTimetableContentType.Subject:
+          parsed_lesson.name = content.L;
+          break;
+        case PronoteApiUserTimetableContentType.Room:
+          parsed_lesson.room = content.L;
+          break;
+        case PronoteApiUserTimetableContentType.Teacher:
+          parsed_lesson.teacher = content.L;
+          break;
       }
     }
 
@@ -705,11 +705,11 @@ export const getLabelOfPosition = (position: number) => {
 
 export const getTimeFormattedDiff = (
   a: {
-    value: string,
+    value: string
     format: string
   },
   b: {
-    value: string,
+    value: string
     format: string
   },
   format: string
@@ -728,9 +728,11 @@ export const callUserHomeworksAPI = async (
   options: { force?: boolean, queue?: boolean } = { force: false, queue: true }
 ) => {
   const user = app.current_user;
-  if (!user.slug) throw new ApiError ({
-    code: ResponseErrorCode.UserUnavailable
-  });
+  if (!user.slug) {
+    throw new ApiError({
+      code: ResponseErrorCode.UserUnavailable
+    });
+  }
 
   const endpoint: ApiUserHomeworks["path"] = `/user/homeworks/${week}`;
   const local_response = await endpoints.get<ApiUserHomeworks>(user.slug, endpoint);
@@ -755,14 +757,14 @@ export const callUserHomeworksAPI = async (
 };
 
 export interface Homework {
-  id: string;
+  id: string
 
-  subject_name: string;
-  subject_color: string;
+  subject_name: string
+  subject_color: string
 
-  description: string;
-  attachments: { id: string, name: string }[];
-  done: boolean;
+  description: string
+  attachments: Array<{ id: string, name: string }>
+  done: boolean
 }
 
 /**
@@ -805,13 +807,15 @@ export const callUserRessourcesAPI = async (
   options: { force?: boolean, queue?: boolean } = { force: false, queue: true }
 ) => {
   const user = app.current_user;
-  if (!user.slug) throw new ApiError ({
-    code: ResponseErrorCode.UserUnavailable
-  });
+  if (!user.slug) {
+    throw new ApiError({
+      code: ResponseErrorCode.UserUnavailable
+    });
+  }
 
   const endpoint: ApiUserRessources["path"] = `/user/ressources/${week}`;
   const local_response = await endpoints.get<ApiUserRessources>(user.slug, endpoint);
-  if (local_response && !local_response.expired  && !options.force) return local_response;
+  if (local_response && !local_response.expired && !options.force) return local_response;
 
   const call = async () => {
     console.info("[ressources]: renew");
@@ -833,35 +837,43 @@ export const callUserRessourcesAPI = async (
 
 export const getDefaultPeriodOnglet = (onglet_id: PronoteApiOnglets) => {
   const user = app.current_user;
-  if (!user.slug) throw new ApiError ({
-    code: ResponseErrorCode.UserUnavailable
-  });
+  if (!user.slug) {
+    throw new ApiError({
+      code: ResponseErrorCode.UserUnavailable
+    });
+  }
 
   const user_data = () => user.endpoints["/user/data"];
   const onglet = () => user_data().donnees.ressource.listeOngletsPourPeriodes.V.find(
     onglet => onglet.G === onglet_id
   );
 
-  if (!onglet()) throw new ApiError ({
-    code: ResponseErrorCode.OngletUnauthorized
-  });
+  if (!onglet()) {
+    throw new ApiError({
+      code: ResponseErrorCode.OngletUnauthorized
+    });
+  }
 
   const period = onglet()?.listePeriodes.V.find(
     period => period.N === onglet()?.periodeParDefaut.V.N
   );
 
-  if (!period) throw new ApiError ({
-    code: ResponseErrorCode.OngletUnauthorized
-  });
+  if (!period) {
+    throw new ApiError({
+      code: ResponseErrorCode.OngletUnauthorized
+    });
+  }
 
   return period;
 };
 
 export const getCurrentPeriod = (periods: PronoteApiUserData["response"]["donnees"]["ressource"]["listeOngletsPourPeriodes"]["V"][number]["listePeriodes"]["V"]) => {
   const user = app.current_user;
-  if (!user.slug) throw new ApiError ({
-    code: ResponseErrorCode.UserUnavailable
-  });
+  if (!user.slug) {
+    throw new ApiError({
+      code: ResponseErrorCode.UserUnavailable
+    });
+  }
 
   const login_informations = () => user.endpoints["/login/informations"];
   const periods_info = login_informations().donnees.General.ListePeriodes.filter(
@@ -890,9 +902,11 @@ export const callUserGradesAPI = async (
   options: { force?: boolean, queue?: boolean } = { force: false, queue: true }
 ) => {
   const user = app.current_user;
-  if (!user.slug) throw new ApiError ({
-    code: ResponseErrorCode.UserUnavailable
-  });
+  if (!user.slug) {
+    throw new ApiError({
+      code: ResponseErrorCode.UserUnavailable
+    });
+  }
 
   const endpoint = (): ApiUserGrades["path"] => `/user/grades/${period().N}`;
   const local_response = await endpoints.get<ApiUserGrades>(user.slug, endpoint());
@@ -918,39 +932,39 @@ export const callUserGradesAPI = async (
 };
 
 export interface Grade {
-  description: string;
-  date: dayjs.Dayjs;
+  description: string
+  date: dayjs.Dayjs
 
   /** Maxmimum grade that can be obtained. */
-  maximum: number;
+  maximum: number
   /** Average grade. */
-  average: number | string;
-  optional: boolean;
-  ratio: number;
+  average: number | string
+  optional: boolean
+  ratio: number
 
   /** Grade obtained by the current user. */
-  user: number | string;
+  user: number | string
   /** Maximum grade obtained by an user. */
-  user_max: number | string;
+  user_max: number | string
   /** Minimum grade obtained by an user. */
-  user_min: number | string;
+  user_min: number | string
 
-  subject_id: string;
-  subject_color: string;
-  subject_name: string;
+  subject_id: string
+  subject_color: string
+  subject_name: string
 }
 
 export interface GradeSubject {
-  name: string;
-  color: string;
+  name: string
+  color: string
 
-  user_average: number | string;
-  global_average: number | string;
+  user_average: number | string
+  global_average: number | string
 
-  max_average: number | string;
-  min_average: number | string;
+  max_average: number | string
+  min_average: number | string
 
-  grades: Grade[];
+  grades: Grade[]
 }
 
 export const parseGrade = (grade: PronoteApiUserGrades["response"]["donnees"]["listeDevoirs"]["V"][number]): Grade => ({
@@ -1038,18 +1052,22 @@ export const getDayNameFromDayNumber = (day_number: string | number) => {
  * the endpoints with the correct data.
  */
 export const callUserHomeworkDoneAPI = async (options: {
-   homework_id: string;
-   week_number: number;
-   done?: boolean;
+   homework_id: string
+   week_number: number
+   done?: boolean
 }) => {
-  if (!navigator.onLine) throw new ClientError ({
-    code: ClientErrorCode.Offline
-  });
+  if (!navigator.onLine) {
+    throw new ClientError({
+      code: ClientErrorCode.Offline
+    });
+  }
 
   const user = app.current_user;
-  if (!user.slug) throw new ApiError ({
-    code: ResponseErrorCode.UserUnavailable
-  });
+  if (!user.slug) {
+    throw new ApiError({
+      code: ResponseErrorCode.UserUnavailable
+    });
+  }
 
   const endpoint: ApiUserHomeworkDone["path"] = `/user/homework/${options.homework_id}/done`;
 

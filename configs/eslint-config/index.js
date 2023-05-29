@@ -16,14 +16,13 @@ module.exports = /** @type {import('@typescript-eslint/utils').TSESLint.Linter.C
       "error", "always"
     ],
 
-    "no-return-await": "error",
     "n/no-callback-literal": "off",
-
     "@typescript-eslint/semi": "off",
-    "@typescript-eslint/brace-style": "off",
     "@typescript-eslint/quotes": "off",
     "@typescript-eslint/indent": "off",
+    "@typescript-eslint/brace-style": "off",
     "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/no-non-null-assertion": "off"
   }
 });

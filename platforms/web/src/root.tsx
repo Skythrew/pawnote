@@ -7,6 +7,8 @@ import "@fontsource/comfortaa/700.css";
 import "@unocss/reset/tailwind.css";
 import "virtual:uno.css";
 
+import type { JSX } from "solid-js";
+
 import {
   Html,
   Head,
@@ -32,14 +34,15 @@ import { PawnoteUpdaterModal } from "@/components/molecules/modals";
 import { Toaster } from "solid-toast";
 import version from "@/utils/version";
 
-export default function Root () {
+export default function Root (): JSX.Element {
   const [t] = locale;
 
   /** Always default to `fr`. */
-  const language = isServer ? "fr" :
-    localStorage.getItem("lang") as keyof typeof LANGUAGES || findLanguageBasedOnBrowser();
+  const language = isServer
+    ? "fr"
+    : localStorage.getItem("lang") as keyof typeof LANGUAGES ?? findLanguageBasedOnBrowser();
 
-  onMount(() => switchLanguage(language));
+  onMount(async () => await switchLanguage(language));
 
   return (
     <Html lang={language}>

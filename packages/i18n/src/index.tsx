@@ -4,7 +4,6 @@ import { createI18nContext, I18nContext } from "@solid-primitives/i18n";
 // We import the French locale since it's the language by default.
 import fr from "@/locales/fr";
 export const LANGUAGES = {
-  // eslint-disable-next-line no-return-await
   en: async () => await import("@/locales/en"),
   fr
 };

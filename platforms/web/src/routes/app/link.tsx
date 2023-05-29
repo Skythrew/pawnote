@@ -1,5 +1,5 @@
 import type { Component } from "solid-js";
-import type { ApiGeolocation, ApiInstance } from "@/types/api";
+import type { ApiGeolocation, ApiInstance } from "@pawnote/api";
 
 import { A } from "solid-start";
 
@@ -17,12 +17,12 @@ import Input from "@/components/atoms/Input";
 
 const Page: Component = () => {
   const [state, setState] = createStore<{
-    loading_instance: boolean;
-    loading_geolocation: boolean;
+    loading_instance: boolean
+    loading_geolocation: boolean
 
-    pronote_url: string;
-    instance_data: ApiInstance["response"] | null;
-    geolocation_data: ApiGeolocation["response"] | null;
+    pronote_url: string
+    instance_data: ApiInstance["response"] | null
+    geolocation_data: ApiGeolocation["response"] | null
   }>({
     loading_instance: false,
     loading_geolocation: false,
@@ -44,7 +44,7 @@ const Page: Component = () => {
    * Should be run in the `onMount` and on a refresh pull,
    * so users can directly see instances near them.
    */
-  const handleGeolocation = async () => {
+  const handleGeolocation = async (): Promise<void> => {
     try {
       setState("loading_geolocation", true);
 
@@ -79,7 +79,7 @@ const Page: Component = () => {
     }
   };
 
-  const handleInstance = async (url?: string) => {
+  const handleInstance = async (url?: string): Promise<void> => {
     try {
       setState("loading_instance", true);
 
@@ -101,13 +101,12 @@ const Page: Component = () => {
       });
 
       if (err instanceof ApiError) {
-        console.error(err.message);
         prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
       }
     }
   };
 
-  onMount(() => handleGeolocation());
+  onMount(async () => await handleGeolocation());
 
   return (
     <>
@@ -124,9 +123,9 @@ const Page: Component = () => {
 
       <main class="flex flex-col items-center gap-6 px-4">
         <form class="group max-w-lg w-full flex"
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
-            handleInstance();
+            await handleInstance();
           }}
         >
           <Input.Text
@@ -159,7 +158,7 @@ const Page: Component = () => {
           <hr class="flex-grow-1" />
           <button type="button" class="rounded-full bg-latteText p-2 text-latteBase disabled:(animate-spin opacity-60)"
             disabled={state.loading_geolocation}
-            onClick={() => handleGeolocation()}
+            onClick={async () => await handleGeolocation()}
           >
             <IconMdiRefresh />
           </button>
@@ -171,7 +170,7 @@ const Page: Component = () => {
               <For each={instances()}>
                 {instance => (
                   <button type="button" class="w-full flex flex-col border border-gray-300 rounded-lg px-4 py-2 text-left outline-none transition-colors duration-150 md:max-w-[364px] focus:(border-latte-rosewater text-latte-rosewater) hover:(border-latte-rosewater text-latte-rosewater)"
-                    onClick={() => handleInstance(instance.url)}
+                    onClick={async () => await handleInstance(instance.url)}
                   >
                     <h3 class="w-full truncate text-sm font-bold md:text-lg">
                       {instance.name}

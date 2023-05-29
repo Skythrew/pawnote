@@ -1,30 +1,23 @@
 import type { Component } from "solid-js";
-import type { ApiUserData } from "@/types/api";
+import type { ApiUserData } from "@pawnote/api";
 
 import { A, Navigate, useNavigate } from "solid-start";
 
-import {
-  type LANGUAGES,
-  FULLNAME_LANGUAGE_LIST,
-
-  useLocale,
-  switchLanguage
-} from "@pawnote/i18n";
+import { useLocale } from "@pawnote/i18n";
 
 import sessions from "@/stores/sessions";
 import endpoints from "@/stores/endpoints";
 
-import { classNames } from "@/utils/client";
 import version from "@/utils/version";
 
 interface AvailableSession {
-  slug: string;
-  user_name: string;
-  instance_name: string;
+  slug: string
+  user_name: string
+  instance_name: string
 }
 
 const Page: Component = () => {
-  const [t, { locale }] = useLocale();
+  const [t] = useLocale();
   const navigate = useNavigate();
 
   const [availableSessions, setAvailableSessions] = createSignal<AvailableSession[] | null>(null);
@@ -41,7 +34,7 @@ const Page: Component = () => {
 
     for (const slug of slugs) {
       const user_data = await endpoints.get<ApiUserData>(slug, "/user/data");
-      if (!user_data) continue;
+      if (user_data == null) continue;
 
       const user_name = user_data.data.donnees.ressource.L;
       const instance_name = user_data.data.donnees.listeInformationsEtablissements.V[0].L;
