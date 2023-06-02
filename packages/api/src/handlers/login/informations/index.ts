@@ -17,7 +17,7 @@ export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsReque
   // Don't clean the URL when `raw_url` is set to `true`.
   const pronote_page_url = req.body.raw_url === true && req.body.raw_url
     ? req.body.pronote_url
-    : pronote_url + `/${account_type.path as string}?login=true`;
+    : pronote_url + `/${account_type.path}?login=true`;
 
   const pronote_page = await downloadPronotePage(req.fetch, {
     url: pronote_page_url,
