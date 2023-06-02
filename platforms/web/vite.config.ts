@@ -19,14 +19,14 @@ const workspace_pkg = JSON.parse(
   )
 );
 
-export default defineConfig ({
+export default defineConfig({
   plugins: [
-    solid ({
+    solid({
       ssr: false,
       adapter: vercel({})
     }),
 
-    auto ({
+    auto({
       dts: "./src/auto-imports.d.ts",
 
       resolvers: [
@@ -46,7 +46,7 @@ export default defineConfig ({
       ]
     }),
 
-    pwa ({
+    pwa({
       base: "/",
       registerType: "prompt",
       includeAssets: ["favicon.ico", "apple-touch-icon.png"],
@@ -106,7 +106,7 @@ export default defineConfig ({
   define: {
     APP_NAME: JSON.stringify("Pawnote"),
     APP_VERSION: JSON.stringify(workspace_pkg.version),
-    BETA_GITHUB_SHA: JSON.stringify(process.env.GITHUB_SHA || "")
+    BETA_GITHUB_SHA: JSON.stringify(process.env.GITHUB_SHA ?? "")
   },
 
   server: {
