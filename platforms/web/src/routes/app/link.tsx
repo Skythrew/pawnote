@@ -6,14 +6,18 @@ import { A } from "solid-start";
 import { createModal } from "@/primitives/modal";
 import { AuthenticateSessionModalContent } from "@/components/molecules/modals";
 
-import {
-  callAPI,
-  getGeolocationPosition,
+import { callAPI } from "@pawnote/client";
+import { fetchAPI } from "@/utils/client/requests/fetcher";
 
-  ApiError
-} from "@/utils/client";
+// import {
+//   callAPI,
+//   getGeolocationPosition,
+
+//   ApiError
+// } from "@/utils/client";
 
 import Input from "@/components/atoms/Input";
+import { getGeolocationPosition } from "@/utils/client/geolocation";
 
 const Page: Component = () => {
   const [state, setState] = createStore<{
@@ -54,7 +58,10 @@ const Page: Component = () => {
         }
       } = await getGeolocationPosition();
 
-      const data = await callAPI<ApiGeolocation>("/geolocation", () => ({ latitude, longitude }));
+      const data = await callAPI<ApiGeolocation>(fetchAPI, {
+        handler_id: "geolocation",
+        body: { latitude, longitude }
+      });
 
       if (data.length <= 0) {
         alert("Aucune instance Pronote proche de votre location n'a été trouvée.");
@@ -72,10 +79,10 @@ const Page: Component = () => {
         geolocation_data: null
       });
 
-      if (err instanceof ApiError) {
-        console.error(err.message);
-        prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
-      }
+      // if (err instanceof ApiError) {
+      //   console.error(err.message);
+      //   prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
+      // }
     }
   };
 
@@ -83,14 +90,14 @@ const Page: Component = () => {
     try {
       setState("loading_instance", true);
 
-      const response = await callAPI<ApiInstance>("/instance", () => ({
-        pronote_url: url ?? state.pronote_url
-      }));
+      // const response = await callAPI<ApiInstance>("/instance", () => ({
+      //   pronote_url: url ?? state.pronote_url
+      // }));
 
-      setState({
-        loading_instance: false,
-        instance_data: response
-      });
+      // setState({
+      //   loading_instance: false,
+      //   instance_data: response
+      // });
 
       showInstanceModal();
     }
@@ -100,9 +107,9 @@ const Page: Component = () => {
         instance_data: null
       });
 
-      if (err instanceof ApiError) {
-        prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
-      }
+      // if (err instanceof ApiError) {
+      //   prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
+      // }
     }
   };
 
@@ -111,7 +118,7 @@ const Page: Component = () => {
   return (
     <>
       <Title>Connexion - {APP_NAME}</Title>
-      <header class="border-b-latteSubtext1 sticky top-0 z-10 mb-6 flex items-center justify-start gap-2 border-b-2 bg-latteBase px-2 py-4">
+      <header class="sticky top-0 z-10 mb-6 flex items-center justify-start gap-2 border-b-2 border-b-latteSubtext1 bg-latteBase px-2 py-4">
         <A class="flex items-center justify-center px-4 py-2 text-xl" href="/app">
           <IconMdiArrowLeft />
         </A>
@@ -175,7 +182,7 @@ const Page: Component = () => {
                     <h3 class="w-full truncate text-sm font-bold md:text-lg">
                       {instance.name}
                     </h3>
-                    <p class="opcity-80 w-full truncate text-sm">
+                    <p class="w-full truncate text-sm opacity-80">
                       Situé dans le {instance.postal_code} à {(instance.distance / 1000).toFixed(2)}km.
                     </p>
                     <p class="mt-1 w-full truncate text-xs font-light opacity-60 md:text-sm">
