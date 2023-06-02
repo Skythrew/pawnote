@@ -1,39 +1,40 @@
+import type { JSX } from "solid-js";
 import { Select } from "@kobalte/core";
 
 interface SelectInputOption<T> {
-  label: string;
-  value: T;
+  label: string
+  value: T
 }
 
-const SelectInput = <T,>(props: {
-  options: SelectInputOption<T>[];
-  triggerAriaLabel?: string;
+const COLORS = {
+  "latte-rosewater": {
+    trigger_open: "ui-expanded:border-latte-rosewater focus:border-latte-rosewater",
+    label_open: "bg-latte-rosewater text-latte-base",
+    label_value_selected: "peer-focus:bg-latte-rosewater peer-focus:text-latte-base"
+  }
+};
 
-  value?: SelectInputOption<T> | undefined;
-  onChange?: (value: SelectInputOption<T>) => unknown;
+const SelectInput = <T,>(props: {
+  options: Array<SelectInputOption<T>>
+  triggerAriaLabel?: string
+
+  value?: SelectInputOption<T> | undefined
+  onChange?: (value: SelectInputOption<T>) => unknown
 
   /** Label and placeholder of the text input. */
-  placeholder?: string;
+  placeholder?: string
 
   /** Defaults to `latte-rosewater` on light mode. */
-  color?: "latte-rosewater";
+  color?: keyof typeof COLORS
 
   /** Removes the rounding and the border at the right. */
-  removeRightBorder?: boolean;
+  removeRightBorder?: boolean
   /** Removes the rounding and the border at the left. */
-  removeLeftBorder?: boolean;
-}) => {
+  removeLeftBorder?: boolean
+}): JSX.Element => {
   const id = `_select_${crypto.randomUUID()}`;
   const [isOpen, setIsOpen] = createSignal(false);
   const [valueSelected, setValueSelected] = createSignal(false);
-
-  const colors = {
-    "latte-rosewater": {
-      trigger_open: "ui-expanded:border-latte-rosewater focus:border-latte-rosewater",
-      label_open: "bg-latte-rosewater text-latte-base",
-      label_value_selected: "peer-focus:bg-latte-rosewater peer-focus:text-latte-base"
-    }
-  };
 
   return (
     <Select.Root
@@ -45,9 +46,7 @@ const SelectInput = <T,>(props: {
       placeholder={" "}
       value={props.value}
       onChange={(value) => {
-        if (!value) return;
-
-        if (props.onChange) props.onChange(value);
+        if (props.onChange != null) props.onChange(value);
         setValueSelected(true);
       }}
       itemComponent={props => (
@@ -61,7 +60,7 @@ const SelectInput = <T,>(props: {
     >
       <Select.Trigger
         id={id}
-        class={`peer block w-full inline-flex appearance-none items-center justify-between border-2 border-gray-300 rounded-lg bg-transparent pb-2.5 pl-[16px] pr-[10px] pt-4 text-sm text-latte-text focus:outline-none focus:ring-0 ${colors[props.color ?? "latte-rosewater"].trigger_open}`}
+        class={`peer block w-full inline-flex appearance-none items-center justify-between border-2 border-gray-300 rounded-lg bg-transparent pb-2.5 pl-[16px] pr-[10px] pt-4 text-sm text-latte-text focus:outline-none focus:ring-0 ${COLORS[props.color ?? "latte-rosewater"].trigger_open}`}
         classList={{
           "rounded-r-none border-r-0": props.removeRightBorder,
           "rounded-l-none border-l-0": props.removeLeftBorder
@@ -76,12 +75,12 @@ const SelectInput = <T,>(props: {
       </Select.Trigger>
       <label
         for={id}
-        class="text-latte-subtext0 pointer-events-none absolute left-2 z-[1] origin-[0] transform rounded-md px-2 text-sm duration-150"
+        class="pointer-events-none absolute left-2 z-[1] origin-[0] transform rounded-md px-2 text-sm text-latte-subtext0 duration-150"
         classList={{
           "bg-latte-base": !isOpen(),
           "top-1/2 scale-100 -translate-y-1/2": !isOpen() && !valueSelected(),
-          [`top-2 scale-75 -translate-y-4 ${colors[props.color ?? "latte-rosewater"].label_open}`]: isOpen(),
-          [`top-2 scale-75 -translate-y-4 ${colors[props.color ?? "latte-rosewater"].label_value_selected}`]: !isOpen() && valueSelected()
+          [`top-2 scale-75 -translate-y-4 ${COLORS[props.color ?? "latte-rosewater"].label_open}`]: isOpen(),
+          [`top-2 scale-75 -translate-y-4 ${COLORS[props.color ?? "latte-rosewater"].label_value_selected}`]: !isOpen() && valueSelected()
         }}
       >
         {props.placeholder}

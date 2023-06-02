@@ -2,14 +2,14 @@ import type { FlowComponent } from "solid-js";
 import { Dialog } from "@kobalte/core";
 
 export interface ModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 const Modal: FlowComponent<ModalProps> & {
-  Title: typeof Dialog["Title"];
-  Description: typeof Dialog["Description"];
-  CloseButton: typeof Dialog["CloseButton"];
+  Title: typeof Dialog["Title"]
+  Description: typeof Dialog["Description"]
+  CloseButton: typeof Dialog["CloseButton"]
 } = (props) => (
   <Dialog.Root open={props.open} onOpenChange={props.onOpenChange}>
     <Dialog.Portal>

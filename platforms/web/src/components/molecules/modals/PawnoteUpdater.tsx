@@ -19,13 +19,13 @@ export const PawnoteUpdaterModalContent: Component<{
       du <a href="https://dsc.gg/pawnote" target="_blank" class="border-(b latte-rosewater dotted) font-semibold text-latte-rosewater hover:border-solid">serveur Discord de Pawnote</a>.
 
       <br /><br />
-      Vous pouvez choisir de mettre à jour en rafraichissant la page maintenant, ou plus tard.
+      Vous pouvez choisir de mettre à jour en rafraîchissant la page maintenant, ou plus tard.
     </Modal.Description>
 
     <div class="flex flex-col-reverse items-center justify-end gap-4 pb-2 pt-4 sm:flex-row sm:gap-8">
       <Modal.CloseButton
         onClick={() => props.updateServiceWorker(false)}
-        class="text-latteOverlay1 text-sm opacity-80 transition-colors focus:opacity-90 hover:opacity-90"
+        class="text-sm text-latteOverlay1 opacity-80 transition-colors focus:opacity-90 hover:opacity-90"
       >
         Plus tard
       </Modal.CloseButton>

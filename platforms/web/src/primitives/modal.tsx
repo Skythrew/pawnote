@@ -6,8 +6,8 @@ import { createSignal, onCleanup } from "solid-js";
 import Modal from "@/components/atoms/Modal";
 
 export const createModal = (createModalContent: (components: {
-  Title: typeof Modal["Title"],
-  Description: typeof Modal["Description"],
+  Title: typeof Modal["Title"]
+  Description: typeof Modal["Description"]
   CloseButton: typeof Modal["CloseButton"]
 }) => JSX.Element) => {
   const [open, setOpen] = createSignal(false);

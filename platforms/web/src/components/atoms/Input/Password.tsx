@@ -24,9 +24,9 @@ const PasswordInput: Component<Omit<ComponentProps<typeof TextInput>, "type">> =
         onClick={() => setShowPassword(prev => !prev)}
         class="border-2 border-l-0 border-gray-300 px-3 py-2 text-lg text-gray-400 outline-none"
         classList={{
-          "group-focus-within:border-latte-rosewater": !props.color || props.color === "latte-rosewater",
+          "group-focus-within:border-latte-rosewater": props.color === undefined || props.color === "latte-rosewater",
           "rounded-r-none border-r-0": props.removeRightBorder,
-          "rounded-r-lg": !props.removeRightBorder
+          "rounded-r-lg": !(props.removeRightBorder ?? false)
         }}
       >
         {showPassword() ? <IconMdiEyeOffOutline /> : <IconMdiEye />}

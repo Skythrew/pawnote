@@ -1,9 +1,9 @@
-import { default as TextInput } from "./Text";
-import { default as PasswordInput } from "./Password";
-import { default as SelectInput } from "./Select";
+import TextInput from "./Text";
+import SelectInput from "./Select";
+import PasswordInput from "./Password";
 
 export default {
   Text: TextInput,
-  Password: PasswordInput,
-  Select: SelectInput
+  Select: SelectInput,
+  Password: PasswordInput
 };
