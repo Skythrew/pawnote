@@ -16,7 +16,9 @@ const database = localforage.createInstance({
  * const data = await sessions.select(slug);
  * if (!data) throw new Error("Unknown slug, not in database.");
  */
-export const select = (slug: string) => database.getItem<SessionExported>(slug);
+export const select = async (slug: string): Promise<SessionExported | null> => (
+  await database.getItem<SessionExported>(slug)
+);
 
 /**
  * Inserts or updates if existing a session of a given slug.
@@ -28,7 +30,7 @@ export const select = (slug: string) => database.getItem<SessionExported>(slug);
  * const succeed = await sessions.upsert(slug, session);
  * if (!succeed) throw new Error(`Can't insert or update the session of ${slug}`);
  */
-export const upsert = async (slug: string, session: Session | SessionExported) => {
+export const upsert = async (slug: string, session: Session | SessionExported): Promise<boolean> => {
   try {
     if (session instanceof Session) session = session.exportToObject();
     await database.setItem<SessionExported>(slug, session);
@@ -57,7 +59,7 @@ export const upsert = async (slug: string, session: Session | SessionExported) =
  * const succeed = await sessions.remove(slug);
  * if (!succeed) throw new Error(`Can't remove the session of ${slug}`);
  */
-export const remove = async (slug: string) => {
+export const remove = async (slug: string): Promise<boolean> => {
   try {
     await database.removeItem(slug);
 
@@ -76,6 +78,9 @@ export const remove = async (slug: string) => {
 };
 
 /**
+ * Get every slugs in the local database.
+ * Redirection to the localForage's method `.keys()`.
+ *
  * @example
  * import { sessions } from "@pawnote/client";
  *

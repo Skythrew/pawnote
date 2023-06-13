@@ -6,6 +6,11 @@ const database = localforage.createInstance({
   storeName: "credentials"
 });
 
+interface Credentials {
+  username: string
+  password: string
+}
+
 /**
  * Gets the credentials of the given `slug` from the local database.
  *
@@ -17,9 +22,9 @@ const database = localforage.createInstance({
  * if (!user_credentials) throw new Error("Unknown slug, not in database.");
  * const { username, password } = user_credentials;
  */
-export const select = async (slug: string) => {
+export const select = async (slug: string): Promise<Credentials | null> => {
   const encoded_credentials = await database.getItem<string>(slug);
-  if (!encoded_credentials) return null;
+  if (encoded_credentials === null) return null;
 
   const decoded_credentials = credentials.decode(encoded_credentials);
   return decoded_credentials;
@@ -35,10 +40,7 @@ export const select = async (slug: string) => {
  * const succeed = await credentials.upsert(slug, { username, password });
  * if (!succeed) throw new Error(`Can't insert or update the credentials of ${slug}`);
  */
-export const upsert = async (slug: string, decoded_credentials: {
-  username: string;
-  password: string;
-}) => {
+export const upsert = async (slug: string, decoded_credentials: Credentials): Promise<boolean> => {
   try {
     const encoded_credentials = credentials.encode(decoded_credentials);
     await database.setItem<string>(slug, encoded_credentials);
@@ -61,7 +63,7 @@ export const upsert = async (slug: string, decoded_credentials: {
  * const succeed = await credentials.remove(slug);
  * if (!succeed) throw new Error(`Can't remove the credentials of ${slug}`);
  */
-export const remove = async (slug: string) => {
+export const remove = async (slug: string): Promise<boolean> => {
   try {
     await database.removeItem(slug);
     return true;

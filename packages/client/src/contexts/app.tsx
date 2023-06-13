@@ -3,7 +3,7 @@ import { SetStoreFunction, createStore } from "solid-js/store";
 
 import { useNavigate } from "@solidjs/router";
 
-import { ClientAppStateCode } from "@pawnote/i18n";
+// import { ClientAppStateCode } from "@pawnote/i18n";
 import { PronoteApiAccountId } from "@pawnote/api";
 
 import type {
@@ -20,23 +20,23 @@ import * as endpoints from "@/stores/endpoints";
 import * as sessions from "@/stores/sessions";
 
 export interface CurrentUserStoreDefault {
-  slug: null;
+  slug: null
 }
 
 export interface CurrentUserStoreReady {
-  slug: string;
-  session: SessionExported;
+  slug: string
+  session: SessionExported
 
   endpoints: {
     // Required data for other API calls.
-    "/user/data": ApiUserData["response"]["received"];
-    "/login/informations": ApiLoginInformations["response"]["received"];
+    "/user/data": ApiUserData["response"]["received"]
+    "/login/informations": ApiLoginInformations["response"]["received"]
 
     // Not available when not cached/fetched.
-    [key: ApiUserTimetable["path"]]: ApiUserTimetable["response"]["received"] | undefined;
-    [key: ApiUserHomeworks["path"]]: ApiUserHomeworks["response"]["received"] | undefined;
-    [key: ApiUserResources["path"]]: ApiUserResources["response"]["received"] | undefined;
-    [key: ApiUserGrades["path"]]: ApiUserGrades["response"]["received"] | undefined;
+    [key: ApiUserTimetable["path"]]: ApiUserTimetable["response"]["received"] | undefined
+    [key: ApiUserHomeworks["path"]]: ApiUserHomeworks["response"]["received"] | undefined
+    [key: ApiUserResources["path"]]: ApiUserResources["response"]["received"] | undefined
+    [key: ApiUserGrades["path"]]: ApiUserGrades["response"]["received"] | undefined
   }
 }
 
@@ -45,8 +45,8 @@ export type CurrentUserStore = CurrentUserStoreDefault | CurrentUserStoreReady;
 type UserContextValue = [
   CurrentUserStore,
   {
-    mutate: SetStoreFunction<CurrentUserStoreReady>;
-    clean: () => void;
+    mutate: SetStoreFunction<CurrentUserStoreReady>
+    clean: () => void
   }
 ];
 
@@ -54,14 +54,14 @@ const UserContext = createContext<UserContextValue>();
 
 export const UserProvider: FlowComponent<{
   /** Slug of the user to get. */
-  slug: string;
+  slug: string
 }> = (props) => {
   const defaultUserStore: CurrentUserStoreDefault = { slug: null };
 
   const navigate = useNavigate();
   const [user, setUser] = createStore<CurrentUserStore>(defaultUserStore);
 
-  const cleanUser = () => {
+  const cleanUser = (): void => {
     setUser(defaultUserStore);
     console.info("[debug]: cleared store");
   };
@@ -78,7 +78,7 @@ export const UserProvider: FlowComponent<{
     onCleanup(() => cleanUser());
 
     const session = await sessions.select(slug);
-    if (!session) {
+    if (session === null) {
       console.error("[debug] no session found");
       return navigate("/app/link");
     }
@@ -90,14 +90,14 @@ export const UserProvider: FlowComponent<{
     }
 
     const user_data = await endpoints.select<ApiUserData>(slug, "/user/data");
-    if (!user_data) {
+    if (user_data === null) {
       console.error("[debug] no endpoint '/user/data' found");
       return navigate("/app/link");
     }
     console.info("[debug]: got '/user/data'");
 
     const login_informations = await endpoints.select<ApiLoginInformations>(slug, "/login/informations");
-    if (!login_informations) {
+    if (login_informations == null) {
       console.error("[debug] no endpoint '/login/informations' found");
       return navigate("/app/link");
     }
@@ -122,75 +122,78 @@ export const UserProvider: FlowComponent<{
   );
 };
 
-export const useUser = () => useContext<UserContextValue>(UserContext as Context<UserContextValue>);
+export const useUser = (): UserContextValue => useContext<UserContextValue>(UserContext as Context<UserContextValue>);
 
-const [current_state, setCurrentState] = createStore<{
-  /** `true` when SessionFromScratch modal is shown/being used. */
-  restoring_session: boolean;
-  fetching: boolean;
-  code: ClientAppStateCode
-}>({
-  restoring_session: false,
-  fetching: false,
-  code: ClientAppStateCode.Idle
-});
+// const [current_state, setCurrentState] = createStore<{
+//   /** `true` when SessionFromScratch modal is shown/being used. */
+//   restoring_session: boolean
+//   fetching: boolean
+//   code: ClientAppStateCode
+// }>({
+//   restoring_session: false,
+//   fetching: false,
+//   code: ClientAppStateCode.Idle
+// });
 
-const fetch_queue: {
-  resolve: (value: unknown) => void;
-  reject: (error: unknown) => unknown;
-  action: () => unknown;
-}[] = [];
+// const fetch_queue: Array<{
+//   resolve: (value: unknown) => void
+//   reject: (error: unknown) => unknown
+//   action: () => unknown
+// }> = [];
 
-const enqueue_fetch = (code: ClientAppStateCode, action: () => unknown) => {
-  console.info("[enqueue_fetch]", code, fetch_queue);
-  return new Promise((resolve, reject) => {
-    fetch_queue.push({
-      resolve, reject, action: async () => {
-        setCurrentState({ fetching: true, code });
-        return action();
-      }
-    });
+// const enqueue_fetch = async (code: ClientAppStateCode, action: () => unknown) => {
+//   console.info("[enqueue_fetch]", code, fetch_queue);
+//   return await new Promise((resolve, reject) => {
+//     fetch_queue.push({
+//       resolve,
+//       reject,
+//       action: async () => {
+//         setCurrentState({ fetching: true, code });
+//         return action();
+//       }
+//     });
 
-    dequeue_fetch();
-  });
-};
+//     dequeue_fetch();
+//   });
+// };
 
-const dequeue_fetch = async () => {
-  if (current_state.fetching) return false;
+// const dequeue_fetch = async () => {
+//   if (current_state.fetching) return false;
 
-  // Clear queue when session is restoring.
-  if (current_state.restoring_session) {
-    console.info("[dequeue_fetch] queue cleared (restoring session)", fetch_queue);
-    fetch_queue.splice(0, fetch_queue.length);
-    return false;
-  }
+//   // Clear queue when session is restoring.
+//   if (current_state.restoring_session) {
+//     console.info("[dequeue_fetch] queue cleared (restoring session)", fetch_queue);
+//     fetch_queue.splice(0, fetch_queue.length);
+//     return false;
+//   }
 
-  const item = fetch_queue.shift();
-  if (!item) return false;
+//   const item = fetch_queue.shift();
+//   if (item == null) return false;
 
-  try {
-    console.info("run fetch in queue", item);
-    const payload = await item.action();
-    setStateToIdle();
+//   try {
+//     console.info("run fetch in queue", item);
+//     const payload = await item.action();
+//     setStateToIdle();
 
-    item.resolve(payload);
-  }
-  catch (error) {
-    console.info("fetch error in queue", error);
-    setStateToIdle();
-    item.reject(error);
-  }
-  finally {
-    dequeue_fetch();
-  }
+//     item.resolve(payload);
+//   }
+//   catch (error) {
+//     console.info("fetch error in queue", error);
+//     setStateToIdle();
+//     item.reject(error);
+//   }
+//   finally {
+//     dequeue_fetch();
+//   }
 
-  return true;
-};
+//   return true;
+// };
 
 /** Helper function to reset the state of the app. */
-const setStateToIdle = () => setCurrentState({
-  fetching: false,
-  restoring_session: false,
-  code: ClientAppStateCode.Idle
-});
-
+// const setStateToIdle = (): void => {
+//   setCurrentState({
+//     fetching: false,
+//     restoring_session: false,
+//     code: ClientAppStateCode.Idle
+//   });
+// };

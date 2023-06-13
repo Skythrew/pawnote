@@ -4,6 +4,17 @@ import { CurrentUserStoreReady, useUser } from "@/contexts/app";
 import { onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 
+interface ApiResponseLike {
+  path: string
+  response: { received: unknown }
+}
+
+export interface APIEndpointStored {
+  received: ApiResponseLike["response"]["received"]
+  /** When the endpoint was saved in milliseconds. */
+  date: number
+}
+
 /**
  * We create a cache to prevent running `createInstance` each time
  * we want to access an instance.
@@ -17,9 +28,9 @@ const cachedDatabaseInstances: { [slug: string]: LocalForage } = {};
  * Each slug have its own local database instance, to prevent conflicts
  * and to have a better organisation.
  */
-export const fromDatabase = (slug: string) => {
+export const fromDatabase = (slug: string): LocalForage => {
   // If the instance wasn't created, we have to create and store it in cache.
-  if (!cachedDatabaseInstances[slug]) {
+  if (cachedDatabaseInstances[slug] !== undefined) {
     cachedDatabaseInstances[slug] = localforage.createInstance({
       name: "endpoints",
       storeName: slug
@@ -50,14 +61,11 @@ export const fromDatabase = (slug: string) => {
  *   // and then store it using the `upsert` method.
  * }
  */
-export const select = async <Api extends {
-  path: string,
-  response: { received: unknown }
-}>(
+export const select = async <Api extends ApiResponseLike>(
   slug: string,
   endpoint: Api["path"]
 ): Promise<{
-  expired: boolean,
+  expired: boolean
   data: Api["response"]["received"]
 } | null> => {
   const database = fromDatabase(slug);
@@ -71,15 +79,11 @@ export const select = async <Api extends {
   //   };
   // }
 
-  const data = await database.getItem<{
-    received: Api["response"]["received"];
-    /** When the endpoint was saved in millis. */
-    date: number;
-  }>(endpoint);
-  if (!data) return null;
+  const data = await database.getItem<APIEndpointStored>(endpoint);
+  if (data === null) return null;
 
-  const login_informations = await database.getItem<{ date: number }>("/login/informations");
-  if (!login_informations) return null;
+  const login_informations = await database.getItem<APIEndpointStored>("/login/informations");
+  if (login_informations === null) return null;
 
   const last_session_restore = new Date(login_informations.date);
   const last_endpoint_cache = new Date(data.date);
@@ -103,9 +107,9 @@ export const select = async <Api extends {
 
 export const upsert = async <Api extends { path: string, response: { received: unknown } }>(
   slug: string, endpoint: Api["path"], data: Api["response"]["received"]
-) => {
+): Promise<boolean> => {
   try {
-    await fromDatabase(slug).setItem(endpoint, {
+    await fromDatabase(slug).setItem<APIEndpointStored>(endpoint, {
       received: data,
       date: Date.now()
     });
@@ -134,7 +138,7 @@ export const upsert = async <Api extends { path: string, response: { received: u
  * Removes every entries from a local endpoints database
  * starting with the `searchString` string.
  */
-export const removeAllStartingWith = async (slug: string, searchString: string) => {
+export const removeAllStartingWith = async (slug: string, searchString: string): Promise<void> => {
   const database = fromDatabase(slug);
   const keys = await database.keys();
 
@@ -144,19 +148,25 @@ export const removeAllStartingWith = async (slug: string, searchString: string) 
   }
 };
 
+type CurrentUserStoreReadyEndpoint = CurrentUserStoreReady["endpoints"][keyof CurrentUserStoreReady["endpoints"]]
+type UseEndpointFunctions = [
+  getter: () => CurrentUserStoreReadyEndpoint | null,
+  refetch: () => Promise<void>
+]
+
 export const useEndpoint = <Api extends {
-  path: keyof CurrentUserStoreReady["endpoints"],
-  response: CurrentUserStoreReady["endpoints"][keyof CurrentUserStoreReady["endpoints"]]
-}>(endpoint: keyof CurrentUserStoreReady["endpoints"], fetcher: () => Promise<Api["response"]>) => {
+  path: keyof CurrentUserStoreReady["endpoints"]
+  response: CurrentUserStoreReadyEndpoint
+}>(endpoint: keyof CurrentUserStoreReady["endpoints"], fetcher: () => Promise<Api["response"]>): UseEndpointFunctions => {
   const [user, { mutate }] = useUser();
   const navigate = useNavigate();
 
-  if (!user.slug) {
+  if (user.slug === null) {
     navigate("/app/");
-    return;
+    throw new Error("[@pawnote/client][useEndpoint]: user.slug is null");
   }
 
-  const refetch = async () => {
+  const refetch = async (): Promise<void> => {
     if (!navigator.onLine) {
       console.error("[@pawnote/client][endpoints]: cannot refetch, no internet connection.");
       return;
@@ -166,14 +176,14 @@ export const useEndpoint = <Api extends {
     mutate("endpoints", endpoint, data);
   };
 
-  const getter = () => user.slug ? user.endpoints[endpoint] ?? null : null;
+  const getter = (): (CurrentUserStoreReadyEndpoint | null) => user.endpoints[endpoint] ?? null;
 
-  onMount(() => {
-    if (!user.slug) return;
-    if (!getter()) return;
+  onMount(async () => {
+    if (user.slug === null || user.slug.length === 0) return;
+    if (getter() === null) return;
 
-    refetch();
+    await refetch();
   });
 
-  return [getter, refetch] as const;
+  return [getter, refetch];
 };
