@@ -50,7 +50,7 @@ export const switchAPIHandler: CallAPIFetcher = async (request) => {
   }
 
   const data = await handler(fetcher, request.body, request.params);
-  return data.response.data as unknown;
+  return data.response;
 };
 
 export const callAPIUsingCapacitor = async <T extends RequestLikeApi>(request: CallApiRequester<T>): ReturnType<Awaited<typeof callAPI<T>>> => {

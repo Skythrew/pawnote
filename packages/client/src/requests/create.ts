@@ -1,4 +1,5 @@
-import type { handlers } from "@pawnote/api";
+import { type handlers, type ApiResponseError, ApiResponseErrorCode, type ApiResponse } from "@pawnote/api";
+import { locale } from "@pawnote/i18n";
 
 type Join<K, P> = K extends string | number ?
     P extends string | number ?
@@ -22,12 +23,32 @@ export type CallAPIFetcher = (request: {
   handler_id: Leaves<typeof handlers, 5>
   body: RequestLikeApi["request"]
   params?: RequestLikeApi["params"]
-}) => Promise<RequestLikeApi["response"]>
+}) => Promise<ApiResponse<RequestLikeApi["response"]>>
 
 export interface CallApiRequester<T extends RequestLikeApi> {
   handler_id: Leaves<typeof handlers, 5>
   body: T["request"]
   params?: T["params"]
+}
+
+export class ApiError extends Error {
+  public debug?: ApiResponseError["debug"];
+  public code: ApiResponseErrorCode;
+  public message: string;
+
+  constructor (response: ApiResponseError) {
+    const [t] = locale;
+
+    const error_message = t(`API_ERRORS.${response.code}`);
+
+    const message = `ResponseErrorCode[#${response.code}]: ${error_message}`;
+    super(message);
+
+    this.name = "ApiError";
+    this.debug = response.debug;
+    this.code = response.code;
+    this.message = message;
+  }
 }
 
 /**
@@ -51,10 +72,16 @@ export const callAPI = async <T extends RequestLikeApi>(
       throw new Error(`[@pawnote/client][requests/create]: case "${request.handler_id}" doesn't exist !`);
   }
 
-  return await fetcher({
+  const response = await fetcher({
     path,
     handler_id: request.handler_id,
     body: request.body,
     params: request.params
   });
+
+  if (!response.success) {
+    throw new ApiError(response);
+  }
+
+  return response.data;
 };

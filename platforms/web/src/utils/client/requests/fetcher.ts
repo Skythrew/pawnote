@@ -8,7 +8,7 @@ export const fetcher: CallAPIFetcher = async (request) => {
   });
 
   const data = await response.json() as ApiResponse<unknown>;
-  return data.data;
+  return data;
 };
 
 export const callAPIUsingFetch = async <T extends RequestLikeApi>(request: CallApiRequester<T>): ReturnType<Awaited<typeof callAPI<T>>> => {
