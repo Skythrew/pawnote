@@ -39,7 +39,7 @@ export class ApiError extends Error {
   constructor (response: ApiResponseError) {
     const [t] = locale;
 
-    const error_message = t(`API_ERRORS.${response.code}`);
+    const error_message: string = t(`API_ERRORS.${response.code}`);
 
     const message = `ResponseErrorCode[#${response.code}]: ${error_message}`;
     super(message);
