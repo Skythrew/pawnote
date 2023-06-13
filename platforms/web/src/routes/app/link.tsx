@@ -6,15 +6,7 @@ import { A } from "solid-start";
 import { createModal } from "@/primitives/modal";
 import { AuthenticateSessionModalContent } from "@/components/molecules/modals";
 
-import { callAPI } from "@pawnote/client";
-import { fetchAPI } from "@/utils/client/requests/fetcher";
-
-// import {
-//   callAPI,
-//   getGeolocationPosition,
-
-//   ApiError
-// } from "@/utils/client";
+import { callAPIUsingFetch } from "@/utils/client/requests/fetcher";
 
 import Input from "@/components/atoms/Input";
 import { getGeolocationPosition } from "@/utils/client/geolocation";
@@ -58,7 +50,7 @@ const Page: Component = () => {
         }
       } = await getGeolocationPosition();
 
-      const data = await callAPI<ApiGeolocation>(fetchAPI, {
+      const data = await callAPIUsingFetch<ApiGeolocation>({
         handler_id: "geolocation",
         body: { latitude, longitude }
       });

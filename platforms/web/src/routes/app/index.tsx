@@ -1,12 +1,13 @@
 import type { Component } from "solid-js";
-import type { ApiUserData } from "@pawnote/api";
+// import type { ApiUserData } from "@pawnote/api";
+import { sessions } from "@pawnote/client";
 
-import { A, Navigate, useNavigate } from "solid-start";
+import { A, Navigate /* useNavigate */ } from "solid-start";
 
 import { useLocale } from "@pawnote/i18n";
 
-import sessions from "@/stores/sessions";
-import endpoints from "@/stores/endpoints";
+// import sessions from "@/stores/sessions";
+// import endpoints from "@/stores/endpoints";
 
 import version from "@/utils/version";
 
@@ -18,7 +19,7 @@ interface AvailableSession {
 
 const Page: Component = () => {
   const [t] = useLocale();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [availableSessions, setAvailableSessions] = createSignal<AvailableSession[] | null>(null);
 
@@ -26,21 +27,23 @@ const Page: Component = () => {
     const available_sessions: AvailableSession[] = [];
     const slugs = await sessions.keys();
 
-    // When no account is found, we directly ask the user to log in.
-    if (slugs.length === 0) {
-      navigate("/app/link");
-      return;
-    }
+    console.log(slugs);
 
-    for (const slug of slugs) {
-      const user_data = await endpoints.get<ApiUserData>(slug, "/user/data");
-      if (user_data == null) continue;
+    // // When no account is found, we directly ask the user to log in.
+    // if (slugs.length === 0) {
+    //   navigate("/app/link");
+    //   return;
+    // }
 
-      const user_name = user_data.data.donnees.ressource.L;
-      const instance_name = user_data.data.donnees.listeInformationsEtablissements.V[0].L;
+    // for (const slug of slugs) {
+    //   const user_data = await endpoints.get<ApiUserData>(slug, "/user/data");
+    //   if (user_data == null) continue;
 
-      available_sessions.push({ slug, user_name, instance_name });
-    }
+    //   const user_name = user_data.data.donnees.ressource.L;
+    //   const instance_name = user_data.data.donnees.listeInformationsEtablissements.V[0].L;
+
+    //   available_sessions.push({ slug, user_name, instance_name });
+    // }
 
     setAvailableSessions([...available_sessions]);
   });
@@ -117,8 +120,8 @@ const Page: Component = () => {
         </p>
         <div class="flex gap-4">
           <a
-            class="dark:text-brand-white text-brand-light font-medium text-opacity-60 transition-colors dark:text-opacity-40 hover:text-opacity-80 dark:hover:text-opacity-60"
-            href="https://github.com/Vexcited/pornote"
+            class="text-brand-light dark:text-brand-white font-medium text-opacity-60 transition-colors dark:text-opacity-40 hover:text-opacity-80 dark:hover:text-opacity-60"
+            href="https://github.com/catto-labs/pawnote"
             rel="noopener noreferrer"
             target="_blank"
           >
