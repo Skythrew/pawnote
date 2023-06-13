@@ -34,7 +34,6 @@ export const handleServerRequest = <T extends {
 }>(callback: (
   req: {
     body: T["request"]
-    user_agent: string
     params: APIEvent["params"]
     fetcher: HttpCallFunction
   },
@@ -106,7 +105,6 @@ export const handleServerRequest = <T extends {
     return await callback(
       {
         body,
-        user_agent,
         params: evt.params,
         fetcher: createFetcher(user_agent)
       }, ({
