@@ -8,6 +8,7 @@
     
     "esModuleInterop": true,
     "isolatedModules": true,
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
 
     "strict": true,
@@ -21,7 +22,13 @@
       "@/*": ["./*"]
     },
 
-    "types": ["vite/client"],
+    "types": [
+      "vite/client",
+      "unplugin-icons/types/solid",
+      "vite-plugin-pages/client-solid"
+    ]
   },
-  "include": ["src"]
+
+  "include": ["src", ".eslintrc.cjs", "vite.config.ts", "uno.config.ts", "capacitor.config.ts"],
+  "exclude": ["node_modules/**", "dist/**"]
 }
