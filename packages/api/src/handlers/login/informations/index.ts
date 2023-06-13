@@ -21,8 +21,7 @@ export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsReque
 
   const pronote_page = await downloadPronotePage(req.fetch, {
     url: pronote_page_url,
-    cookies: req.body.cookies,
-    user_agent: req.userAgent
+    cookies: req.body.cookies
   });
 
   // We extract session from the downloaded Pronote page.
@@ -73,8 +72,7 @@ export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsReque
     cookies,
     pronote_url,
     payload: request_payload,
-    session_instance: session.instance,
-    user_agent: req.userAgent
+    session_instance: session.instance
   });
 
   const received = session.readPronoteFunctionPayload<PronoteApiLoginInformations["response"]>(response.payload);

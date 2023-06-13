@@ -21,8 +21,7 @@ export default createApiFunction<ApiLoginAuthenticate>(ApiLoginAuthenticateReque
   const response = await createPronoteAPICall(req.fetch)(PronoteApiFunctions.Authenticate, {
     session_instance: session.instance,
     cookies: req.body.cookies ?? [],
-    payload: request_payload,
-    user_agent: req.userAgent
+    payload: request_payload
   });
 
   const received = session.readPronoteFunctionPayload<PronoteApiLoginAuthenticate["response"]>(response.payload);

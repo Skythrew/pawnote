@@ -46,8 +46,7 @@ export default createApiFunction<ApiUserTimetable>(ApiUserTimetableRequestSchema
 
   const response = await createPronoteAPICall(req.fetch)(PronoteApiFunctions.Timetable, {
     session_instance: session.instance,
-    payload: request_payload,
-    user_agent: req.userAgent
+    payload: request_payload
   });
 
   const received = session.readPronoteFunctionPayload<PronoteApiUserTimetable["response"]>(response.payload);

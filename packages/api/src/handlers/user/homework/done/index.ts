@@ -38,8 +38,7 @@ export default createApiFunction<ApiUserHomeworkDone>(ApiUserHomeworkDoneRequest
 
   const response = await createPronoteAPICall(req.fetch)(PronoteApiFunctions.HomeworkDone, {
     session_instance: session.instance,
-    payload: request_payload,
-    user_agent: req.userAgent
+    payload: request_payload
   });
 
   const received = session.readPronoteFunctionPayload<PronoteApiUserHomeworkDone["response"]>(response.payload);

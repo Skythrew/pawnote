@@ -113,8 +113,6 @@ export const createPronoteAPICall = (fetcher: HttpCallFunction) => async <T>(
     /** Force to use this URL instead of the one in `session_instance` */
     pronote_url?: string
     session_instance: SessionInstance
-    /** `User-Agent` header to prevent browser/bot detection issues. */
-    user_agent: string
     cookies?: string[]
   }
 ) => {
@@ -124,7 +122,6 @@ export const createPronoteAPICall = (fetcher: HttpCallFunction) => async <T>(
     const response = await fetcher(function_url, {
       method: "POST",
       headers: {
-        "User-Agent": data.user_agent,
         "Content-Type": "application/json",
         Cookie: data.cookies?.join("; ") ?? ""
       },
@@ -153,7 +150,6 @@ export const createPronoteAPICall = (fetcher: HttpCallFunction) => async <T>(
 export const downloadPronotePage = async (fetcher: HttpCallFunction, options: {
   url: string
   cookies?: string[]
-  user_agent: string
 }): Promise<{
   /** Data **as text** from the given URL. */
   body: string

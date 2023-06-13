@@ -46,7 +46,6 @@ type HandlerFunction<T extends RequestLikeApi> = (
     fetch: HttpCallFunction
     body: T["request"]
     params: T["params"]
-    userAgent: string
   },
   res: {
     error: (
@@ -67,8 +66,7 @@ type HandlerFunction<T extends RequestLikeApi> = (
 export const createApiFunction = <T extends RequestLikeApi>(requestBodySchema: z.ZodType, callback: HandlerFunction<T>) => async (
   fetcher: HttpCallFunction,
   body: T["request"],
-  params: T["params"],
-  userAgent: string
+  params: T["params"]
 ): ReturnType<HandlerFunction<T>> => {
   // Validate the request body before continue.
   const requestBodyCheck = requestBodySchema.safeParse(body);
@@ -86,8 +84,7 @@ export const createApiFunction = <T extends RequestLikeApi>(requestBodySchema: z
     return await callback({
       fetch: fetcher,
       body,
-      params,
-      userAgent
+      params
     }, {
       success: (data) => ({
         status: 200,

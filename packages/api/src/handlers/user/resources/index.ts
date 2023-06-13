@@ -35,8 +35,7 @@ export default createApiFunction<ApiUserResources>(ApiUserResourcesRequestSchema
 
   const response = await createPronoteAPICall(req.fetch)(PronoteApiFunctions.Resources, {
     session_instance: session.instance,
-    payload: request_payload,
-    user_agent: req.userAgent
+    payload: request_payload
   });
 
   const received = session.readPronoteFunctionPayload<PronoteApiUserResources["response"]>(response.payload);

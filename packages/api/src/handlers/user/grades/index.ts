@@ -31,8 +31,7 @@ export default createApiFunction<ApiUserGrades>(ApiUserGradesRequestSchema, asyn
   });
   const response = await createPronoteAPICall(req.fetch)(PronoteApiFunctions.Grades, {
     session_instance: session.instance,
-    payload: request_payload,
-    user_agent: req.userAgent
+    payload: request_payload
   });
 
   const received = session.readPronoteFunctionPayload<PronoteApiUserGrades["response"]>(response.payload);

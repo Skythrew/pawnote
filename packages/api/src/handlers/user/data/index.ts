@@ -13,8 +13,7 @@ export default createApiFunction<ApiUserData>(ApiUserDataRequestSchema, async (r
   const response = await createPronoteAPICall(req.fetch)(PronoteApiFunctions.UserData, {
     session_instance: session.instance,
     cookies: session.instance.pronote_cookies,
-    payload: request_payload,
-    user_agent: req.userAgent
+    payload: request_payload
   });
 
   const received = session.readPronoteFunctionPayload<PronoteApiUserData["response"]>(response.payload);
