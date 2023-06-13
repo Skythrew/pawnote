@@ -1,7 +1,7 @@
 <h1 align="center"><a href="https://pawnote.vercel.app">Pawnote</a></h1>
 
 <p align="center">
-  <kbd>SolidJS</kbd> - <kbd>WindiCSS</kbd> - <kbd>TypeScript</kbd> <br />
+  <kbd>SolidJS</kbd> - <kbd>UnoCSS</kbd> - <kbd>TypeScript</kbd> <br />
   <a href="https://dsc.gg/pawnote">Discord</a>
 </p>
 
@@ -28,12 +28,12 @@ including many features such as...
 
 ## Alternatives
 
-- [Pronote+ / Papillon](https://github.com/PapillonApp/Papillon)
+- [Papillon](https://github.com/PapillonApp/Papillon)
 - [yNotes (Deprecated)](https://github.com/EduWireApps/ynotes)
 
-## Ressources
+## Resources
 
-Without these very useful ressources, I wouldn't be able to write this whole client by myself.
+Without these very useful resources, I wouldn't be able to write this whole client by myself.
 
 - [Pronote Protocol](https://github.com/bain3/pronotepy/blob/master/PRONOTE%20protocol.md) written by developers of `pronotepy`.
 - [`pronote-api`](https://github.com/dorian-eydoux/pronote-api/tree/master/src)'s (forked/archived) source code.
@@ -42,5 +42,4 @@ Without these very useful ressources, I wouldn't be able to write this whole cli
 ## Contributing
 
 - [`/packages`](./packages) is a good starting point if you want to navigate through Pawnote's internal source code. You'll find a README that explains what each package does.
-- [`/platforms`](./platforms) is where we build the interfaces for each platforms. You may want to look at it if you want to make some UI changes.
-- [`/docs`](./docs) is where I write all the documentation about the API and, later, stuff about how the app works and should be used. There's still a lot of work in progress in here.
+- [`/platforms`](./platforms) is where we build the client for each platforms. You may want to look at it if you want to make some UI changes.
