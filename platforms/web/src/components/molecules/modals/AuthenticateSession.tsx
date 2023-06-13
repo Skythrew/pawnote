@@ -1,35 +1,37 @@
 import type { Component, JSX } from "solid-js";
 
-import type { PronoteApiAccountId } from "@/types/pronote";
-import type { ApiInstance, ApiLoginInformations, ApiUserData } from "@/types/api";
+import type { ApiInstance, ApiLoginInformations, ApiUserData, PronoteApiAccountId } from "@pawnote/api";
+import { PRONOTE_ACCOUNT_TYPES } from "@pawnote/api";
 
 import Modal, { type ModalProps } from "@/components/atoms/Modal";
 import Input from "@/components/atoms/Input";
 
-import { connectToPronote } from "@/utils/client";
-import { objectHasProperty } from "@/utils/globals";
-import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
+// import { connectToPronote } from "@/utils/client";
 
-import app from "@/stores/app";
-import sessions from "@/stores/sessions";
-import endpoints from "@/stores/endpoints";
-import credentials_store from "@/stores/credentials";
+// import app from "@/old_stores/app";
+// import sessions from "@/old_stores/sessions";
+// import endpoints from "@/old_stores/endpoints";
+// import credentials_store from "@/old_stores/credentials";
 
 import { createModal } from "@/primitives/modal";
 import { SaveSessionIntoSlugModalContent } from "./SaveSessionIntoSlug";
 
 interface Props {
-  loading: boolean;
-  instance: ApiInstance["response"] | null;
+  loading: boolean
+  instance: ApiInstance["response"] | null
 }
 
 export const AuthenticateSessionModalContent: Component<Props> = (props) => {
-  const first_account_type = () => props.instance ? props.instance.accounts?.[0].id as number : null;
+  const first_account_type = (): number | null => (props.instance != null) ? props.instance.accounts?.[0].id as number : null;
+
+  const handleSaveIntoSlugModalSubmit = async (slug: string): Promise<void> => {
+    return await saveIntoSlug(slug, slugModalData());
+  };
 
   const [showSlugModal] = createModal(() => (
     <SaveSessionIntoSlugModalContent
       slugModalData={slugModalData()}
-      onSubmit={(slug) => saveIntoSlug(slug, slugModalData())}
+      onSubmit={handleSaveIntoSlugModalSubmit}
     />
   ));
 
@@ -40,11 +42,11 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
   const [loading, setLoading] = createSignal(false);
 
   const [credentials, setCredentials] = createStore<{
-    account_type: PronoteApiAccountId | null;
-    use_ent: boolean;
+    account_type: PronoteApiAccountId | null
+    use_ent: boolean
 
-    username: string;
-    password: string;
+    username: string
+    password: string
   }>({
     use_ent: false,
     username: "",
@@ -56,39 +58,40 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
   const processUserAuthentication: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
     event.preventDefault();
 
-    if (!credentials.username || !credentials.password || !props.instance) return;
+    if ((credentials.username.length === 0) || (credentials.password.length === 0) || (props.instance == null)) return;
 
     const account_type = credentials.account_type;
-    if (account_type === null || !objectHasProperty(PRONOTE_ACCOUNT_TYPES, account_type)) return;
+    if (account_type === null || !(account_type in PRONOTE_ACCOUNT_TYPES)) return;
 
     try {
       setLoading(true);
+      return;
 
-      const data = await connectToPronote({
-        pronote_url: props.instance.pronote_url,
-        use_credentials: true,
+      // const data = await connectToPronote({
+      //   pronote_url: props.instance.pronote_url,
+      //   use_credentials: true,
 
-        username: credentials.username,
-        password: credentials.password,
+      //   username: credentials.username,
+      //   password: credentials.password,
 
-        ...(credentials.use_ent
-          ? {
-            use_ent: true,
-            ent_url: props.instance.ent_url as string
-          }
-          : {
-            use_ent: false,
-            account_type
-          }
-        )
-      });
+      //   ...(credentials.use_ent
+      //     ? {
+      //       use_ent: true,
+      //       ent_url: props.instance.ent_url as string
+      //     }
+      //     : {
+      //       use_ent: false,
+      //       account_type
+      //     }
+      //   )
+      // });
 
-      batch(() => {
-        setLoading(false);
+      // batch(() => {
+      //   setLoading(false);
 
-        setSlugModalData(data);
-        showSlugModal();
-      });
+      //   setSlugModalData(data);
+      //   showSlugModal();
+      // });
     }
     catch (err) {
       setLoading(false);
@@ -96,25 +99,25 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
     }
   };
 
-  const saveIntoSlug = async (slug: string, data: Awaited<ReturnType<typeof connectToPronote>>) => {
-    if (!data) return;
+  const saveIntoSlug = async (slug: string, data: Awaited<ReturnType<typeof connectToPronote>>): Promise<void> => {
+    if (!(data)) return;
 
-    await sessions.upsert(
-      slug, data.session
-    );
+    // await sessions.upsert(
+    //   slug, data.session
+    // );
 
-    await endpoints.upsert<ApiUserData>(
-      slug, "/user/data", data.endpoints["/user/data"]
-    );
+    // await endpoints.upsert<ApiUserData>(
+    //   slug, "/user/data", data.endpoints["/user/data"]
+    // );
 
-    await endpoints.upsert<ApiLoginInformations>(
-      slug, "/login/informations", data.endpoints["/login/informations"]
-    );
+    // await endpoints.upsert<ApiLoginInformations>(
+    //   slug, "/login/informations", data.endpoints["/login/informations"]
+    // );
 
-    await credentials_store.upsert(slug, {
-      username: credentials.username,
-      password: credentials.password
-    });
+    // await credentials_store.upsert(slug, {
+    //   username: credentials.username,
+    //   password: credentials.password
+    // });
   };
 
   return (
@@ -127,7 +130,7 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
           >
             {instance().school_name}
           </Modal.Title>
-          <Modal.Description class="text-latteSubtext0 px-6 text-center text-sm">
+          <Modal.Description class="px-6 text-center text-sm text-latteSubtext0">
               Créez une nouvelle session sur cette instance en entrant vos identifiants.
           </Modal.Description>
 
@@ -153,7 +156,8 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
               </label>
             </Show>
 
-            <Show when={!credentials.use_ent && !app.current_user.slug}>
+            {/* <Show when={!credentials.use_ent && !app.current_user.slug}> */}
+            <Show when={!credentials.use_ent}>
               <Input.Select<PronoteApiAccountId>
                 options={instance().accounts.map(instance => ({ label: instance.name, value: instance.id }))}
                 placeholder="Espace à utiliser"

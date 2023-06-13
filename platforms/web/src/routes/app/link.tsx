@@ -6,10 +6,11 @@ import { A } from "solid-start";
 import { createModal } from "@/primitives/modal";
 import { AuthenticateSessionModalContent } from "@/components/molecules/modals";
 
+import { ApiError } from "@pawnote/client";
 import { callAPIUsingFetch } from "@/utils/client/requests/fetcher";
+import { getGeolocationPosition } from "@/utils/client/geolocation";
 
 import Input from "@/components/atoms/Input";
-import { getGeolocationPosition } from "@/utils/client/geolocation";
 
 const Page: Component = () => {
   const [state, setState] = createStore<{
@@ -35,11 +36,6 @@ const Page: Component = () => {
     />
   ));
 
-  /**
-   * Calls `/api/geolocation`.
-   * Should be run in the `onMount` and on a refresh pull,
-   * so users can directly see instances near them.
-   */
   const handleGeolocation = async (): Promise<void> => {
     try {
       setState("loading_geolocation", true);
@@ -71,10 +67,10 @@ const Page: Component = () => {
         geolocation_data: null
       });
 
-      // if (err instanceof ApiError) {
-      //   console.error(err.message);
-      //   prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
-      // }
+      if (err instanceof ApiError) {
+        console.error(err.message);
+        prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
+      }
     }
   };
 
@@ -82,14 +78,15 @@ const Page: Component = () => {
     try {
       setState("loading_instance", true);
 
-      // const response = await callAPI<ApiInstance>("/instance", () => ({
-      //   pronote_url: url ?? state.pronote_url
-      // }));
+      const response = await callAPIUsingFetch<ApiInstance>({
+        handler_id: "instance",
+        body: { pronote_url: url ?? state.pronote_url }
+      });
 
-      // setState({
-      //   loading_instance: false,
-      //   instance_data: response
-      // });
+      setState({
+        loading_instance: false,
+        instance_data: response
+      });
 
       showInstanceModal();
     }
@@ -99,13 +96,14 @@ const Page: Component = () => {
         instance_data: null
       });
 
-      // if (err instanceof ApiError) {
-      //   prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
-      // }
+      if (err instanceof ApiError) {
+        prompt("Une erreur est survenue. Vous pouvez copier le message d'erreur ci-dessous si vous souhaitez ouvrir un bug report.", err.message);
+      }
     }
   };
 
-  onMount(async () => await handleGeolocation());
+  // Run geolocation on page mount.
+  void handleGeolocation();
 
   return (
     <>
