@@ -24,4 +24,5 @@ export { PronoteApiAccountId, PronoteApiFunctions, PronoteApiOnglets } from "@/u
 // Utilities that can be used outside.
 export { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
 export { credentials } from "@/utils/credentials";
+export * as encryption from "@/utils/encryption";
 export * from "@/utils/session";
