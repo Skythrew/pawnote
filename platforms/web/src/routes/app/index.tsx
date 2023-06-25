@@ -1,52 +1,15 @@
 import type { Component } from "solid-js";
-// import type { ApiUserData } from "@pawnote/api";
-import { sessions } from "@pawnote/client";
 
-import { A, Navigate /* useNavigate */ } from "solid-start";
+import { A, useNavigate, Navigate } from "solid-start";
 
 import { useLocale } from "@pawnote/i18n";
-
-// import sessions from "@/stores/sessions";
-// import endpoints from "@/stores/endpoints";
+import { ListSessions } from "@pawnote/client";
 
 import version from "@/utils/version";
 
-interface AvailableSession {
-  slug: string
-  user_name: string
-  instance_name: string
-}
-
 const Page: Component = () => {
   const [t] = useLocale();
-  // const navigate = useNavigate();
-
-  const [availableSessions, setAvailableSessions] = createSignal<AvailableSession[] | null>(null);
-
-  onMount(async () => {
-    const available_sessions: AvailableSession[] = [];
-    const slugs = await sessions.keys();
-
-    console.log(slugs);
-
-    // // When no account is found, we directly ask the user to log in.
-    // if (slugs.length === 0) {
-    //   navigate("/app/link");
-    //   return;
-    // }
-
-    // for (const slug of slugs) {
-    //   const user_data = await endpoints.get<ApiUserData>(slug, "/user/data");
-    //   if (user_data == null) continue;
-
-    //   const user_name = user_data.data.donnees.ressource.L;
-    //   const instance_name = user_data.data.donnees.listeInformationsEtablissements.V[0].L;
-
-    //   available_sessions.push({ slug, user_name, instance_name });
-    // }
-
-    setAvailableSessions([...available_sessions]);
-  });
+  const navigate = useNavigate();
 
   return (
     <div class="h-full min-h-screen flex flex-col justify-between gap-12 p-10">
@@ -71,22 +34,21 @@ const Page: Component = () => {
 
       </header>
       <section class="mx-auto max-w-sm w-full flex flex-col items-center justify-center gap-6 px-4">
-        <Show
-          when={availableSessions()}
-          fallback={
+        <ListSessions
+          loading={
             <p class="bg-brand-white text-brand-primary dark:bg-brand-primary dark:text-brand-light rounded-full px-4 py-1">
               {t("PAGES.INDEX.LOADING")}
             </p>
           }
+          onDone={(sessions) => {
+            if (sessions.length === 0) {
+              navigate("/app/link");
+            }
+          }}
         >
           {sessions => (
             <>
-              <For each={sessions()}
-                fallback={
-                  // When no account is found, we directly ask the user to log in.
-                  <Navigate href="/app/link" />
-                }
-              >
+              <For each={sessions()} fallback={<Navigate href="/app/link" />}>
                 {session => (
                   <A class="w-full" href={`/app/session/${session.slug}`}>
                     <div
@@ -111,7 +73,7 @@ const Page: Component = () => {
               </A>
             </>
           )}
-        </Show>
+        </ListSessions>
       </section>
 
       <footer class="w-full flex items-center justify-between text-sm">

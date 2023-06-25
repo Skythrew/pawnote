@@ -31,8 +31,9 @@ const Page: Component = () => {
 
   const [showInstanceModal] = createModal(() => (
     <AuthenticateSessionModalContent
-      instance={state.instance_data}
-      loading={state.loading_instance}
+      // Since we show the instance modal only when the instance data
+      // has been retrieved, we are sure the data is non-null.
+      instance={state.instance_data as ApiInstance["response"]}
     />
   ));
 
@@ -166,7 +167,7 @@ const Page: Component = () => {
             {instances => (
               <For each={instances()}>
                 {instance => (
-                  <button type="button" class="w-full flex flex-col border border-gray-300 rounded-lg px-4 py-2 text-left outline-none transition-colors duration-150 md:max-w-[364px] focus:(border-latte-rosewater text-latte-rosewater) hover:(border-latte-rosewater text-latte-rosewater)"
+                  <button type="button" disabled={state.loading_instance} class="w-full flex flex-col border border-gray-300 rounded-lg px-4 py-2 text-left outline-none transition-colors duration-150 md:max-w-[364px] focus:(border-latte-rosewater text-latte-rosewater) hover:(border-latte-rosewater text-latte-rosewater) disabled:opacity-80"
                     onClick={async () => await handleInstance(instance.url)}
                   >
                     <h3 class="w-full truncate text-sm font-bold md:text-lg">
