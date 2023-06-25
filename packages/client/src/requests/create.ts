@@ -1,5 +1,5 @@
-import { type handlers, type ApiResponseError, ApiResponseErrorCode, type ApiResponse } from "@pawnote/api";
-import { locale } from "@pawnote/i18n";
+import { type handlers, type ApiResponse } from "@pawnote/api";
+import { ApiError } from "@/utils/errors";
 
 type Join<K, P> = K extends string | number ?
     P extends string | number ?
@@ -31,26 +31,6 @@ export interface CallApiRequester<T extends RequestLikeApi> {
   params?: T["params"]
 }
 
-export class ApiError extends Error {
-  public debug?: ApiResponseError["debug"];
-  public code: ApiResponseErrorCode;
-  public message: string;
-
-  constructor (response: ApiResponseError) {
-    const [t] = locale;
-
-    const error_message: string = t(`API_ERRORS.${response.code}`);
-
-    const message = `ResponseErrorCode[#${response.code}]: ${error_message}`;
-    super(message);
-
-    this.name = "ApiError";
-    this.debug = response.debug;
-    this.code = response.code;
-    this.message = message;
-  }
-}
-
 /**
  * Adds `path` parameter to final fetcher.
  * TODO: Intercept requests to store them locally in the cache.
@@ -63,13 +43,50 @@ export const callAPI = async <T extends RequestLikeApi>(
 
   switch (request.handler_id) {
     case "geolocation":
-      path = "/geolocation";
-      break;
     case "instance":
-      path = "/instance";
+    case "login.informations":
+    case "login.ent_cookies":
+    case "login.ent_ticket":
+    case "login.authenticate":
+    case "login.identify":
+    case "user.data":
+      path = `/${request.handler_id.replaceAll(".", "/")}`;
       break;
+
+    case "user.grades":
+      if (typeof request.params !== "object" || request.params === null ||
+        !("period_id" in request.params) || typeof request.params.period_id !== "string"
+      ) {
+        throw new Error("[@pawnote/client][requests/create(user.grades)]: `period_id` check not passed.");
+      }
+
+      path = "/user/grades/" + request.params.period_id;
+      break;
+
+    case "user.homework.done":
+      if (typeof request.params !== "object" || request.params === null ||
+        !("id" in request.params) || typeof request.params.id !== "string"
+      ) {
+        throw new Error("[@pawnote/client][requests/create(user.homework.done)]: `id` check not passed.");
+      }
+
+      path = "/user/homework/" + request.params.id + "/done";
+      break;
+
+    case "user.homeworks":
+    case "user.resources":
+    case "user.timetable":
+      if (typeof request.params !== "object" || request.params === null ||
+        !("week" in request.params) || typeof request.params.week !== "number"
+      ) {
+        throw new Error(`[@pawnote/client][requests/create(${request.handler_id})]: \`week\` check not passed.`);
+      }
+
+      path = `/${request.handler_id.replaceAll(".", "/")}/${request.params.week}`;
+      break;
+
     default:
-      throw new Error(`[@pawnote/client][requests/create]: case "${request.handler_id}" doesn't exist !`);
+      throw new Error("[@pawnote/client][requests/create]: case doesn't exist !");
   }
 
   const response = await fetcher({
