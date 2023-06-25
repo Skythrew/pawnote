@@ -14,10 +14,7 @@ This is a constant in this package when calling `navigate` from `@solidjs/router
 
 ### `UserProvider` and `useUser`
 
-When enterring a session, each pages or components that needs the actual user
+When entering a session, each pages or components that needs the actual user
 will have to be a children of `<UserProvider />`
 
-To get the value of this provider, you can `const [user, { mutate }] = useUser()|`
-
-<!-- ### `useEndpoint` -->
-
+To get the value of this provider, you can `const [user, { mutate }] = useUser()`
