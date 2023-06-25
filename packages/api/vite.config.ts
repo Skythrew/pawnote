@@ -22,6 +22,9 @@ export default defineConfig({
       formats: ["es"],
       entry: path.resolve(__dirname, "src/index.ts"),
       fileName: "index"
+    },
+    rollupOptions: {
+      external: ["node-forge"]
     }
   }
 });

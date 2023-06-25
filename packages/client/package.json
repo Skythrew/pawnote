@@ -18,7 +18,9 @@
     "@pawnote/i18n": "workspace:*",
     "@solidjs/router": "^0.8.2",
     "@types/node": "^18.16.9",
+    "@types/node-forge": "^1.3.2",
     "eslint": "^8.40.0",
+    "node-forge": "^1.3.1",
     "solid-js": "^1.7.5",
     "typescript": "^5.0.4",
     "vite": "^4.3.5",
@@ -29,6 +31,7 @@
     "@pawnote/api": "workspace:*",
     "@pawnote/i18n": "workspace:*",
     "@solidjs/router": "^0.8.2",
+    "node-forge": "^1.3.1",
     "solid-js": "^1.7.5"
   },
   "dependencies": {
