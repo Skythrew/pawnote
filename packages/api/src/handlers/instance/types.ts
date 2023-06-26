@@ -11,7 +11,7 @@ export interface PronoteApiInstance {
   response: {
     version: number[]
     date: string
-    CAS: { actif: boolean, casURL: string }
+    CAS: { actif: false } | { actif: true, casURL: string, jetonCAS: string }
     espaces: Array<{ nom: string, URL: string }>
     nomEtab: string
   }
@@ -30,8 +30,11 @@ export interface ApiInstance {
 
     /** Base URL of the instance. */
     pronote_url: string
-    /** When available, ENT to use will use that URL to check which ENT to use/propose. */
+
+    /** URL of the ENT we have to handle. */
     ent_url?: string
+    /** Used to generate new temporary passwords for Pronote after ENT login. */
+    ent_token?: string
   }
 
   path: "/instance"

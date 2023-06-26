@@ -38,6 +38,7 @@ export default createApiFunction<ApiInstance>(ApiInstanceRequestSchema, async (r
     accounts,
     pronote_url,
     school_name: data.nomEtab,
-    ent_url: data.CAS.actif ? data.CAS.casURL : undefined
+    ent_url: data.CAS.actif ? data.CAS.casURL : undefined,
+    ent_token: data.CAS.actif ? data.CAS.jetonCAS : undefined
   });
 });
