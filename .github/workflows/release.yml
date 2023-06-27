@@ -7,6 +7,8 @@ on:
 
 jobs:
   web-deploy:
+    if: ${{ false }}  # Disable since @pawnote/web is not ready.
+
     name: Deploy @pawnote/web to Vercel
     runs-on: ubuntu-latest
 
