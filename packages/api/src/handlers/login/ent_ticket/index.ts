@@ -12,5 +12,12 @@ export default createApiFunction<ApiLoginEntTicket>(ApiLoginEntTicketRequestSche
     pronote_url: req.body.pronote_url
   });
 
-  return res.success({ pronote_url: pronote_url_ticket });
+  const url = new URL(pronote_url_ticket);
+  const lastPath = url.pathname.split("/").pop() as string;
+  const indexOfLastSlash = url.pathname.lastIndexOf("/");
+  if (!lastPath.includes("mobile.")) {
+    url.pathname = url.pathname.slice(0, indexOfLastSlash) + "/mobile." + url.pathname.slice(indexOfLastSlash + 1);
+  }
+
+  return res.success({ pronote_url: url.href });
 });

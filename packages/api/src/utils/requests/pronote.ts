@@ -8,7 +8,7 @@ import { serializeError } from "serialize-error";
 
 export enum PronoteApiAccountId {
   Commun = 0,
-  Eleve = 3,
+  Eleve = 6,
   Parent = 2,
   Professeur = 1,
   Accompagnant = 25,

@@ -2,7 +2,7 @@ import type { PronoteApiLoginInformations, ApiLoginInformations } from "./types"
 import { ApiLoginInformationsRequestSchema } from "./types";
 
 import { createApiFunction } from "@/utils/handlers/create";
-import { ApiResponseErrorCode } from "@/utils/handlers/errors";
+import { ApiResponseErrorCode, HandlerResponseError } from "@/utils/handlers/errors";
 
 import { PronoteApiFunctions, cleanPronoteUrl, downloadPronotePage, extractPronoteSessionFromBody, createPronoteAPICall } from "@/utils/requests/pronote";
 import { PRONOTE_ACCOUNT_TYPES } from "@/utils/constants";
@@ -12,10 +12,16 @@ import forge from "node-forge";
 
 export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsRequestSchema, async (req, res) => {
   const pronote_url = cleanPronoteUrl(req.body.pronote_url);
-  const account_type = PRONOTE_ACCOUNT_TYPES[req.body.account_type];
+  const account_type = PRONOTE_ACCOUNT_TYPES.find(entry => entry.id === req.body.account_type);
+
+  if (account_type == null) {
+    throw new HandlerResponseError(
+      ApiResponseErrorCode.InvalidRequestBody, { status: 400 }
+    );
+  };
 
   // Don't clean the URL when `raw_url` is set to `true`.
-  const pronote_page_url = req.body.raw_url === true && req.body.raw_url
+  const pronote_page_url = req.body.raw_url === true
     ? req.body.pronote_url
     : pronote_url + `/${account_type.path}?login=true`;
 

@@ -12,7 +12,7 @@ export const PRONOTE_ACCOUNT_TYPES: PronoteApiAccountType[] = [
   {
     id: PronoteApiAccountId.Eleve,
     name: "Élève",
-    path: "eleve.html"
+    path: "mobile.eleve.html"
   },
   {
     id: PronoteApiAccountId.Parent,
