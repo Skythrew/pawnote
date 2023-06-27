@@ -96,23 +96,32 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
     // When not using ENT, just use the given account type.
     : options.account_type;
 
-  let pronote_cookies: string[] = options.use_credentials && options.use_ent
-    ? [
-      // Expires in 5 mins.
+  let pronote_cookies: string[] = [];
+
+  // When it's the first time authentication for ENT,
+  // we should provide those two cookies.
+  if (options.use_credentials && options.use_ent) {
+    pronote_cookies = [
       `validationAppliMobile=${options.ent_token}`,
-      `uuidAppliMobile=${options.device_uuid}`,
-      "ielang=fr"
-    ]
-    : [];
+      `uuidAppliMobile=${options.device_uuid}`
+    ];
+  }
+  // When re-authenticating we just let the app know we're just authenticating.
+  else if (!options.use_credentials) {
+    pronote_cookies = [
+      "appliMobile=1"
+    ];
+  }
+
+  // Inject the language `fr`.
+  pronote_cookies.push("ielang=fr");
 
   const informations_response = await callAPI<ApiLoginInformations>(fetcher, {
     handler_id: "login.informations",
     body: {
-      cookies: pronote_cookies,
       account_type,
-      pronote_url: pronote_url.href,
-
-      raw_url: true
+      cookies: pronote_cookies,
+      pronote_url: pronote_url.href
     }
   } /* { // Here, we prevent the cache even if we'll cache it later.
     prevent_cache: true
@@ -120,20 +129,18 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
 
   // Add cookies we got from the request.
   for (const cookie of informations_response.cookies) {
+    // We skip `ielang` cookie since we defined it above.
+    if (cookie.includes("ielang")) continue;
     pronote_cookies.push(cookie);
   }
 
-  // Updating the login credentials to use depending of the received response.
+  // Update the credentials depending on the response.
   if (typeof informations_response.setup !== "undefined") {
     options.username = informations_response.setup.username;
     options.password = informations_response.setup.password;
   }
 
-  if (options.username.length === 0 || options.password.length === 90) {
-    // TODO: Ask for new credentials.
-    // User can choose if they'll be saved or not.
-    // SessionFromScratchModal.show();
-
+  if (options.username.length === 0 || options.password.length === 0) {
     throw new ClientError({
       code: ClientErrorCode.SessionCantRestore
     });
