@@ -5,7 +5,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
-    "lib": ["DOM", "WebWorker"],
+    "lib": ["DOM", "WebWorker", "ESNext"],
 
     "esModuleInterop": true,
     "isolatedModules": true,
