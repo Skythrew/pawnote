@@ -127,13 +127,6 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
     prevent_cache: true
   } */);
 
-  // Add cookies we got from the request.
-  for (const cookie of informations_response.cookies) {
-    // We skip `ielang` cookie since we defined it above.
-    if (cookie.includes("ielang")) continue;
-    pronote_cookies.push(cookie);
-  }
-
   // Update the credentials depending on the response.
   if (typeof informations_response.setup !== "undefined") {
     options.username = informations_response.setup.username;
@@ -149,11 +142,12 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
   const identify_response = await callAPI<ApiLoginIdentify>(fetcher, {
     handler_id: "login.identify",
     body: {
-      pronote_username: options.username,
       cookies: pronote_cookies,
+      pronote_username: options.username,
       session: informations_response.session,
       useENT: options.use_credentials && options.use_ent,
-      askMobileAuthentication: true,
+      requestFirstMobileAuthentication: options.use_credentials,
+      reuseMobileAuthentication: !options.use_credentials,
       deviceUUID: options.device_uuid
     }
   } /* { prevent_cache: true } */);
@@ -174,9 +168,9 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
 
   // Generate the hash for the AES key.
   const challengeAesKeyHash = forge.md.sha256.create()
-    .update((informations_response.setup != null)
+    .update(typeof informations_response.setup !== "undefined"
       ? "" // When using generated credentials, we don't have to use `alea`.
-      : identify_response.received.donnees.alea
+      : identify_response.received.donnees.alea ?? ""
     )
     .update(forge.util.encodeUtf8(options.password))
     .digest();
@@ -234,9 +228,6 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
     }
   } /* { prevent_cache: true } */);
 
-  // Remove the stored cookie "CASTJU" if exists.
-  pronote_cookies = pronote_cookies.filter(cookie => !cookie.startsWith("CASTJU="));
-
   const decryptedAuthKey = encryption.aes.decrypt(authenticate_response.received.donnees.cle, {
     iv: aesIvBuffer,
     key: challengeAesKeyBuffer
@@ -250,13 +241,6 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
   /// and let the "/user/data" endpoint do the final touches.
 
   authenticate_response.session.encryption.aes.key = authKey;
-  authenticate_response.session.instance.pronote_cookies = pronote_cookies;
-
-  console.log(authenticate_response);
-
-  // authenticate_response.session.instance.use_ent = options.use_ent;
-  // authenticate_response.session.instance.ent_cookies = ent_cookies;
-  // authenticate_response.session.instance.ent_url = options.use_ent ? options.ent_url : null;
 
   const user_data_response = await callAPI<ApiUserData>(fetcher, {
     handler_id: "user.data",
@@ -277,8 +261,12 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
     "/login/informations": informations_response.received
   };
 
-  return {
+  const output = {
     session: _session,
     endpoints: _endpoints
   };
+
+  console.info(output);
+
+  return output;
 };
