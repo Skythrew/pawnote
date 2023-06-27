@@ -10,7 +10,7 @@ import { PRONOTE_ACCOUNT_TYPES, PRONOTE_INSTANCE_MOBILE_INFOS_PATH } from "@/uti
  * Allows to check that every item is defined and make them typed to `PronoteApiAccountType`.
  */
 const isPronoteApiAccountType = (item: PronoteApiAccountType | undefined): item is PronoteApiAccountType => {
-  return !(item === null);
+  return Boolean(item);
 };
 
 /**
@@ -30,8 +30,7 @@ export default createApiFunction<ApiInstance>(ApiInstanceRequestSchema, async (r
   const data = await response.json<PronoteApiInstance["response"]>();
 
   const accounts = data.espaces.map(account => PRONOTE_ACCOUNT_TYPES.find(
-    // We replace every paths from mobile version to desktop version by removing `mobile.` in paths.
-    account_type => account_type.path === account.URL.replace("mobile.", "")
+    account_type => account_type.path === account.URL
   )).filter(isPronoteApiAccountType);
 
   return res.success({

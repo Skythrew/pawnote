@@ -59,7 +59,7 @@ const OpenENT: AvailableENT = {
       try {
         const ticketURL = new URL(`${url.protocol}//${url.hostname}/cas/login`);
         // We don't forget to put a trailing slash, **very important**.
-        ticketURL.searchParams.set("service", cleanPronoteUrl(pronote_url) + "/");
+        ticketURL.searchParams.set("service", pronote_url);
 
         const ticketHeaders = new Headers();
         ticketHeaders.set("cookie", ent_cookies.join("; "));
