@@ -1,7 +1,6 @@
 import type { HttpCallFunction } from "@/utils/handlers/create";
 import { ApiResponseErrorCode, HandlerResponseError } from "@/utils/handlers/errors";
 
-import { cleanPronoteUrl } from "@/utils/requests/pronote";
 import { getHeaderFromFetcherResponse, retrieveResponseCookies } from "@/utils/requests/headers";
 
 import { serializeError } from "serialize-error";
@@ -58,7 +57,6 @@ const OpenENT: AvailableENT = {
     async process_ticket (fetcher, { ent_cookies, pronote_url }) {
       try {
         const ticketURL = new URL(`${url.protocol}//${url.hostname}/cas/login`);
-        // We don't forget to put a trailing slash, **very important**.
         ticketURL.searchParams.set("service", pronote_url);
 
         const ticketHeaders = new Headers();
