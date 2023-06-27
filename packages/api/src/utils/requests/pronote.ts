@@ -110,14 +110,12 @@ export const createPronoteAPICall = (fetcher: HttpCallFunction) => async <T>(
   data: {
     /** Returned value of `Session.writePronoteFunctionPayload`. */
     payload: { order: string, data: T | string }
-    /** Force to use this URL instead of the one in `session_instance` */
-    pronote_url?: string
     session_instance: SessionInstance
     cookies?: string[]
   }
 ) => {
   try {
-    const pronote_url = typeof data.pronote_url === "string" ? data.pronote_url : data.session_instance.pronote_url;
+    const pronote_url = data.session_instance.pronote_url;
     const function_url = pronote_url + `/appelfonction/${data.session_instance.account_type_id}/${data.session_instance.session_id}/${data.payload.order}`;
     const response = await fetcher(function_url, {
       method: "POST",
