@@ -8,41 +8,43 @@ import Input from "@/components/atoms/Input";
 
 // import { connectToPronote } from "@/utils/client";
 
+import { authenticate } from "@pawnote/client";
+import { fetcher } from "@/utils/client/requests/fetcher";
+
 // import app from "@/old_stores/app";
 // import sessions from "@/old_stores/sessions";
 // import endpoints from "@/old_stores/endpoints";
 // import credentials_store from "@/old_stores/credentials";
 
-import { createModal } from "@/primitives/modal";
-import { SaveSessionIntoSlugModalContent } from "./SaveSessionIntoSlug";
+// import { createModal } from "@/primitives/modal";
+// import { SaveSessionIntoSlugModalContent } from "./SaveSessionIntoSlug";
 
 interface Props {
-  loading: boolean
-  instance: ApiInstance["response"] | null
+  instance: ApiInstance["response"]
 }
 
 export const AuthenticateSessionModalContent: Component<Props> = (props) => {
-  const first_account_type = (): number | null => (props.instance != null) ? props.instance.accounts?.[0].id as number : null;
+  const first_account_type = (): number => props.instance.accounts?.[0].id;
 
   const handleSaveIntoSlugModalSubmit = async (slug: string): Promise<void> => {
     return await saveIntoSlug(slug, slugModalData());
   };
 
-  const [showSlugModal] = createModal(() => (
-    <SaveSessionIntoSlugModalContent
-      slugModalData={slugModalData()}
-      onSubmit={handleSaveIntoSlugModalSubmit}
-    />
-  ));
+  // const [showSlugModal] = createModal(() => (
+  //   <SaveSessionIntoSlugModalContent
+  //     slugModalData={slugModalData()}
+  //     onSubmit={handleSaveIntoSlugModalSubmit}
+  //   />
+  // ));
 
   const [slugModalData, setSlugModalData] = createSignal<
-    Awaited<ReturnType<typeof connectToPronote>> | null
+    Awaited<ReturnType<typeof authenticate>> | null
   >(null);
 
   const [loading, setLoading] = createSignal(false);
 
   const [credentials, setCredentials] = createStore<{
-    account_type: PronoteApiAccountId | null
+    account_type: PronoteApiAccountId
     use_ent: boolean
 
     username: string
@@ -58,40 +60,47 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
   const processUserAuthentication: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
     event.preventDefault();
 
-    if ((credentials.username.length === 0) || (credentials.password.length === 0) || (props.instance == null)) return;
-
-    const account_type = credentials.account_type;
-    if (account_type === null || !(account_type in PRONOTE_ACCOUNT_TYPES)) return;
+    if (credentials.username.length === 0 || credentials.password.length === 0) return;
+    if (!credentials.use_ent && (credentials.account_type === null || !(credentials.account_type in PRONOTE_ACCOUNT_TYPES))) return;
 
     try {
       setLoading(true);
-      return;
 
-      // const data = await connectToPronote({
-      //   pronote_url: props.instance.pronote_url,
-      //   use_credentials: true,
+      // Get unique identifier for the account.
+      let deviceUUID = localStorage.getItem("device.uuid");
+      if (deviceUUID === null) {
+        deviceUUID = crypto.randomUUID();
+        localStorage.setItem("device.uuid", deviceUUID);
+      }
 
-      //   username: credentials.username,
-      //   password: credentials.password,
+      const data = await authenticate(fetcher, {
+        pronote_url: props.instance.pronote_url,
+        use_credentials: true,
 
-      //   ...(credentials.use_ent
-      //     ? {
-      //       use_ent: true,
-      //       ent_url: props.instance.ent_url as string
-      //     }
-      //     : {
-      //       use_ent: false,
-      //       account_type
-      //     }
-      //   )
-      // });
+        username: credentials.username,
+        password: credentials.password,
+        account_type: credentials.account_type,
 
-      // batch(() => {
-      //   setLoading(false);
+        device_uuid: deviceUUID,
 
-      //   setSlugModalData(data);
-      //   showSlugModal();
-      // });
+        ...(credentials.use_ent
+          ? {
+            use_ent: true,
+            ent_token: props.instance.ent_token as string,
+            ent_url: props.instance.ent_url as string
+          }
+          : {
+            use_ent: false
+          }
+        )
+      });
+
+      batch(() => {
+        setLoading(false);
+
+        setSlugModalData(data);
+        // showSlugModal();
+      });
     }
     catch (err) {
       setLoading(false);
@@ -99,8 +108,8 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
     }
   };
 
-  const saveIntoSlug = async (slug: string, data: Awaited<ReturnType<typeof connectToPronote>>): Promise<void> => {
-    if (!(data)) return;
+  const saveIntoSlug = async (slug: string, data: Awaited<ReturnType<typeof authenticate>>): Promise<void> => {
+    if (slug.length === 0) return;
 
     // await sessions.upsert(
     //   slug, data.session
@@ -131,7 +140,7 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
             {instance().school_name}
           </Modal.Title>
           <Modal.Description class="px-6 text-center text-sm text-latteSubtext0">
-              Créez une nouvelle session sur cette instance en entrant vos identifiants.
+            Créez une nouvelle session sur cette instance en entrant vos identifiants.
           </Modal.Description>
 
           <form
@@ -156,15 +165,12 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
               </label>
             </Show>
 
-            {/* <Show when={!credentials.use_ent && !app.current_user.slug}> */}
-            <Show when={!credentials.use_ent}>
-              <Input.Select<PronoteApiAccountId>
-                options={instance().accounts.map(instance => ({ label: instance.name, value: instance.id }))}
-                placeholder="Espace à utiliser"
-                triggerAriaLabel="Espace Pronote"
-                onChange={({ value }) => setCredentials("account_type", value)}
-              />
-            </Show>
+            <Input.Select<PronoteApiAccountId>
+              options={instance().accounts.map(instance => ({ label: instance.name, value: instance.id }))}
+              placeholder="Espace à utiliser"
+              triggerAriaLabel="Espace Pronote"
+              onChange={({ value }) => setCredentials("account_type", value)}
+            />
 
             <Input.Text
               placeholder="Nom d'utilisateur"
@@ -198,7 +204,6 @@ export const AuthenticateSessionModal: Component<ModalProps & Props> = (props) =
   <Modal open={props.open} onOpenChange={props.onOpenChange}>
     <AuthenticateSessionModalContent
       instance={props.instance}
-      loading={props.loading}
     />
   </Modal>
 );

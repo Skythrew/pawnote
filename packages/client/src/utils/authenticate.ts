@@ -6,7 +6,7 @@ import forge from "node-forge";
 
 export const guessPronoteAccountTypeFromUrl = (raw_url: string): PronoteApiAccountId => {
   const pronote_url = new URL(raw_url);
-  const account_type_path = pronote_url.pathname.split("/").pop();
+  const account_type_path = pronote_url.pathname.split("/").pop() as string;
 
   const result = PRONOTE_ACCOUNT_TYPES.find(
     entry => entry.path === account_type_path
@@ -19,40 +19,28 @@ export const guessPronoteAccountTypeFromUrl = (raw_url: string): PronoteApiAccou
   return result.id;
 };
 
-export const connectToPronote = async (fetcher: CallAPIFetcher, options: {
+export const authenticate = async (fetcher: CallAPIFetcher, options: {
   // We always need the base Pronote URL,
   // in case it has been modified.
   pronote_url: string
+  device_uuid: string
+  username: string
+  password: string
+  account_type: PronoteApiAccountId
 } & (
-  | { // Using Pronote credentials without cookies.
-    use_ent: false
+  | { // First-time auth using only Pronote credentials.
     use_credentials: true
-
-    username: string
-    password: string
-    account_type: PronoteApiAccountId
-  }
-  | { // Using ENT without cookies.
-    use_ent: true
-    use_credentials: true
-
-    username: string
-    password: string
-    ent_url: string
-  }
-  | { // Using ENT with only cookies.
-    use_ent: true
-    use_credentials: false
-
-    ent_cookies: string[]
-    ent_url: string
-  }
-  | { // Using Pronote auto-reconnection with cookies.
     use_ent: false
-    use_credentials: false
+  }
+  | { // First-time auth using ENT.
+    use_credentials: true
+    use_ent: true
 
-    pronote_cookies: string[]
-    account_type: PronoteApiAccountId
+    ent_url: string
+    ent_token: string
+  }
+  | { // Reconnect using generated password from first-time auth.
+    use_credentials: false
   }
 )): Promise<{
   session: SessionExported
@@ -61,15 +49,9 @@ export const connectToPronote = async (fetcher: CallAPIFetcher, options: {
     "/login/informations": ApiLoginInformations["response"]["received"]
   }
 }> => {
-  let pronote_username = !options.use_ent && options.use_credentials ? options.username : "";
-  let pronote_password = !options.use_ent && options.use_credentials ? options.password : "";
-
-  let ent_cookies: string[] = options.use_ent && !options.use_credentials
-    // Use given cookies when not using credentials.
-    ? options.ent_cookies
-    : []; // Empty array since we gonna fetch them later.
-
-  if (options.use_ent && options.use_credentials) {
+  // When first-time auth with ENT, we should get the ENT login cookies.
+  let ent_cookies: string[] = [];
+  if (options.use_credentials && options.use_ent) {
     const ent_cookies_response = await callAPI<ApiLoginEntCookies>(fetcher, {
       handler_id: "login.ent_cookies",
       body: {
@@ -84,42 +66,53 @@ export const connectToPronote = async (fetcher: CallAPIFetcher, options: {
     ent_cookies = ent_cookies_response.ent_cookies;
   }
 
-  // When we fetch a Pronote ticket, we'll need to use the RAW given URL.
-  let pronote_url = options.pronote_url;
+  let pronote_url = new URL(options.pronote_url);
+  pronote_url.pathname += `/${PRONOTE_ACCOUNT_TYPES.find(entry => entry.id === options.account_type)?.path as string}`;
+  pronote_url.searchParams.set("fd", "1");
 
-  if (options.use_ent) {
+  // From the ENT cookies we got previously, we now get the ticket.
+  if (options.use_credentials && options.use_ent) {
     const ent_ticket_response = await callAPI<ApiLoginEntTicket>(fetcher, {
       handler_id: "login.ent_ticket",
       body: {
         ent_url: options.ent_url,
-        pronote_url,
+        pronote_url: pronote_url.href,
         ent_cookies
       }
     } /* { prevent_cache: true } */);
 
-    pronote_url = ent_ticket_response.pronote_url;
+    pronote_url = new URL(ent_ticket_response.pronote_url);
   }
 
-  const account_type = options.use_ent
+  // Add properties to bypass ENT.
+  if (options.use_credentials && !options.use_ent) {
+    pronote_url.searchParams.set("bydlg", "A6ABB224-12DD-4E31-AD3E-8A39A1C2C335");
+    pronote_url.searchParams.set("login", "true");
+  }
+
+  const account_type = options.use_credentials && options.use_ent
     // Guess the account type using the constants we have.
-    ? guessPronoteAccountTypeFromUrl(pronote_url)
+    ? guessPronoteAccountTypeFromUrl(pronote_url.href)
     // When not using ENT, just use the given account type.
     : options.account_type;
 
-  let pronote_cookies: string[] = !options.use_ent && !options.use_credentials
-    // Use given cookies if we're restoring a basic session.
-    ? options.pronote_cookies
-    : []; // We'll define some cookies for session restoring, later.
+  let pronote_cookies: string[] = options.use_credentials && options.use_ent
+    ? [
+      // Expires in 5 mins.
+      `validationAppliMobile=${options.ent_token}`,
+      `uuidAppliMobile=${options.device_uuid}`,
+      "ielang=fr"
+    ]
+    : [];
 
   const informations_response = await callAPI<ApiLoginInformations>(fetcher, {
     handler_id: "login.informations",
     body: {
       cookies: pronote_cookies,
       account_type,
-      pronote_url,
+      pronote_url: pronote_url.href,
 
-      // If the URL is not the same, we should use it as raw.
-      raw_url: options.pronote_url !== pronote_url
+      raw_url: true
     }
   } /* { // Here, we prevent the cache even if we'll cache it later.
     prevent_cache: true
@@ -131,12 +124,12 @@ export const connectToPronote = async (fetcher: CallAPIFetcher, options: {
   }
 
   // Updating the login credentials to use depending of the received response.
-  if (informations_response.setup != null) {
-    pronote_username = informations_response.setup.username;
-    pronote_password = informations_response.setup.password;
+  if (typeof informations_response.setup !== "undefined") {
+    options.username = informations_response.setup.username;
+    options.password = informations_response.setup.password;
   }
 
-  if (pronote_username.length === 0 || pronote_password.length === 90) {
+  if (options.username.length === 0 || options.password.length === 90) {
     // TODO: Ask for new credentials.
     // User can choose if they'll be saved or not.
     // SessionFromScratchModal.show();
@@ -149,18 +142,21 @@ export const connectToPronote = async (fetcher: CallAPIFetcher, options: {
   const identify_response = await callAPI<ApiLoginIdentify>(fetcher, {
     handler_id: "login.identify",
     body: {
-      pronote_username,
+      pronote_username: options.username,
       cookies: pronote_cookies,
-      session: informations_response.session
+      session: informations_response.session,
+      useENT: options.use_credentials && options.use_ent,
+      askMobileAuthentication: true,
+      deviceUUID: options.device_uuid
     }
   } /* { prevent_cache: true } */);
 
   if (identify_response.received.donnees.modeCompLog === 1) {
-    pronote_username = pronote_username.toLowerCase();
+    options.username = options.username.toLowerCase();
   }
 
   if (identify_response.received.donnees.modeCompMdp === 1) {
-    pronote_password = pronote_password.toLowerCase();
+    options.password = options.password.toLowerCase();
   }
 
   // Short-hand for later usage.
@@ -175,14 +171,14 @@ export const connectToPronote = async (fetcher: CallAPIFetcher, options: {
       ? "" // When using generated credentials, we don't have to use `alea`.
       : identify_response.received.donnees.alea
     )
-    .update(forge.util.encodeUtf8(pronote_password))
+    .update(forge.util.encodeUtf8(options.password))
     .digest();
 
   let challengeAesKey: string = typeof informations_response.setup === "undefined"
-    ? pronote_username.toLowerCase()
+    ? options.username.toLowerCase()
     : ""; // When using generated credentials, we don't have to lowercase.
 
-  challengeAesKey += challengeAesKeyHash.toHex().toUpperCase() as string;
+  challengeAesKey += challengeAesKeyHash.toHex().toUpperCase();
 
   const challengeAesKeyBuffer = forge.util.createBuffer(
     forge.util.encodeUtf8(challengeAesKey)
@@ -225,7 +221,7 @@ export const connectToPronote = async (fetcher: CallAPIFetcher, options: {
   const authenticate_response = await callAPI<ApiLoginAuthenticate>(fetcher, {
     handler_id: "login.authenticate",
     body: {
-      solved_challenge: resolved_challenge!,
+      solved_challenge: resolved_challenge,
       session: identify_response.session,
       cookies: pronote_cookies
     }
@@ -249,9 +245,11 @@ export const connectToPronote = async (fetcher: CallAPIFetcher, options: {
   authenticate_response.session.encryption.aes.key = authKey;
   authenticate_response.session.instance.pronote_cookies = pronote_cookies;
 
-  authenticate_response.session.instance.use_ent = options.use_ent;
-  authenticate_response.session.instance.ent_cookies = ent_cookies;
-  authenticate_response.session.instance.ent_url = options.use_ent ? options.ent_url : null;
+  console.log(authenticate_response);
+
+  // authenticate_response.session.instance.use_ent = options.use_ent;
+  // authenticate_response.session.instance.ent_cookies = ent_cookies;
+  // authenticate_response.session.instance.ent_url = options.use_ent ? options.ent_url : null;
 
   const user_data_response = await callAPI<ApiUserData>(fetcher, {
     handler_id: "user.data",
