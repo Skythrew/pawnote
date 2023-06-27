@@ -12,18 +12,10 @@ export default createApiFunction<ApiUserData>(ApiUserDataRequestSchema, async (r
   const request_payload = session.writePronoteFunctionPayload<PronoteApiUserData["request"]>({});
   const response = await createPronoteAPICall(req.fetch)(PronoteApiFunctions.UserData, {
     session_instance: session.instance,
-    cookies: session.instance.pronote_cookies,
     payload: request_payload
   });
 
   const received = session.readPronoteFunctionPayload<PronoteApiUserData["response"]>(response.payload);
-
-  // This is the authenticated cookie that will be used to restore sessions!
-  const pronote_session_cookie = response.cookies.find(cookie => cookie.startsWith("CASTGC="));
-  if (pronote_session_cookie !== undefined) {
-    // Define the golden cookie in the session to export.
-    session.instance.pronote_cookies = [pronote_session_cookie];
-  }
 
   return res.success({
     received,
