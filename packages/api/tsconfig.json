@@ -19,6 +19,6 @@
     }
   },
 
-  "include": ["src", ".eslintrc.cjs", "rollup.config.js", "vite.config.ts"],
+  "include": ["src", ".eslintrc.cjs", "rollup.config.mjs"],
   "exclude": ["node_modules/**", "dist/**"]
 }

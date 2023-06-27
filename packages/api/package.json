@@ -8,7 +8,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "rollup -c",
+    "build": "pnpm lint && rimraf dist && rollup -c",
     "lint": "eslint . --ext .ts,.js"
   },
   "license": "MIT",
