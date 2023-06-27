@@ -6,18 +6,7 @@ export const ApiLoginInformationsRequestSchema = z.object({
   account_type: z.nativeEnum(PronoteApiAccountId),
   pronote_url: z.string(),
 
-  /**
-    * Tells the server to not clean the Pronote URL.
-    * Defaults to `false`.
-    */
-  raw_url: z.optional(z.boolean()),
-
-  /**
-   * Cookies used when downloading the Pronote page.
-   * Required when creating a new session from ENT or an already set-up session.
-   *
-   * This will append `e` and `f` in to the `setup` object.
-   */
+  /** Cookies to append in the request for instance page. */
   cookies: z.optional(z.array(z.string()))
 });
 
@@ -37,24 +26,38 @@ export interface PronoteApiLoginInformations {
     }
 
     donnees: {
-      identifiantNav: string
-
-      /** Array of available fonts. */
-      listePolices: {
-        _T: 24
-        V: Array<{
-          L: string
-        }>
+      /** Time on the server when the request was made. */
+      DateServeurHttp: {
+        _T: 7
+        /** In the following format : `DD/MM/YYYY HH:mm:ss` */
+        V: string
       }
 
-      avecMembre: boolean
-      pourNouvelleCaledonie: boolean
-      genreImageConnexion: number
-      urlImageConnexion: string
-      logoProduitCss: string
+      /** Content of the header in instance page. */
+      Nom: string
 
+      // Whatever this number is (???)
       Theme: number
 
+      /** Path for the same instance page but on desktop. */
+      URLEspace: string
+
+      // I don't know what all the following properties are meant for.
+      avecMembre: boolean
+      genreImageConnexion: number
+      identifiantNav: string
+      labelLienProduit: string
+
+      /** Array of available fonts... why the hell they need this ? */
+      listePolices: {
+        _T: 24
+        V: Array<{ L: string }>
+      }
+
+      // This should be some CSS path ?
+      logoProduitCss: string
+
+      // I might have an idea of what it is but yeah- no...
       mentionsPagesPubliques: {
         lien: {
           _T: 21
@@ -62,19 +65,10 @@ export interface PronoteApiLoginInformations {
         }
       }
 
-      /** Server current time when request was made. */
-      DateServeurHttp: {
-        _T: 7
-        V: string
-      }
-
-      /** Account type path for mobile devices. */
-      URLMobile: string
-      /** Know if a mobile version is available. */
-      AvecEspaceMobile: boolean
-
-      /** Current header name. */
-      Nom: string
+      // Is there something special for Nouvelle Calédonie instances ?
+      pourNouvelleCaledonie: boolean
+      // Still don't know what it is.
+      urlImageConnexion: string
 
       General: {
         urlSiteIndexEducation: {
@@ -389,7 +383,6 @@ export interface ApiLoginInformations {
   response: {
     received: PronoteApiLoginInformations["response"]
     session: SessionExported
-    cookies: string[]
 
     setup?: {
       username: string
