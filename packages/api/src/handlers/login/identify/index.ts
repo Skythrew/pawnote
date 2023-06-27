@@ -13,12 +13,12 @@ export default createApiFunction<ApiLoginIdentify>(ApiLoginIdentifyRequestSchema
       genreConnexion: 0,
       genreEspace: session.instance.account_type_id,
       identifiant: req.body.pronote_username,
-      pourENT: session.instance.use_ent ?? false,
+      pourENT: req.body.useENT,
       enConnexionAuto: false,
       demandeConnexionAuto: false,
-      demandeConnexionAppliMobile: false,
+      demandeConnexionAppliMobile: req.body.askMobileAuthentication,
       demandeConnexionAppliMobileJeton: false,
-      uuidAppliMobile: "",
+      uuidAppliMobile: req.body.deviceUUID ?? "",
       loginTokenSAV: ""
     }
   });

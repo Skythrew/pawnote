@@ -5,7 +5,10 @@ import { z } from "zod";
 export const ApiLoginIdentifyRequestSchema = z.object({
   pronote_username: z.string(),
   session: SessionExportedSchema,
-  cookies: z.optional(z.array(z.string()))
+  cookies: z.array(z.string()),
+  useENT: z.boolean(),
+  askMobileAuthentication: z.boolean(),
+  deviceUUID: z.optional(z.string())
 });
 
 export interface PronoteApiLoginIdentify {
@@ -17,7 +20,7 @@ export interface PronoteApiLoginIdentify {
       pourENT: boolean
       enConnexionAuto: false
       demandeConnexionAuto: false
-      demandeConnexionAppliMobile: false
+      demandeConnexionAppliMobile: boolean
       demandeConnexionAppliMobileJeton: false
       uuidAppliMobile: string
       loginTokenSAV: string
