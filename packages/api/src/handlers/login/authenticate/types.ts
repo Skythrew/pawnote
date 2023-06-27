@@ -31,6 +31,8 @@ export interface PronoteApiLoginAuthenticate {
         V: string
       }
 
+      jetonConnexionAppliMobile?: string
+
       /** Name of the authenticated user. */
       libelleUtil: string
       modeSecurisationParDefaut: number
