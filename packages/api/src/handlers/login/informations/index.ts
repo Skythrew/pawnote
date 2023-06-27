@@ -11,34 +11,27 @@ import { Session } from "@/utils/session";
 import forge from "node-forge";
 
 export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsRequestSchema, async (req, res) => {
-  const pronote_url = cleanPronoteUrl(req.body.pronote_url);
   const account_type = PRONOTE_ACCOUNT_TYPES.find(entry => entry.id === req.body.account_type);
 
-  if (account_type == null) {
+  if (typeof account_type === "undefined") {
     throw new HandlerResponseError(
       ApiResponseErrorCode.InvalidRequestBody, { status: 400 }
     );
   };
 
-  // Don't clean the URL when `raw_url` is set to `true`.
-  const pronote_page_url = req.body.raw_url === true
-    ? req.body.pronote_url
-    : pronote_url + `/${account_type.path}?login=true`;
-
   const pronote_page = await downloadPronotePage(req.fetch, {
-    url: pronote_page_url,
+    url: req.body.pronote_url,
+    // Those cookies are very important since they're like the *initializer*.
+    // When logging in for the first time using ENT, you'll have three important cookies here.
+    // If they're not present, the whole authentication process will fail.
     cookies: req.body.cookies
   });
 
-  // We extract session from the downloaded Pronote page.
+  // We extract session data from the downloaded instance page.
   const session_data = extractPronoteSessionFromBody(pronote_page.body);
 
-  // We explicitly don't use ENT but we will change this value
-  // on the client side to prevent useless API parameters.
   const session = Session.from_raw(session_data, {
-    pronote_url,
-    ent_url: null,
-    use_ent: false
+    pronote_url: cleanPronoteUrl(req.body.pronote_url)
   });
 
   // Create RSA using given modulos.
@@ -53,7 +46,7 @@ export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsReque
       code: ApiResponseErrorCode.NoIVForAESCreated,
       debug: {
         pronote_page,
-        pronote_page_url,
+        pronote_page_url: req.body.pronote_url,
         encryption: session.encryption
       }
     }, { status: 500 });
@@ -76,7 +69,6 @@ export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsReque
 
   const response = await createPronoteAPICall(req.fetch)(PronoteApiFunctions.Informations, {
     cookies,
-    pronote_url,
     payload: request_payload,
     session_instance: session.instance
   });
@@ -85,7 +77,6 @@ export default createApiFunction<ApiLoginInformations>(ApiLoginInformationsReque
 
   return res.success({
     session: session.exportToObject(),
-    cookies: response.cookies,
     received,
 
     setup: session_data.e !== undefined && session_data.f !== undefined

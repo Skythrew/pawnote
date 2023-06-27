@@ -9,18 +9,15 @@ import { aes } from "@/utils/encryption";
 
 export const SessionInstanceSchema = z.object({
   pronote_url: z.string(),
-  ent_url: z.string().nullable(),
+  pronote_username: z.string(),
 
   session_id: z.number(),
   account_type_id: z.nativeEnum(PronoteApiAccountId),
 
-  ent_cookies: z.array(z.string()),
-  pronote_cookies: z.array(z.string()),
-
   skip_encryption: z.boolean(),
   skip_compression: z.boolean(),
 
-  use_ent: z.boolean(),
+  device_uuid: z.string(),
   order: z.number()
 });
 
@@ -78,26 +75,23 @@ export class Session {
   }
 
   /**
-   * Takes a raw Session extracted from Pronote then parses it
-   * to make it usable inside this class.
-   **/
+   * Takes a raw session extracted from the Pronote page and then parses it.
+   *
+   * Should only be used inside `/login/informations` API endpoint,
+   * that's why we provide an empty string for `pronote_username` and `device_uuid` for now.
+   * They should be filled automatically in the next request, `/login/identify`.
+   */
   static from_raw (session_data: PronoteApiSession, instance: {
     pronote_url: string
-    ent_url: string | null
-
-    ent_cookies?: string[]
-    pronote_cookies?: string[]
-
-    use_ent: boolean
   }): Session {
     let aes_iv: string | undefined;
 
-    // Sometimes, the "a" parameter is not available in "Commun".
+    // `a` parameter is not available in `Commun`.
     if (typeof session_data.a !== "number") {
       session_data.a = PronoteApiAccountId.Commun;
     }
 
-    // Setup IV for our session when not in "Commun".
+    // We have to setup IV for our session when we're not in `Commun`.
     if (session_data.a !== PronoteApiAccountId.Commun) {
       aes_iv = forge.random.getBytesSync(16);
     }
@@ -107,16 +101,15 @@ export class Session {
       account_type_id: session_data.a,
 
       pronote_url: instance.pronote_url,
-      ent_url: instance.ent_url,
-
-      pronote_cookies: instance.pronote_cookies ?? [],
-      ent_cookies: instance.ent_cookies ?? [],
 
       skip_compression: session_data.sCoA,
       skip_encryption: session_data.sCrA,
 
       order: 0,
-      use_ent: instance.use_ent
+
+      // Should be filled manually in the `/login/identify` handler.
+      pronote_username: "",
+      device_uuid: ""
     }, {
       aes: {
         iv: aes_iv,
