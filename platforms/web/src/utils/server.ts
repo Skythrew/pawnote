@@ -12,13 +12,18 @@ declare global {
 }
 
 export const createFetcher = (user_agent: string): HttpCallFunction => async (url, options) => {
+  const headers = options.headers instanceof Headers
+    ? Object.fromEntries(options.headers.entries())
+    : options.headers;
+
   const response = await fetch(url, {
     method: options.method,
     body: options.body as BodyInit | undefined,
     headers: {
       "User-Agent": user_agent,
-      ...options.headers
-    }
+      ...headers
+    },
+    redirect: options.redirect
   });
 
   return ({
