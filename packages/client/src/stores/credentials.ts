@@ -6,7 +6,7 @@ const database = localforage.createInstance({
   storeName: "credentials"
 });
 
-interface Credentials {
+export interface Credentials {
   username: string
   password: string
 }

@@ -3,6 +3,7 @@ import { type ApiLoginEntCookies, PronoteApiAccountId, PRONOTE_ACCOUNT_TYPES, cr
 import { ApiError, ClientError } from "@/utils/errors";
 import { ClientErrorCode } from "@pawnote/i18n";
 import forge from "node-forge";
+import type { Credentials } from "@/stores/credentials";
 
 export const guessPronoteAccountTypeFromUrl = (raw_url: string): PronoteApiAccountId => {
   const pronote_url = new URL(raw_url);
@@ -48,6 +49,7 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
     "/user/data": ApiUserData["response"]["received"]
     "/login/informations": ApiLoginInformations["response"]["received"]
   }
+  credentials: Credentials
 }> => {
   // When first-time auth with ENT, we should get the ENT login cookies.
   let ent_cookies: string[] = [];
@@ -61,7 +63,7 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
           password: options.password
         })
       }
-    } /* { prevent_cache: true } */);
+    });
 
     ent_cookies = ent_cookies_response.ent_cookies;
   }
@@ -79,7 +81,7 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
         pronote_url: pronote_url.href,
         ent_cookies
       }
-    } /* { prevent_cache: true } */);
+    });
 
     pronote_url = new URL(ent_ticket_response.pronote_url);
   }
@@ -123,9 +125,7 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
       cookies: pronote_cookies,
       pronote_url: pronote_url.href
     }
-  } /* { // Here, we prevent the cache even if we'll cache it later.
-    prevent_cache: true
-  } */);
+  });
 
   // Update the credentials depending on the response.
   if (typeof informations_response.setup !== "undefined") {
@@ -150,7 +150,7 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
       reuseMobileAuthentication: !options.use_credentials,
       deviceUUID: options.device_uuid
     }
-  } /* { prevent_cache: true } */);
+  });
 
   if (identify_response.received.donnees.modeCompLog === 1) {
     options.username = options.username.toLowerCase();
@@ -226,7 +226,7 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
       session: identify_response.session,
       cookies: pronote_cookies
     }
-  } /* { prevent_cache: true } */);
+  });
 
   const decryptedAuthKey = encryption.aes.decrypt(authenticate_response.received.donnees.cle, {
     iv: aesIvBuffer,
@@ -247,26 +247,25 @@ export const authenticate = async (fetcher: CallAPIFetcher, options: {
     body: {
       session: authenticate_response.session
     }
-  } /* { // Here, we prevent the cache even if we'll cache it later.
-    prevent_cache: true
-  } */);
+  });
 
   /// Preparing to export datas.
   /// We export a method to directly store the data with a slug
   /// and we export also the endpoints and the session to use without saving.
 
-  const _session = user_data_response.session;
+  const _session: SessionExported = user_data_response.session;
   const _endpoints = {
     "/user/data": user_data_response.received,
     "/login/informations": informations_response.received
   };
-
-  const output = {
-    session: _session,
-    endpoints: _endpoints
+  const _credentials: Credentials = {
+    username: identify_response.received.donnees.login ?? options.username,
+    password: authenticate_response.received.donnees.jetonConnexionAppliMobile as string
   };
 
-  console.info(output);
-
-  return output;
+  return {
+    session: _session,
+    endpoints: _endpoints,
+    credentials: _credentials
+  };
 };
