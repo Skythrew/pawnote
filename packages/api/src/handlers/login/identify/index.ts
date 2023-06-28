@@ -32,21 +32,6 @@ export default createApiFunction<ApiLoginIdentify>(ApiLoginIdentifyRequestSchema
 
   const received = session.readPronoteFunctionPayload<PronoteApiLoginIdentify["response"]>(response.payload);
 
-  // Update the username in the session.
-  // When using ENT, the username from request body is generated.
-  // The response will provide us a `login` property containing the real account username.
-  if (req.body.useENT && typeof received.donnees.login === "string") {
-    session.instance.pronote_username = received.donnees.login;
-  }
-  // Otherwise, when not using ENT, the username from request body
-  // is directly the real account username.
-  else {
-    session.instance.pronote_username = req.body.pronote_username;
-  }
-
-  // Add device UUID to session object.
-  session.instance.device_uuid = req.body.deviceUUID;
-
   return res.success({
     received,
     session: session.exportToObject()

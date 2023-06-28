@@ -9,7 +9,6 @@ import { aes } from "@/utils/encryption";
 
 export const SessionInstanceSchema = z.object({
   pronote_url: z.string(),
-  pronote_username: z.string(),
 
   session_id: z.number(),
   account_type_id: z.nativeEnum(PronoteApiAccountId),
@@ -17,7 +16,6 @@ export const SessionInstanceSchema = z.object({
   skip_encryption: z.boolean(),
   skip_compression: z.boolean(),
 
-  device_uuid: z.string(),
   order: z.number()
 });
 
@@ -56,31 +54,23 @@ export class Session {
     this.encryption = encryption_data;
   }
 
-  /**
-   * Exports the current session into an object
-   * so it can be saved in the localForage for later usage.
-   */
-  exportToObject (): SessionExported {
+  /** Exports the current session into an object. */
+  public exportToObject (): SessionExported {
     return {
       instance: this.instance,
       encryption: this.encryption
     };
   }
 
-  static importFromObject (session: SessionExported): Session {
+  /** Creates a new session instance from an exported session object. */
+  public static importFromObject (session: SessionExported): Session {
     return new Session(
       session.instance,
       session.encryption
     );
   }
 
-  /**
-   * Takes a raw session extracted from the Pronote page and then parses it.
-   *
-   * Should only be used inside `/login/informations` API endpoint,
-   * that's why we provide an empty string for `pronote_username` and `device_uuid` for now.
-   * They should be filled automatically in the next request, `/login/identify`.
-   */
+  /** Takes a raw session extracted from the Pronote page and then parses it. */
   static from_raw (session_data: PronoteApiSession, instance: {
     pronote_url: string
   }): Session {
@@ -105,11 +95,7 @@ export class Session {
       skip_compression: session_data.sCoA,
       skip_encryption: session_data.sCrA,
 
-      order: 0,
-
-      // Should be filled manually in the `/login/identify` handler.
-      pronote_username: "",
-      device_uuid: ""
+      order: 0
     }, {
       aes: {
         iv: aes_iv,
@@ -143,7 +129,7 @@ export class Session {
     return { aes_iv, aes_key };
   }
 
-  writePronoteFunctionPayload <Req>(data: Req): { order: string, data: Req | string } {
+  public writePronoteFunctionPayload <Req>(data: Req): { order: string, data: Req | string } {
     this.instance.order++;
 
     let final_data: Req | string = data;
@@ -189,11 +175,7 @@ export class Session {
     };
   }
 
-  /**
-   * Returns an object when the request was successful
-   * and `string` if an error has been found.
-   */
-  readPronoteFunctionPayload <Res>(response_body: string): Res {
+  public readPronoteFunctionPayload <Res>(response_body: string): Res {
     if (response_body.includes("La page a expir")) {
       throw new HandlerResponseError(
         ApiResponseErrorCode.SessionExpired, { status: 401 }
