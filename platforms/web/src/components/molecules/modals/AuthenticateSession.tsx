@@ -6,40 +6,55 @@ import { PRONOTE_ACCOUNT_TYPES } from "@pawnote/api";
 import Modal, { type ModalProps } from "@/components/atoms/Modal";
 import Input from "@/components/atoms/Input";
 
-// import { connectToPronote } from "@/utils/client";
-
-import { authenticate } from "@pawnote/client";
+import { authenticate, sessions, credentials as credentials_store, endpoints } from "@pawnote/client";
 import { fetcher } from "@/utils/client/requests/fetcher";
 
-// import app from "@/old_stores/app";
-// import sessions from "@/old_stores/sessions";
-// import endpoints from "@/old_stores/endpoints";
-// import credentials_store from "@/old_stores/credentials";
-
-// import { createModal } from "@/primitives/modal";
-// import { SaveSessionIntoSlugModalContent } from "./SaveSessionIntoSlug";
+import { createModal } from "@/primitives/modal";
+import { SaveSessionIntoSlugModalContent } from "@/components/molecules/modals/SaveSessionIntoSlug";
 
 interface Props {
   instance: ApiInstance["response"]
 }
 
+type ReturnValueOfAuthenticate = Awaited<ReturnType<typeof authenticate>>;
+
 export const AuthenticateSessionModalContent: Component<Props> = (props) => {
   const first_account_type = (): number => props.instance.accounts?.[0].id;
 
-  const handleSaveIntoSlugModalSubmit = async (slug: string): Promise<void> => {
-    return await saveIntoSlug(slug, slugModalData());
+  const [slugModalData, setSlugModalData] = createSignal<ReturnValueOfAuthenticate | null>(null);
+
+  const handleSaveIntoSlugModalSubmit = async (slug: string): Promise<boolean> => {
+    const data = slugModalData();
+    if (slug.length === 0 || data === null) return false;
+
+    try {
+      await sessions.upsert(
+        slug, data.session
+      );
+
+      await endpoints.upsert<ApiUserData>(
+        slug, "/user/data", data.endpoints["/user/data"]
+      );
+
+      await endpoints.upsert<ApiLoginInformations>(
+        slug, "/login/informations", data.endpoints["/login/informations"]
+      );
+
+      await credentials_store.upsert(slug, data.credentials);
+
+      return true;
+    }
+    catch {
+      return false;
+    }
   };
 
-  // const [showSlugModal] = createModal(() => (
-  //   <SaveSessionIntoSlugModalContent
-  //     slugModalData={slugModalData()}
-  //     onSubmit={handleSaveIntoSlugModalSubmit}
-  //   />
-  // ));
-
-  const [slugModalData, setSlugModalData] = createSignal<
-    Awaited<ReturnType<typeof authenticate>> | null
-  >(null);
+  const [showSlugModal] = createModal(() => (
+    <SaveSessionIntoSlugModalContent
+      slugModalData={slugModalData()}
+      onSubmit={handleSaveIntoSlugModalSubmit}
+    />
+  ));
 
   const [loading, setLoading] = createSignal(false);
 
@@ -99,34 +114,13 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
         setLoading(false);
 
         setSlugModalData(data);
-        // showSlugModal();
+        showSlugModal();
       });
     }
     catch (err) {
       setLoading(false);
       console.error(err);
     }
-  };
-
-  const saveIntoSlug = async (slug: string, data: Awaited<ReturnType<typeof authenticate>>): Promise<void> => {
-    if (slug.length === 0) return;
-
-    // await sessions.upsert(
-    //   slug, data.session
-    // );
-
-    // await endpoints.upsert<ApiUserData>(
-    //   slug, "/user/data", data.endpoints["/user/data"]
-    // );
-
-    // await endpoints.upsert<ApiLoginInformations>(
-    //   slug, "/login/informations", data.endpoints["/login/informations"]
-    // );
-
-    // await credentials_store.upsert(slug, {
-    //   username: credentials.username,
-    //   password: credentials.password
-    // });
   };
 
   return (

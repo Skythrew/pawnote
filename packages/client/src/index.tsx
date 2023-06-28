@@ -1,5 +1,6 @@
 // Stores
 export * as sessions from "@/stores/sessions";
+export * as endpoints from "@/stores/endpoints";
 export * as credentials from "@/stores/credentials";
 
 // Contexts

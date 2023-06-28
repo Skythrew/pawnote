@@ -4,14 +4,11 @@ import { useNavigate } from "solid-start";
 
 import Modal, { type ModalProps } from "@/components/atoms/Modal";
 import Input from "@/components/atoms/Input";
-
-import { connectToPronote } from "@/utils/client";
-
-import app from "@/stores/app";
+import type { authenticate } from "@pawnote/client";
 
 interface Props {
-  slugModalData: Awaited<ReturnType<typeof connectToPronote>> | null;
-  onSubmit: (slug: string) => Promise<unknown>;
+  slugModalData: Awaited<ReturnType<typeof authenticate>> | null
+  onSubmit: (slug: string) => Promise<unknown>
 }
 
 export const SaveSessionIntoSlugModalContent: Component<Props> = (props) => {
@@ -22,14 +19,14 @@ export const SaveSessionIntoSlugModalContent: Component<Props> = (props) => {
 
   const handleSlugSubmit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
     event.preventDefault();
-    if (!slug()) return;
+    if (slug().length === 0) return;
 
     setLoading(true);
     await props.onSubmit(slug());
 
     batch(() => {
       setLoading(false);
-      app.setCurrentState({ restoring_session: false });
+      // app.setCurrentState({ restoring_session: false });
 
       navigate(`/app/session/${slug()}`);
     });
@@ -47,12 +44,12 @@ export const SaveSessionIntoSlugModalContent: Component<Props> = (props) => {
           </Modal.Title>
           <Modal.Description
             as="p"
-            class="text-latteSubtext0 px-6 text-center text-sm"
+            class="px-6 text-center text-sm text-latteSubtext0"
           >
             Vous êtes connecté en tant que {data().endpoints["/user/data"].donnees.ressource.L} à l'instance {data().endpoints["/user/data"].donnees.ressource.Etablissement.V.L.trim()}.
           </Modal.Description>
 
-          <p class="text-latteSubtext1 my-6 text-center text-sm">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
+          <p class="my-6 text-center text-sm text-latteSubtext1">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
 
           <form onSubmit={handleSlugSubmit} class="flex flex-col gap-4 px-2">
             <Input.Text
@@ -70,7 +67,7 @@ export const SaveSessionIntoSlugModalContent: Component<Props> = (props) => {
 
             <button
               type="submit"
-              disabled={loading() || !slug()}
+              disabled={loading() || slug().length === 0}
               class="mt-2 w-full rounded-md bg-latte-rosewater bg-opacity-100 p-2 text-latte-base outline-none transition-colors disabled:(bg-latte-text bg-opacity-5 text-latte-text text-opacity-80 focus:bg-opacity-10 hover:bg-opacity-10) focus:bg-opacity-90 hover:bg-opacity-90"
             >
               {loading() ? "Sauvegarde..." : "Sauvegarder la session"}
