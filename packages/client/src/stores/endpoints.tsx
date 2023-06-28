@@ -1,5 +1,5 @@
 import localforage from "localforage";
-import { CurrentUserStoreReady, useUser } from "@/contexts/app";
+import { type CurrentUserStoreReady, useUser } from "@/contexts/app";
 
 import { onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
