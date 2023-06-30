@@ -30,7 +30,7 @@ const cachedDatabaseInstances: { [slug: string]: LocalForage } = {};
  */
 export const fromDatabase = (slug: string): LocalForage => {
   // If the instance wasn't created, we have to create and store it in cache.
-  if (cachedDatabaseInstances[slug] !== undefined) {
+  if (cachedDatabaseInstances[slug] === undefined) {
     cachedDatabaseInstances[slug] = localforage.createInstance({
       name: "endpoints",
       storeName: slug
