@@ -23,6 +23,7 @@ module.exports = /** @type {import('@typescript-eslint/utils').TSESLint.Linter.C
       "error", "always"
     ],
 
-    "n/no-callback-literal": "off"
+    "n/no-callback-literal": "off",
+    "@typescript-eslint/no-extra-semi": "off"
   }
 });
