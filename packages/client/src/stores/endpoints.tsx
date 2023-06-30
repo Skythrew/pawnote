@@ -114,8 +114,6 @@ export const upsert = async <Api extends { path: string, response: { received: u
       date: Date.now()
     });
 
-    console.info(`[debug][endpoints.upsert]: stored locally '${endpoint}'`);
-
     // const user = app.current_user;
     // if (user.slug && user.slug === slug) {
     //   batch(() => {
@@ -129,7 +127,7 @@ export const upsert = async <Api extends { path: string, response: { received: u
     return true;
   }
   catch (error) {
-    console.error(`[debug][endpoints.upsert][${endpoint}]:`, error);
+    console.error(`[@pawnote/client][endpoints]: upsert("${endpoint}")`, error);
     return false;
   }
 };
