@@ -1,4 +1,5 @@
 import type { Component, JSX } from "solid-js";
+import { useNavigate } from "solid-start";
 
 import type { ApiInstance, ApiLoginInformations, ApiUserData, PronoteApiAccountId } from "@pawnote/api";
 import { PRONOTE_ACCOUNT_TYPES } from "@pawnote/api";
@@ -10,7 +11,6 @@ import { authenticate, sessions, credentials as credentials_store, endpoints } f
 import { fetcher } from "@/utils/client/requests/fetcher";
 
 import { createModal } from "@/primitives/modal";
-import { SaveSessionIntoSlugModalContent } from "@/components/molecules/modals/SaveSessionIntoSlug";
 
 interface Props {
   instance: ApiInstance["response"]
@@ -19,41 +19,57 @@ interface Props {
 type ReturnValueOfAuthenticate = Awaited<ReturnType<typeof authenticate>>;
 
 export const AuthenticateSessionModalContent: Component<Props> = (props) => {
+  const navigate = useNavigate();
+
   const first_account_type = (): number => props.instance.accounts?.[0].id;
 
+  const [slug, setSlug] = createSignal("");
   const [slugModalData, setSlugModalData] = createSignal<ReturnValueOfAuthenticate | null>(null);
 
-  const handleSaveIntoSlugModalSubmit = async (slug: string): Promise<boolean> => {
-    const data = slugModalData();
-    if (slug.length === 0 || data === null) return false;
+  const [showSlugModal] = createModal(Modal => (
+    <Show when={slugModalData()}>
+      {data => (
+        <>
+          <Modal.Title
+            as="h3"
+            class="p-2 pb-2 text-center text-lg font-bold leading-6 text-latteText"
+          >
+            Connexion établie !
+          </Modal.Title>
+          <Modal.Description
+            as="p"
+            class="px-6 text-center text-sm text-latteSubtext0"
+          >
+            Vous êtes connecté en tant que {data().endpoints["/user/data"].donnees.ressource.L} à l'instance {data().endpoints["/user/data"].donnees.ressource.Etablissement.V.L.trim()}.
+          </Modal.Description>
 
-    try {
-      await sessions.upsert(
-        slug, data.session
-      );
+          <p class="my-6 text-center text-sm text-latteSubtext1">Entrez un nom d'utilisateur local. Celui-ci va être utilisé en interne pour stocker vos données.</p>
 
-      await endpoints.upsert<ApiUserData>(
-        slug, "/user/data", data.endpoints["/user/data"]
-      );
+          <form onSubmit={processSaveIntoSlug} class="flex flex-col gap-4 px-2">
+            <Input.Text
+              value={slug()}
+              placeholder="Slug pour ce compte"
+              onInput={value => {
+                setSlug(
+                  value
+                    .toLowerCase()
+                    // Clean-up the value to make sure it's a slug.
+                    .replace(/[^a-z0-9-]+/g, "-")
+                );
+              }}
+            />
 
-      await endpoints.upsert<ApiLoginInformations>(
-        slug, "/login/informations", data.endpoints["/login/informations"]
-      );
-
-      await credentials_store.upsert(slug, data.credentials);
-
-      return true;
-    }
-    catch {
-      return false;
-    }
-  };
-
-  const [showSlugModal] = createModal(() => (
-    <SaveSessionIntoSlugModalContent
-      slugModalData={slugModalData()}
-      onSubmit={handleSaveIntoSlugModalSubmit}
-    />
+            <button
+              type="submit"
+              disabled={loading() || slug().length === 0}
+              class="mt-2 w-full rounded-md bg-latte-rosewater bg-opacity-100 p-2 text-latte-base outline-none transition-colors disabled:(bg-latte-text bg-opacity-5 text-latte-text text-opacity-80 focus:bg-opacity-10 hover:bg-opacity-10) focus:bg-opacity-90 hover:bg-opacity-90"
+            >
+              {loading() ? "Sauvegarde..." : "Sauvegarder la session"}
+            </button>
+          </form>
+        </>
+      )}
+    </Show>
   ));
 
   const [loading, setLoading] = createSignal(false);
@@ -120,6 +136,39 @@ export const AuthenticateSessionModalContent: Component<Props> = (props) => {
     catch (err) {
       setLoading(false);
       console.error(err);
+    }
+  };
+
+  const processSaveIntoSlug: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
+    event.preventDefault();
+
+    const data = slugModalData();
+    if (slug().length === 0 || data === null) return false;
+
+    try {
+      setLoading(true);
+
+      await sessions.upsert(
+        slug(), data.session
+      );
+
+      await endpoints.upsert<ApiUserData>(
+        slug(), "/user/data", data.endpoints["/user/data"]
+      );
+
+      await endpoints.upsert<ApiLoginInformations>(
+        slug(), "/login/informations", data.endpoints["/login/informations"]
+      );
+
+      await credentials_store.upsert(slug(), data.credentials);
+
+      navigate("/app");
+    }
+    catch (err) {
+      console.error(err);
+    }
+    finally {
+      setLoading(false);
     }
   };
 

@@ -65,7 +65,7 @@ export default function Root (): JSX.Element {
 
           <Suspense fallback={
             <div class="bg-brand-primary dark:bg-brand-dark h-screen w-screen flex flex-col items-center justify-center gap-2">
-              <h2 class="bg-brand-white text-md text-brand-primary dark:text-brand-white dark:bg-brand-primary rounded-full px-6 py-2 font-medium">{t("PAGES._.LOADING")}</h2>
+              <h2 class="bg-brand-white text-brand-primary dark:text-brand-white dark:bg-brand-primary text-md rounded-full px-6 py-2 font-medium">{t("PAGES._.LOADING")}</h2>
               <span class="dark:text-brand-white text-brand-light text-sm font-medium dark:text-opacity-60">{version()}</span>
             </div>
           }>
