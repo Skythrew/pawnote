@@ -26,9 +26,7 @@ export const SaveSessionIntoSlugModalContent: Component<Props> = (props) => {
 
     batch(() => {
       setLoading(false);
-      // app.setCurrentState({ restoring_session: false });
-
-      navigate(`/app/session/${slug()}`);
+      navigate("/app");
     });
   };
 
