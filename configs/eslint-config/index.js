@@ -1,7 +1,14 @@
 // @ts-check
 // eslint-disable-next-line no-undef
 module.exports = /** @type {import('@typescript-eslint/utils').TSESLint.Linter.Config} */ ({
-  extends: "standard-with-typescript",
+  parser: "@typescript-eslint/parser",
+  plugins: [
+    "@typescript-eslint"
+  ],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   rules: {
     "brace-style": [
       "error", "stroustrup"
@@ -16,13 +23,6 @@ module.exports = /** @type {import('@typescript-eslint/utils').TSESLint.Linter.C
       "error", "always"
     ],
 
-    "n/no-callback-literal": "off",
-    "@typescript-eslint/semi": "off",
-    "@typescript-eslint/quotes": "off",
-    "@typescript-eslint/indent": "off",
-    "@typescript-eslint/brace-style": "off",
-    "@typescript-eslint/naming-convention": "off",
-    "@typescript-eslint/no-misused-promises": "off",
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "n/no-callback-literal": "off"
   }
 });
