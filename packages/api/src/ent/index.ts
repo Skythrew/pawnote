@@ -1,5 +1,5 @@
 import { ApiResponseErrorCode, HandlerResponseError } from "@/utils/handlers/errors";
-import { AvailableENT, MethodsENT } from "./types";
+import { AvailableENT, MethodsENT } from "@/ent/types";
 import { OpenENT } from "@/ent/openent";
 
 const available_ents: AvailableENT[] = [
